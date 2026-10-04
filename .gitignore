@@ -1,0 +1,10 @@
+# secrets & runtime
+backend/.env
+backend/storage/logs/*
+backend/storage/exports/*
+!backend/storage/**/.gitkeep
+backend/vendor/
+# mobile adalah repo git terpisah (project_s3)
+mobile/
+# arsip hasil rapikan-struktur
+_arsip/
