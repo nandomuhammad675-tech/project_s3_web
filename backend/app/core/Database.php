@@ -28,4 +28,24 @@ final class Database
         }
         return self::$pdo;
     }
+
+    /**
+     * Jalankan $fn dalam satu transaksi: semua berhasil (commit) atau semua dibatalkan (rollback).
+     * Exception dilempar ulang agar tetap diproses ErrorHandler.
+     */
+    public static function transaksi(callable $fn): mixed
+    {
+        $pdo = self::connection();
+        $pdo->beginTransaction();
+        try {
+            $hasil = $fn($pdo);
+            $pdo->commit();
+            return $hasil;
+        } catch (\Throwable $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            throw $e;
+        }
+    }
 }
