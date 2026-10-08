@@ -1,0 +1,3 @@
+# Backend berada di dalam htdocs: blokir akses web ke semua isi folder ini
+# (app/, config/, vendor/, storage/, .env, composer.json). Hanya public/ yang dibuka.
+Require all denied
