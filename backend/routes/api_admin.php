@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 use App\Controllers\Admin\AkunController;
+use App\Controllers\Admin\DasborController;
 use App\Controllers\Admin\GuruController;
 use App\Controllers\Admin\HariLiburController;
 use App\Controllers\Admin\KelasController;
@@ -71,5 +72,9 @@ return static function (Router $r): void {
     $r->put('/api/admin/riwayat-kelas/{id}',     [RiwayatKelasController::class, 'update'],  $admin);
     $r->delete('/api/admin/riwayat-kelas/{id}',  [RiwayatKelasController::class, 'destroy'], $admin);
 
-    // Rencana langkah 5/6: kenaikan-kelas, laporan, konten website, pengaturan, dasbor absensi
+    // Dasbor status absensi seluruh kelas (read-only)
+    $r->get('/api/admin/dasbor/absensi', [DasborController::class, 'absensi'], $admin);
+
+    // Rencana langkah 5: kenaikan-kelas (+ log)
+    // Rencana langkah 6: akademik (read-only absensi/nilai/disiplin), laporan, konten website, pengaturan
 };

@@ -67,6 +67,26 @@ final class HariLiburRepository
         $st->execute([$id]);
     }
 
+    /**
+     * Apakah $tanggal hari libur untuk kelas ini? Libur tanpa baris target berlaku untuk SEMUA kelas;
+     * libur dengan target hanya berlaku untuk kelas yang tercantum (FR-LIBUR-02).
+     * Hari Minggu TIDAK dicatat di sini (non-efektif otomatis, dicek terpisah di service).
+     * @return array{id_libur:int, keterangan:?string}|null
+     */
+    public function liburUntukKelas(string $tanggal, int $idKelas): ?array
+    {
+        $st = $this->db->prepare(
+            'SELECT h.id_libur, h.keterangan FROM hari_libur h
+             WHERE h.tanggal_libur = ?
+               AND (NOT EXISTS (SELECT 1 FROM libur_target_kelas t WHERE t.id_libur = h.id_libur)
+                    OR EXISTS (SELECT 1 FROM libur_target_kelas t WHERE t.id_libur = h.id_libur AND t.id_kelas = ?))
+             LIMIT 1'
+        );
+        $st->execute([$tanggal, $idKelas]);
+        $r = $st->fetch();
+        return $r === false ? null : ['id_libur' => (int) $r['id_libur'], 'keterangan' => $r['keterangan']];
+    }
+
     private function filter(?string $dari, ?string $sampai): array
     {
         $w = [];

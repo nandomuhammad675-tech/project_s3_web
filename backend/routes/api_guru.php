@@ -1,7 +1,11 @@
 <?php
 declare(strict_types=1);
 
+use App\Controllers\Guru\AbsensiController;
+use App\Controllers\Guru\DasborController;
+use App\Controllers\Guru\DisiplinController;
 use App\Controllers\Guru\JadwalController;
+use App\Controllers\Guru\NilaiController;
 use App\Controllers\Guru\PiketController;
 use App\Controllers\Guru\ProfileController;
 use App\Controllers\Guru\SiswaController;
@@ -11,7 +15,7 @@ use App\Middleware\GuruMiddleware;
 
 return static function (Router $r): void {
     // Role guru + wajib punya kelas pada tahun ajaran aktif (kelas dari database, bukan dari klien).
-    // Admin ditolak 403 di semua rute ini (AC-08).
+    // Admin ditolak 403 di semua rute ini; Admin hanya membaca data akademik (rute read-only menyusul).
     $guru = [[AuthMiddleware::class, 'guru'], GuruMiddleware::class];
     // Khusus /me: tetap 200 dengan kelas = null bila belum menjadi wali.
     $guruOpsional = [[AuthMiddleware::class, 'guru'], [GuruMiddleware::class, 'opsional']];
@@ -33,6 +37,24 @@ return static function (Router $r): void {
     $r->put('/api/guru/piket/{id}',     [PiketController::class, 'update'],  $guru);
     $r->delete('/api/guru/piket/{id}',  [PiketController::class, 'destroy'], $guru);
 
-    // Rencana langkah 4b: absensi, dasbor/absensi, nilai, disiplin
+    // Absensi harian (tanpa DELETE) dan dasbor status absensi
+    $r->get('/api/guru/absensi',         [AbsensiController::class, 'index'],  $guru);
+    $r->post('/api/guru/absensi',        [AbsensiController::class, 'store'],  $guru);
+    $r->put('/api/guru/absensi/{id}',    [AbsensiController::class, 'update'], $guru);
+    $r->get('/api/guru/dasbor/absensi',  [DasborController::class, 'absensi'], $guru);
+
+    // Nilai: DELETE hanya untuk UH (ditegakkan di service)
+    $r->get('/api/guru/nilai',          [NilaiController::class, 'index'],   $guru);
+    $r->post('/api/guru/nilai',         [NilaiController::class, 'store'],   $guru);
+    $r->get('/api/guru/nilai/{id}',     [NilaiController::class, 'show'],    $guru);
+    $r->put('/api/guru/nilai/{id}',     [NilaiController::class, 'update'],  $guru);
+    $r->delete('/api/guru/nilai/{id}',  [NilaiController::class, 'destroy'], $guru);
+
+    // Kedisiplinan: sengaja TANPA rute DELETE (=> 405)
+    $r->get('/api/guru/disiplin',        [DisiplinController::class, 'index'],  $guru);
+    $r->post('/api/guru/disiplin',       [DisiplinController::class, 'store'],  $guru);
+    $r->get('/api/guru/disiplin/{id}',   [DisiplinController::class, 'show'],   $guru);
+    $r->put('/api/guru/disiplin/{id}',   [DisiplinController::class, 'update'], $guru);
+
     // Rencana langkah 6: laporan
 };
