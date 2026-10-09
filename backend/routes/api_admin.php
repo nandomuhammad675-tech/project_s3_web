@@ -6,6 +6,7 @@ use App\Controllers\Admin\DasborController;
 use App\Controllers\Admin\GuruController;
 use App\Controllers\Admin\HariLiburController;
 use App\Controllers\Admin\KelasController;
+use App\Controllers\Admin\KenaikanKelasController;
 use App\Controllers\Admin\MapelController;
 use App\Controllers\Admin\RiwayatKelasController;
 use App\Controllers\Admin\SiswaController;
@@ -29,6 +30,10 @@ return static function (Router $r): void {
     $r->put('/api/admin/tahun-ajaran/{id}',            [TahunAjaranController::class, 'update'],   $admin);
     $r->delete('/api/admin/tahun-ajaran/{id}',         [TahunAjaranController::class, 'destroy'],  $admin);
     $r->put('/api/admin/tahun-ajaran/{id}/aktifkan',   [TahunAjaranController::class, 'aktifkan'], $admin);
+
+    // Kenaikan kelas (satu transaksi) dan log hasilnya. Tidak ada rute ubah/hapus: koreksi oleh pengembang (BR-37).
+    $r->post('/api/admin/kenaikan-kelas',      [KenaikanKelasController::class, 'store'], $admin);
+    $r->get('/api/admin/kenaikan-kelas/log',   [KenaikanKelasController::class, 'log'],   $admin);
 
     // Mata pelajaran
     $r->get('/api/admin/mapel',          [MapelController::class, 'index'],   $admin);
@@ -75,6 +80,5 @@ return static function (Router $r): void {
     // Dasbor status absensi seluruh kelas (read-only)
     $r->get('/api/admin/dasbor/absensi', [DasborController::class, 'absensi'], $admin);
 
-    // Rencana langkah 5: kenaikan-kelas (+ log)
     // Rencana langkah 6: akademik (read-only absensi/nilai/disiplin), laporan, konten website, pengaturan
 };
