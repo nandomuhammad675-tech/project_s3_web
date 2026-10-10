@@ -5,6 +5,7 @@ use App\Controllers\Guru\AbsensiController;
 use App\Controllers\Guru\DasborController;
 use App\Controllers\Guru\DisiplinController;
 use App\Controllers\Guru\JadwalController;
+use App\Controllers\Guru\LaporanController;
 use App\Controllers\Guru\NilaiController;
 use App\Controllers\Guru\PiketController;
 use App\Controllers\Guru\ProfileController;
@@ -56,5 +57,7 @@ return static function (Router $r): void {
     $r->get('/api/guru/disiplin/{id}',   [DisiplinController::class, 'show'],   $guru);
     $r->put('/api/guru/disiplin/{id}',   [DisiplinController::class, 'update'], $guru);
 
-    // Rencana langkah 6: laporan
+    // Laporan kelas sendiri, hanya tahun ajaran aktif (selain itu 403)
+    $r->get('/api/guru/laporan',        [LaporanController::class, 'index'], $guru);
+    $r->get('/api/guru/laporan/excel',  [LaporanController::class, 'excel'], $guru);
 };

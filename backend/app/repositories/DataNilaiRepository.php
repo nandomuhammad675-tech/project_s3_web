@@ -93,6 +93,31 @@ final class DataNilaiRepository
         return $st->fetchColumn() !== false;
     }
 
+    /**
+     * Nilai satu siswa pada tahun ajaran tertentu, untuk Wali (read-only). Hanya kolom yang perlu tampil.
+     * @return array<int, array{id_mapel:int, nama_mapel:string, semester:string, jenis:string, nomor_uh:?int, nilai:int}>
+     */
+    public function untukSiswa(int $idSiswa, int $idTahun, ?string $semester): array
+    {
+        $sql = 'SELECT n.id_mapel, m.nama_mapel, n.semester, n.jenis_penilaian AS jenis, n.nomor_uh, n.nilai_angka AS nilai
+                FROM data_nilai n JOIN mata_pelajaran m ON m.id_mapel = n.id_mapel
+                WHERE n.id_siswa = ? AND n.id_tahun_ajaran = ?';
+        $p = [$idSiswa, $idTahun];
+        if ($semester !== null) {
+            $sql .= ' AND n.semester = ?';
+            $p[] = $semester;
+        }
+        $st = $this->db->prepare($sql . " ORDER BY m.nama_mapel, n.id_mapel, FIELD(n.semester, 'ganjil', 'genap'),
+                FIELD(n.jenis_penilaian, 'UH', 'ASTS', 'ASAS'), n.nomor_uh");
+        $st->execute($p);
+        return array_map(function (array $r): array {
+            $r['id_mapel'] = (int) $r['id_mapel'];
+            $r['nilai']    = (int) $r['nilai'];
+            $r['nomor_uh'] = $r['nomor_uh'] === null ? null : (int) $r['nomor_uh'];
+            return $r;
+        }, $st->fetchAll());
+    }
+
     private function filter(int $idKelas, int $idTahun, array $f): array
     {
         $w = ['n.id_kelas = ?', 'n.id_tahun_ajaran = ?'];

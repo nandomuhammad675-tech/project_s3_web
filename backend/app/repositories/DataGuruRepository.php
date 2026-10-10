@@ -124,6 +124,16 @@ final class DataGuruRepository
         ];
     }
 
+    /** Profil publik (FR-WEB-01): hanya nama, NIP, jabatan, foto; tanpa email/telepon. Hanya Guru berakun aktif. */
+    public function publik(): array
+    {
+        return $this->db->query(
+            "SELECT g.nama_guru, g.nip, g.jabatan, g.foto_profil
+             FROM data_guru g JOIN akun_pengguna a ON a.id_user = g.id_user AND a.status_akun = 'aktif'
+             ORDER BY g.nama_guru, g.id_guru"
+        )->fetchAll();
+    }
+
     private function filter(?string $q): array
     {
         if ($q === null || $q === '') {
