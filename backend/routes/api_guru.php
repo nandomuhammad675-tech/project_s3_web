@@ -6,6 +6,7 @@ use App\Controllers\Guru\DasborController;
 use App\Controllers\Guru\DisiplinController;
 use App\Controllers\Guru\JadwalController;
 use App\Controllers\Guru\LaporanController;
+use App\Controllers\Guru\MapelController;
 use App\Controllers\Guru\NilaiController;
 use App\Controllers\Guru\PiketController;
 use App\Controllers\Guru\ProfileController;
@@ -16,13 +17,16 @@ use App\Middleware\GuruMiddleware;
 
 return static function (Router $r): void {
     // Role guru + wajib punya kelas pada tahun ajaran aktif (kelas dari database, bukan dari klien).
-    // Admin ditolak 403 di semua rute ini; Admin hanya membaca data akademik (rute read-only menyusul).
+    // Admin ditolak 403 di semua rute ini; Admin membaca data akademik lewat /api/admin/akademik/*.
     $guru = [[AuthMiddleware::class, 'guru'], GuruMiddleware::class];
     // Khusus /me: tetap 200 dengan kelas = null bila belum menjadi wali.
     $guruOpsional = [[AuthMiddleware::class, 'guru'], [GuruMiddleware::class, 'opsional']];
 
     $r->get('/api/guru/me',     [ProfileController::class, 'me'],     $guruOpsional);
     $r->get('/api/guru/siswa',  [SiswaController::class, 'index'],    $guru);
+
+    // Daftar mata pelajaran (read-only) untuk pilihan di form Jadwal dan Nilai
+    $r->get('/api/guru/mapel',  [MapelController::class, 'index'], $guru);
 
     // Jadwal pelajaran kelas sendiri
     $r->get('/api/guru/jadwal',          [JadwalController::class, 'index'],   $guru);

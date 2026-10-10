@@ -1,5 +1,6 @@
 # secrets & runtime
 backend/.env
+backend/storage/ratelimit/*
 backend/storage/logs/*
 backend/storage/exports/*
 !backend/storage/**/.gitkeep
@@ -8,3 +9,7 @@ backend/vendor/
 mobile/
 # arsip hasil rapikan-struktur
 _arsip/
+# gambar unggahan Admin (jangan di-commit; .htaccess penjaga folder tetap ikut)
+backend/public/uploads/*
+!backend/public/uploads/.htaccess
+!backend/public/uploads/.gitkeep
