@@ -189,7 +189,7 @@ CREATE TABLE `tahun_ajaran` (
   `nama_tahun` varchar(9) NOT NULL COMMENT 'contoh: 2026/2027',
   `semester_aktif` enum('ganjil','genap') NOT NULL DEFAULT 'ganjil',
   `status_aktif` tinyint(1) NOT NULL DEFAULT 0,
-  `aktif_flag` tinyint(1) GENERATED ALWAYS AS (IF(`status_aktif` = 1, 1, NULL)) VIRTUAL,
+  `aktif_flag` tinyint(1) GENERATED ALWAYS AS (IF(`status_aktif` = 1, 1, NULL)) STORED,
   PRIMARY KEY (`id_tahun_ajaran`),
   UNIQUE KEY `uq_nama_tahun` (`nama_tahun`),
   UNIQUE KEY `uq_tahun_aktif_tunggal` (`aktif_flag`)
@@ -419,7 +419,7 @@ CREATE TABLE `data_nilai` (
   `id_guru` int(10) UNSIGNED NOT NULL,
   `jenis_penilaian` enum('UH','ASTS','ASAS') NOT NULL,
   `nomor_uh` tinyint(3) UNSIGNED DEFAULT NULL,
-  `nomor_uh_kunci` tinyint(3) UNSIGNED GENERATED ALWAYS AS (IFNULL(`nomor_uh`, 0)) VIRTUAL,
+  `nomor_uh_kunci` tinyint(3) UNSIGNED GENERATED ALWAYS AS (IFNULL(`nomor_uh`, 0)) STORED,
   `nilai_angka` tinyint(3) UNSIGNED NOT NULL,
   `dibuat_pada` timestamp NOT NULL DEFAULT current_timestamp(),
   `diubah_pada` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),

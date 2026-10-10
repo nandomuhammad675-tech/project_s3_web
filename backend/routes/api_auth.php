@@ -10,6 +10,6 @@ return static function (Router $r): void {
     $r->post('/api/auth/logout',   [AuthController::class, 'logout'],         [AuthMiddleware::class]);
     $r->put('/api/auth/password',  [AuthController::class, 'changePassword'], [AuthMiddleware::class]);
 
-    // SEMENTARA (uji middleware); hapus di langkah 4
+    // Utilitas: identitas akun dari token (klien memakainya untuk memeriksa sesi; dipakai juga oleh uji otomatis)
     $r->get('/api/auth/me',        [AuthController::class, 'me'],             [AuthMiddleware::class]);
 };
