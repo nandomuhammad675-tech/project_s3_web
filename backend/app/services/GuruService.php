@@ -29,6 +29,12 @@ final class GuruService
         return Pagination::hasil($this->repo->daftar($q, $p['limit'], $p['offset']), $this->repo->total($q), $p);
     }
 
+    /** Untuk GET /api/public/guru. */
+    public function publik(): array
+    {
+        return $this->repo->publik();
+    }
+
     public function detail(int $id): array
     {
         return ($this->repo->cari($id) ?? throw HttpException::notFound('Guru tidak ditemukan.'))->toArray();

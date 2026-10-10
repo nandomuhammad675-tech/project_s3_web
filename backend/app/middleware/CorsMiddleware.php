@@ -22,6 +22,7 @@ final class CorsMiddleware
                 header('Access-Control-Allow-Methods: ' . $cfg['allowed_methods']);
                 header('Access-Control-Allow-Headers: ' . $cfg['allowed_headers']);
                 header('Access-Control-Max-Age: ' . $cfg['max_age']);
+                header('Access-Control-Expose-Headers: Content-Disposition');   // agar nama berkas unduhan terbaca klien
             }
         }
 

@@ -84,4 +84,29 @@ final class AbsensiSiswaRepository
         $st = $this->db->prepare('UPDATE absensi_siswa SET status_kehadiran = ? WHERE id_absensi = ?');
         $st->execute([$status, $id]);
     }
+
+    /**
+     * Absensi satu siswa untuk Wali (read-only), tahun ajaran tertentu. Filter opsional: semester dan/atau bulan.
+     * @param ?string $bulan "YYYY-MM"
+     * @return array<int, array{tanggal:string, status:string, semester:string}>
+     */
+    public function untukSiswa(int $idSiswa, int $idTahun, ?string $semester, ?string $bulan): array
+    {
+        $sql = 'SELECT tanggal_absen AS tanggal, status_kehadiran AS status, semester FROM absensi_siswa
+                WHERE id_siswa = ? AND id_tahun_ajaran = ?';
+        $p = [$idSiswa, $idTahun];
+        if ($semester !== null) {
+            $sql .= ' AND semester = ?';
+            $p[] = $semester;
+        }
+        if ($bulan !== null) {
+            $awal = new \DateTimeImmutable($bulan . '-01');
+            $sql .= ' AND tanggal_absen >= ? AND tanggal_absen < ?';
+            $p[] = $awal->format('Y-m-d');
+            $p[] = $awal->modify('first day of next month')->format('Y-m-d');
+        }
+        $st = $this->db->prepare($sql . ' ORDER BY tanggal_absen');
+        $st->execute($p);
+        return $st->fetchAll();
+    }
 }

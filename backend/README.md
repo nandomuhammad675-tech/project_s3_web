@@ -13,3 +13,10 @@
 
 ## Keamanan folder
 `backend/.htaccess` menolak akses web ke seluruh backend kecuali `public/`.
+
+## Langkah 6a: Wali, publik, konten website
+- Data awal: `php database/seeds/data_awal.php` (enam program pembiasaan; aman diulang).
+- Unggah gambar: `POST /api/admin/upload` (multipart, field `file`; JPG/PNG/WEBP, maks 2 MB) -> `{"path":"uploads/<acak>.png"}`.
+  Path itu dipakai pada kolom gambar (banner, ikon, file_gambar). URL gambar = `<alamat API>/<path>`.
+  File tersimpan di `public/uploads/` (diabaikan git). Menghapus konten TIDAK menghapus berkasnya (lihat catatan pembersihan).
+- Uji: `bash tests/smoke_langkah6a.sh`

@@ -156,6 +156,23 @@ final class Validasi
         return array_values(array_unique($hasil));
     }
 
+    /** Boolean (true/false/1/0). Tidak dikirim atau null => $default. */
+    public function bool(string $k, string $label, ?bool $default = null): ?bool
+    {
+        $v = $this->in[$k] ?? null;
+        if ($v === null) {
+            return $default;
+        }
+        if (is_bool($v)) {
+            return $v;
+        }
+        if ($v === 1 || $v === 0 || $v === '1' || $v === '0') {
+            return (bool) (int) $v;
+        }
+        $this->err[$k] = $label . ' harus berupa true atau false.';
+        return $default;
+    }
+
     public function selesai(): void
     {
         if ($this->err) {

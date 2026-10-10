@@ -1,7 +1,17 @@
 <?php
 declare(strict_types=1);
 
+use App\Controllers\Admin\AkademikController;
 use App\Controllers\Admin\AkunController;
+use App\Controllers\Admin\LaporanController;
+use App\Controllers\Admin\EkstrakurikulerController;
+use App\Controllers\Admin\EventController;
+use App\Controllers\Admin\GaleriController;
+use App\Controllers\Admin\GuruEkskulController;
+use App\Controllers\Admin\MadingController;
+use App\Controllers\Admin\PengaturanController;
+use App\Controllers\Admin\ProgramPembiasaanController;
+use App\Controllers\Admin\UploadController;
 use App\Controllers\Admin\DasborController;
 use App\Controllers\Admin\GuruController;
 use App\Controllers\Admin\HariLiburController;
@@ -80,5 +90,56 @@ return static function (Router $r): void {
     // Dasbor status absensi seluruh kelas (read-only)
     $r->get('/api/admin/dasbor/absensi', [DasborController::class, 'absensi'], $admin);
 
-    // Rencana langkah 6: akademik (read-only absensi/nilai/disiplin), laporan, konten website, pengaturan
+    // --- Langkah 6a: konten website ---
+    // Unggah gambar (multipart, field "file") -> path untuk banner/ikon/file_gambar/foto_profil
+    $r->post('/api/admin/upload', [UploadController::class, 'store'], $admin);
+
+    // Ekstrakurikuler (+ relasi Guru-ekskul)
+    $r->get('/api/admin/ekstrakurikuler',          [EkstrakurikulerController::class, 'index'],   $admin);
+    $r->post('/api/admin/ekstrakurikuler',         [EkstrakurikulerController::class, 'store'],   $admin);
+    $r->get('/api/admin/ekstrakurikuler/{id}',     [EkstrakurikulerController::class, 'show'],    $admin);
+    $r->put('/api/admin/ekstrakurikuler/{id}',     [EkstrakurikulerController::class, 'update'],  $admin);
+    $r->delete('/api/admin/ekstrakurikuler/{id}',  [EkstrakurikulerController::class, 'destroy'], $admin);
+
+    $r->get('/api/admin/guru-ekskul',          [GuruEkskulController::class, 'index'],   $admin);
+    $r->post('/api/admin/guru-ekskul',         [GuruEkskulController::class, 'store'],   $admin);
+    $r->delete('/api/admin/guru-ekskul/{id}',  [GuruEkskulController::class, 'destroy'], $admin);
+
+    // Kegiatan/event/prestasi/kolaborasi, galeri, mading
+    $r->get('/api/admin/event',          [EventController::class, 'index'],   $admin);
+    $r->post('/api/admin/event',         [EventController::class, 'store'],   $admin);
+    $r->get('/api/admin/event/{id}',     [EventController::class, 'show'],    $admin);
+    $r->put('/api/admin/event/{id}',     [EventController::class, 'update'],  $admin);
+    $r->delete('/api/admin/event/{id}',  [EventController::class, 'destroy'], $admin);
+
+    $r->get('/api/admin/galeri',          [GaleriController::class, 'index'],   $admin);
+    $r->post('/api/admin/galeri',         [GaleriController::class, 'store'],   $admin);
+    $r->get('/api/admin/galeri/{id}',     [GaleriController::class, 'show'],    $admin);
+    $r->put('/api/admin/galeri/{id}',     [GaleriController::class, 'update'],  $admin);
+    $r->delete('/api/admin/galeri/{id}',  [GaleriController::class, 'destroy'], $admin);
+
+    $r->get('/api/admin/mading',          [MadingController::class, 'index'],   $admin);
+    $r->post('/api/admin/mading',         [MadingController::class, 'store'],   $admin);
+    $r->get('/api/admin/mading/{id}',     [MadingController::class, 'show'],    $admin);
+    $r->put('/api/admin/mading/{id}',     [MadingController::class, 'update'],  $admin);
+    $r->delete('/api/admin/mading/{id}',  [MadingController::class, 'destroy'], $admin);
+
+    // Enam program pembiasaan: hanya GET dan PUT
+    $r->get('/api/admin/program-pembiasaan',       [ProgramPembiasaanController::class, 'index'],  $admin);
+    $r->get('/api/admin/program-pembiasaan/{id}',  [ProgramPembiasaanController::class, 'show'],   $admin);
+    $r->put('/api/admin/program-pembiasaan/{id}',  [ProgramPembiasaanController::class, 'update'], $admin);
+
+    // URL Google Form PPDB dan video profil
+    $r->get('/api/admin/pengaturan',  [PengaturanController::class, 'show'],   $admin);
+    $r->put('/api/admin/pengaturan',  [PengaturanController::class, 'update'], $admin);
+
+    // --- Langkah 6b ---
+    // Data akademik Guru: HANYA GET (read-only); tidak ada rute tulis
+    $r->get('/api/admin/akademik/absensi',   [AkademikController::class, 'absensi'],  $admin);
+    $r->get('/api/admin/akademik/nilai',     [AkademikController::class, 'nilai'],    $admin);
+    $r->get('/api/admin/akademik/disiplin',  [AkademikController::class, 'disiplin'], $admin);
+
+    // Laporan semester: preview JSON dan unduhan Excel (seluruh tahun ajaran)
+    $r->get('/api/admin/laporan',        [LaporanController::class, 'index'], $admin);
+    $r->get('/api/admin/laporan/excel',  [LaporanController::class, 'excel'], $admin);
 };
