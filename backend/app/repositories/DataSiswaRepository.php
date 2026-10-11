@@ -65,11 +65,13 @@ final class DataSiswaRepository
         $st = $this->db->prepare(
             'SELECT s.nama_siswa, s.nisn_resmi AS nisn,
                     k.nama_kelas, k.tingkat_kelas, r.nomor_absen,
-                    t.nama_tahun AS tahun_ajaran, t.semester_aktif AS semester
+                    t.nama_tahun AS tahun_ajaran, t.semester_aktif AS semester,
+                    g.nama_guru AS nama_wali_kelas
              FROM data_siswa s
              JOIN riwayat_kelas r ON r.id_siswa = s.id_siswa
              JOIN tahun_ajaran t  ON t.id_tahun_ajaran = r.id_tahun_ajaran AND t.status_aktif = 1
              JOIN kelas k         ON k.id_kelas = r.id_kelas
+             LEFT JOIN data_guru g ON g.id_guru = k.id_guru_wali
              WHERE s.id_siswa = ? AND s.status_siswa = \'aktif\' LIMIT 1'
         );
         $st->execute([$idSiswa]);

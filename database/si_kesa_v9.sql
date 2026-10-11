@@ -16,7 +16,7 @@
 --             tidak memblokir proses kenaikan kelas (service).
 --  [FIX] log_promosi_siswa: id_tahun_asal dan id_kelas_asal menjadi NULLABLE;
 --        hasil_proses ditambah 'masuk' (siswa baru/pindahan yang ditempatkan
---        saat proses kenaikan kelas, tanpa asal). CHECK diperluas:
+--        saat proses kenaikan kelas, tanpa asal). CHECK diperlASAS:
 --          naik  -> asal (tahun+kelas) terisi, tujuan terisi
 --          lulus -> asal (tahun+kelas) terisi, tujuan NULL
 --          masuk -> asal (tahun+kelas) NULL,   tujuan terisi

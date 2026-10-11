@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 use App\Controllers\Wali\AbsensiController;
 use App\Controllers\Wali\AuthController;
+use App\Controllers\Wali\DisiplinController;
 use App\Controllers\Wali\NilaiController;
 use App\Controllers\Wali\SiswaController;
 use App\Core\Router;
@@ -15,4 +16,6 @@ return static function (Router $r): void {
     // Read-only; scope dari token (id_siswa), tahun ajaran aktif
     $r->get('/api/wali/nilai',    [NilaiController::class, 'index'],    [WaliMiddleware::class]);
     $r->get('/api/wali/absensi',  [AbsensiController::class, 'index'],  [WaliMiddleware::class]);
+    // Catatan kedisiplinan anak (read-only, tahun ajaran aktif; FR-DIS-06)
+    $r->get('/api/wali/disiplin', [DisiplinController::class, 'index'], [WaliMiddleware::class]);
 };
