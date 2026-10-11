@@ -5,6 +5,7 @@ namespace App\Services;
 
 use App\Core\HttpException;
 use App\Repositories\AbsensiSiswaRepository;
+use App\Repositories\CatatanKedisiplinanRepository;
 use App\Repositories\DataNilaiRepository;
 use App\Repositories\TahunAjaranRepository;
 
@@ -55,6 +56,18 @@ final class WaliService
         }
 
         return ['tahun_ajaran' => $tahun->namaTahun, 'semester_aktif' => $tahun->semesterAktif, 'rekap' => $rekap, 'items' => $items];
+    }
+
+    /**
+     * Catatan kedisiplinan anak (read-only, tahun ajaran aktif, terbaru di atas). Filter opsional: bulan (YYYY-MM).
+     * @return array{tahun_ajaran:string, total:int, items:array}
+     */
+    public function disiplin(int $idSiswa, ?string $bulan): array
+    {
+        $tahun = $this->tahunAktif();
+        $items = (new CatatanKedisiplinanRepository())->untukSiswa($idSiswa, $tahun->idTahunAjaran, $bulan);
+
+        return ['tahun_ajaran' => $tahun->namaTahun, 'total' => count($items), 'items' => $items];
     }
 
     private function tahunAktif(): \App\Models\TahunAjaran

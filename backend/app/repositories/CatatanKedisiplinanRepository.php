@@ -56,6 +56,27 @@ final class CatatanKedisiplinanRepository
         return $r === false ? null : $this->rapikan($r);
     }
 
+    /**
+     * Untuk Wali Murid (read-only): catatan siswa pada token di tahun ajaran aktif, terbaru di atas.
+     * Hanya tanggal, jenis_pelanggaran, dan catatan; TANPA id_guru/nama Guru/id_kelas (FR-DIS-06).
+     * $bulan opsional berformat YYYY-MM (sudah divalidasi controller).
+     * @return array<int, array{tanggal:string, jenis_pelanggaran:string, catatan:string}>
+     */
+    public function untukSiswa(int $idSiswa, int $idTahun, ?string $bulan): array
+    {
+        $sql = 'SELECT tanggal, jenis_pelanggaran, catatan FROM catatan_kedisiplinan WHERE id_siswa = ? AND id_tahun_ajaran = ?';
+        $p   = [$idSiswa, $idTahun];
+        if ($bulan !== null) {
+            $awal = new \DateTimeImmutable($bulan . '-01');
+            $sql .= ' AND tanggal >= ? AND tanggal < ?';
+            $p[] = $awal->format('Y-m-d');
+            $p[] = $awal->modify('first day of next month')->format('Y-m-d');
+        }
+        $st = $this->db->prepare($sql . ' ORDER BY tanggal DESC, id_catatan DESC');
+        $st->execute($p);
+        return $st->fetchAll();
+    }
+
     public function buat(int $idKelas, int $idTahun, int $idGuru, array $d): int
     {
         $st = $this->db->prepare(
