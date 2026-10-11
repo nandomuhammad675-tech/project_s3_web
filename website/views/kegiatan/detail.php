@@ -1,0 +1,375 @@
+<?php
+/**
+ * Halaman Detail Berita - SD Negeri Kedungsari 1
+ * SATU FILE. Letakkan di: website/views/kegiatan/detail.php
+ * Dibuka lewat: ?page=kegiatan&slug=<slug-berita>
+ * (index.php meneruskan ke file ini jika ada parameter "slug")
+ */
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
+// ===== Fungsi bantu (dilewati jika sudah ada) =====
+if (!function_exists('base_url')) {
+    function base_url(string $path = ''): string {
+        static $base = null;
+        if ($base === null) {
+            $base = '';
+            $root = rtrim(str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT'] ?? '') ?: ''), '/');
+            foreach ([__DIR__ . '/../../public', __DIR__ . '/public', __DIR__, __DIR__ . '/..'] as $dir) {
+                $assets = realpath($dir . '/assets');
+                if ($assets) {
+                    $pub = str_replace('\\', '/', dirname($assets));
+                    if ($root !== '' && stripos($pub, $root) === 0) {
+                        $base = substr($pub, strlen($root)) . '/';
+                        break;
+                    }
+                }
+            }
+            if ($base === '') {
+                $base = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/') . '/';
+            }
+        }
+        return $base . ltrim($path, '/');
+    }
+}
+if (!function_exists('esc')) {
+    function esc($text): string {
+        return htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8');
+    }
+}
+if (!function_exists('page_url')) {
+    function page_url(string $key): string {
+        static $map = [
+            'home'    => '',
+            'profil'  => '?page=guru',
+            'berita'  => '?page=kegiatan',
+            'ekstra'  => '?page=ekstrakurikuler',
+            'galeri'  => '?page=galeri',
+            'kontak'  => '?page=kontak',
+            'ppdb'    => '?page=ppdb',
+        ];
+        return base_url($map[$key] ?? $key);
+    }
+}
+if (!function_exists('tanggal_id')) {
+    function tanggal_id(string $ymd): string {
+        static $bulan = [1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                         'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        $t = strtotime($ymd);
+        return date('j', $t) . ' ' . $bulan[(int) date('n', $t)] . ' ' . date('Y', $t);
+    }
+}
+if (!function_exists('detail_url')) {
+    function detail_url(string $slug): string {
+        return page_url('berita') . '&slug=' . rawurlencode($slug);
+    }
+}
+
+$current = 'berita';
+
+// ===== Ambil data & cari berita berdasarkan slug =====
+$beritaList = require __DIR__ . '/data.php';
+usort($beritaList, fn($a, $b) => strcmp($b['tanggal'], $a['tanggal']));
+
+$slug   = (string) ($_GET['slug'] ?? '');
+$berita = null;
+foreach ($beritaList as $item) {
+    if ($item['slug'] === $slug) { $berita = $item; break; }
+}
+
+if (!$berita) {
+    http_response_code(404);
+}
+
+// Paragraf isi (cadangan: ringkasan)
+$paragraf = [];
+if ($berita) {
+    $paragraf = !empty($berita['isi']) ? $berita['isi'] : [$berita['ringkas']];
+}
+
+// Berita lainnya (maksimal 2, selain yang sedang dibaca)
+$lainnya = array_slice(array_filter($beritaList, fn($b) => $b['slug'] !== $slug), 0, 2);
+
+$title = ($berita ? $berita['judul'] : 'Berita tidak ditemukan') . ' - SD Negeri Kedungsari 1';
+?>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><?= esc($title) ?></title>
+<meta name="description" content="<?= esc($berita ? mb_strimwidth($berita['ringkas'], 0, 150, '…', 'UTF-8') : 'Berita SD Negeri Kedungsari 1') ?>">
+
+<link rel="icon" href="<?= base_url('assets/bingkai.png') ?>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+/* ===== Token ===== */
+:root{
+    --green:#5b7553;
+    --green-dark:#46603f;
+    --green-soft:#a9b79a;
+    --sage:#eeecdc;
+    --cream:#f6ecdc;
+    --paper:#fbfaf4;
+    --card-blue:#eef2f8;
+    --card-grey:#dcdcdc;
+    --orange:#f08a1c;
+    --ink:#2f3a2c;
+    --muted:#6b7566;
+    --radius:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Poppins',sans-serif;color:var(--ink);background:var(--paper);line-height:1.6}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+ul{list-style:none}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+
+/* ===== Navbar ===== */
+.navbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
+    padding:10px 6vw;background:linear-gradient(90deg,#4f6b49,#5f7d57);color:#fff}
+.navbar__brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:.95rem}
+.navbar__brand img{width:42px;height:42px;object-fit:contain}
+.navbar__menu{display:flex;align-items:center;gap:26px;font-size:.9rem;font-weight:500}
+.navbar__menu a{padding:6px 2px;border-bottom:2px solid transparent;transition:border-color .2s}
+.navbar__menu a:hover,.navbar__menu a.is-active{border-color:#fff}
+.btn-ppdb{display:inline-block;background:var(--orange);color:#fff!important;padding:7px 18px!important;
+    border-radius:999px;border:0!important;font-weight:600;transition:background .2s}
+.btn-ppdb:hover{background:#d9780f}
+.navbar__toggle{display:none;background:none;border:0;cursor:pointer;flex-direction:column;gap:5px}
+.navbar__toggle span{width:24px;height:2px;background:#fff;display:block}
+
+/* ===== Section umum ===== */
+.section{position:relative;padding:72px 6vw;text-align:center;overflow:hidden}
+.section--leaf::before,.section--leaf::after{content:"";position:absolute;width:190px;height:260px;opacity:.28;pointer-events:none;
+    background:no-repeat center/contain url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140'><path d='M50 4C95 40 98 100 50 136 2 100 5 40 50 4Z' fill='%236f8a62'/><path d='M50 14V132' stroke='%23fbfaf4' stroke-width='2'/></svg>")}
+.section--leaf::before{left:-60px;top:40px;transform:rotate(-25deg)}
+.section--leaf::after{right:-60px;top:20px;transform:rotate(30deg) scaleX(-1)}
+.title{position:relative;display:inline-block;font-size:clamp(1.7rem,3.5vw,2.4rem);font-weight:700;color:var(--green);margin-bottom:34px;padding-bottom:12px}
+.title::after{content:"";position:absolute;left:50%;bottom:0;width:60%;height:3px;background:var(--green);transform:translateX(-50%);border-radius:3px}
+.title--sm{font-size:clamp(1.3rem,2.6vw,1.7rem);margin-bottom:26px}
+.title--sm::after{width:70%}
+
+/* ===== Pill / tombol ===== */
+.pill{display:inline-block;font:inherit;font-size:.85rem;font-weight:600;padding:6px 20px;border-radius:999px;cursor:pointer;
+    background:#fff;color:var(--green-dark);border:1.5px solid var(--green);transition:background .2s,color .2s}
+.pill--solid{background:var(--green);color:#fff}
+.pill:hover{background:var(--green-dark);color:#fff}
+
+/* ===== Detail berita ===== */
+.detail{position:relative;z-index:1;max-width:900px;margin:0 auto;text-align:left}
+.detail__crumb{font-size:.8rem;color:var(--muted);margin-bottom:18px}
+.detail__crumb a{color:var(--green-dark);font-weight:600}
+.detail__crumb a:hover{text-decoration:underline}
+.detail__card{background:var(--card-blue);border:3px solid var(--green);border-radius:22px;overflow:hidden;
+    box-shadow:0 8px 0 rgba(91,117,83,.35)}
+.detail__img{width:100%;aspect-ratio:16/9;object-fit:cover;background:#c9d1bf;border-bottom:3px solid var(--green)}
+.detail__body{padding:32px clamp(20px,5vw,50px) 36px}
+.detail__body h1{font-size:clamp(1.4rem,3vw,2rem);font-weight:700;line-height:1.3;color:var(--green-dark);margin-bottom:8px}
+.detail__date{display:block;font-size:.85rem;color:var(--muted);margin-bottom:22px}
+.detail__body p{font-size:.95rem;color:#1e2a4a;text-align:justify;line-height:1.7;margin-bottom:16px}
+.detail__actions{margin-top:30px;display:flex;gap:10px;flex-wrap:wrap}
+
+/* ===== Berita lainnya ===== */
+.lain{position:relative;z-index:1;max-width:900px;margin:64px auto 0;text-align:center}
+.lain__grid{display:grid;grid-template-columns:repeat(2,1fr);gap:28px;text-align:left}
+.lain-card{display:flex;flex-direction:column;background:var(--card-grey);border:3px solid var(--green);
+    border-radius:18px;overflow:hidden;box-shadow:0 6px 0 rgba(91,117,83,.35);transition:transform .2s}
+.lain-card:hover{transform:translateY(-4px)}
+.lain-card img{aspect-ratio:3/2;width:100%;object-fit:cover;background:#c9d1bf;border-bottom:3px solid var(--green)}
+.lain-card div{padding:14px 16px}
+.lain-card h3{font-size:.9rem;font-weight:700;line-height:1.35;color:#111a2e;margin-bottom:6px}
+.lain-card time{font-size:.75rem;color:var(--muted)}
+
+/* ===== Tidak ditemukan ===== */
+.kosong{position:relative;z-index:1;max-width:560px;margin:0 auto;padding:40px 20px;background:var(--card-blue);
+    border:3px solid var(--green);border-radius:22px;box-shadow:0 8px 0 rgba(91,117,83,.35)}
+.kosong p{color:var(--muted);margin-bottom:20px}
+
+/* ===== Footer ===== */
+.footer{background:linear-gradient(90deg,#4f6b49,#5f7d57);color:#fff;font-size:.8rem}
+.footer__inner{display:grid;grid-template-columns:1.3fr 1fr .8fr 1.4fr;gap:30px;padding:40px 6vw 28px}
+.footer__logo{display:flex;align-items:center;gap:10px;font-size:1rem;margin-bottom:8px}
+.footer__logo img{width:46px;height:46px;object-fit:contain}
+.footer h4{font-size:.9rem;margin-bottom:10px}
+.footer li{margin-bottom:6px;opacity:.9}
+.footer a:hover{text-decoration:underline}
+.footer__map{width:100%;height:90px;border:0;border-radius:8px;margin-top:10px}
+.footer__copy{text-align:center;padding:12px;border-top:1px solid rgba(255,255,255,.25);font-size:.72rem}
+
+/* ===== Responsif ===== */
+@media (max-width:860px){
+    .navbar__toggle{display:flex}
+    .navbar__menu{position:absolute;top:100%;left:0;right:0;flex-direction:column;align-items:flex-start;gap:0;
+        background:#4f6b49;padding:10px 6vw 18px;display:none}
+    .navbar__menu.is-open{display:flex}
+    .navbar__menu li{width:100%;padding:8px 0}
+    .footer__inner{grid-template-columns:1fr 1fr}
+}
+@media (max-width:640px){
+    .lain__grid{grid-template-columns:1fr}
+}
+@media (max-width:520px){
+    .section{padding:56px 5vw}
+    .footer__inner{grid-template-columns:1fr}
+}
+    </style>
+</head>
+<body>
+<?php
+$menuLain = [
+    'berita' => 'Berita',
+    'ekstra' => 'Ekstra',
+    'galeri' => 'Galeri',
+    'kontak' => 'Hubungi kami',
+];
+?>
+    <nav class="navbar" id="navbar">
+        <a href="<?= page_url('home') ?>" class="navbar__brand">
+            <img src="<?= base_url('assets/bingkai.png') ?>" alt="Logo SD Negeri Kedungsari 1">
+            <span>SD NEGERI KEDUNGSARI 1</span>
+        </a>
+
+        <button class="navbar__toggle" id="navToggle" aria-label="Buka menu" aria-expanded="false">
+            <span></span><span></span><span></span>
+        </button>
+
+        <ul class="navbar__menu" id="navMenu">
+            <li>
+                <a href="<?= page_url('home') ?>" class="<?= $current === 'home' ? 'is-active' : '' ?>">Home</a>
+            </li>
+
+            <li>
+                <a href="<?= page_url('profil') ?>" class="<?= $current === 'profil' ? 'is-active' : '' ?>">Profil</a>
+            </li>
+
+            <?php foreach ($menuLain as $key => $label): ?>
+                <li>
+                    <a href="<?= page_url($key) ?>" class="<?= $current === $key ? 'is-active' : '' ?>"><?= $label ?></a>
+                </li>
+            <?php endforeach; ?>
+
+            <li><a href="<?= page_url('ppdb') ?>" class="btn-ppdb">Daftar PPDB</a></li>
+        </ul>
+    </nav>
+
+<main>
+    <section class="section section--leaf" id="detail-berita">
+
+    <?php if (!$berita): ?>
+
+        <h1 class="title">Berita tidak ditemukan</h1>
+        <div class="kosong">
+            <p>Berita yang Anda cari tidak tersedia atau sudah dipindahkan.</p>
+            <a class="pill pill--solid" href="<?= page_url('berita') ?>">Kembali ke Berita &amp; Artikel</a>
+        </div>
+
+    <?php else: ?>
+
+        <div class="detail">
+            <p class="detail__crumb">
+                <a href="<?= page_url('berita') ?>">Berita &amp; Artikel</a> / Detail
+            </p>
+
+            <article class="detail__card">
+                <img class="detail__img" src="<?= base_url($berita['foto']) ?>" alt="<?= esc($berita['judul']) ?>">
+
+                <div class="detail__body">
+                    <h1><?= esc($berita['judul']) ?></h1>
+                    <time class="detail__date" datetime="<?= esc($berita['tanggal']) ?>"><?= esc(tanggal_id($berita['tanggal'])) ?></time>
+
+                    <?php foreach ($paragraf as $p): ?>
+                        <p><?= esc($p) ?></p>
+                    <?php endforeach; ?>
+
+                    <div class="detail__actions">
+                        <a class="pill" href="<?= page_url('berita') ?>">Kembali ke Berita</a>
+                    </div>
+                </div>
+            </article>
+        </div>
+
+        <?php if ($lainnya): ?>
+            <div class="lain">
+                <h2 class="title title--sm">Berita Lainnya</h2>
+                <div class="lain__grid">
+                    <?php foreach ($lainnya as $b): ?>
+                        <a class="lain-card" href="<?= esc(detail_url($b['slug'])) ?>">
+                            <img src="<?= base_url($b['foto']) ?>" alt="<?= esc($b['judul']) ?>" loading="lazy">
+                            <div>
+                                <h3><?= esc(mb_strimwidth($b['judul'], 0, 90, '…', 'UTF-8')) ?></h3>
+                                <time datetime="<?= esc($b['tanggal']) ?>"><?= esc(tanggal_id($b['tanggal'])) ?></time>
+                            </div>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php endif; ?>
+
+    <?php endif; ?>
+
+    </section>
+</main>
+
+<footer class="footer">
+    <div class="footer__inner">
+        <div class="footer__brand">
+            <div class="footer__logo">
+                <img src="<?= base_url('assets/bingkai.png') ?>" alt="Logo">
+                <strong>SD NEGERI KEDUNGSARI 1</strong>
+            </div>
+            <p>Situs resmi SD Negeri Kedungsari 1 untuk informasi akademik dan kegiatan sekolah.</p>
+        </div>
+
+        <div class="footer__col">
+            <h4>Informasi Sekolah</h4>
+            <ul>
+                <li><a href="<?= page_url('profil') ?>#visi-misi">Visi &amp; Misi</a></li>
+                <li><a href="<?= page_url('ppdb') ?>">Pendaftaran Siswa Baru</a></li>
+                <li><a href="<?= page_url('berita') ?>">Artikel &amp; Berita Terkini</a></li>
+                <li><a href="<?= page_url('ekstra') ?>">Ekstrakurikuler</a></li>
+                <li><a href="<?= page_url('profil') ?>#guru">Guru &amp; Karyawan</a></li>
+            </ul>
+        </div>
+
+        <div class="footer__col">
+            <h4>Sosial media</h4>
+            <ul>
+                <li><a href="#" target="_blank" rel="noopener">Instagram</a></li>
+                <li><a href="#" target="_blank" rel="noopener">Facebook</a></li>
+            </ul>
+        </div>
+
+        <div class="footer__col footer__contact">
+            <h4>Kontak &amp; Lokasi</h4>
+            <ul>
+                <li>Jl. Raya Kolinggang, Kec. Tohasen, Kabupaten Kediri, Jawa Timur 64152</li>
+                <li>0000-0000-0000</li>
+                <li>sdnegerikedungsari1@gmail.com</li>
+            </ul>
+            <iframe class="footer__map" loading="lazy" title="Lokasi sekolah"
+                    src="https://www.google.com/maps?q=Kediri&output=embed"></iframe>
+        </div>
+    </div>
+    <div class="footer__copy">&copy; <?= date('Y') ?> SD Negeri Kedungsari 1. Semua hak dilindungi.</div>
+</footer>
+
+<script>
+/* ===== Menu mobile ===== */
+document.addEventListener('DOMContentLoaded', () => {
+    const toggle = document.getElementById('navToggle');
+    const menu   = document.getElementById('navMenu');
+    if (!toggle || !menu) return;
+
+    toggle.addEventListener('click', () => {
+        const open = menu.classList.toggle('is-open');
+        toggle.setAttribute('aria-expanded', open);
+    });
+});
+</script>
+</body>
+</html>
