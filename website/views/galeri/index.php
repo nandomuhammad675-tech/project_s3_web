@@ -95,7 +95,7 @@ $title = 'Galeri - SD Negeri Kedungsari 1';
 <title><?= esc($title) ?></title>
 <meta name="description" content="Galeri kegiatan SD Negeri Kedungsari 1 - merekam momen berharga dan dokumentasi kegiatan">
 
-<link rel="icon" href="<?= base_url('assets/bingkai.png') ?>">
+<link rel="icon" href="<?= base_url('assets/gambar/logo.png') ?>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -216,7 +216,7 @@ $menuLain = [
 ?>
     <nav class="navbar" id="navbar">
         <a href="<?= page_url('home') ?>" class="navbar__brand">
-            <img src="<?= base_url('assets/bingkai.png') ?>" alt="Logo SD Negeri Kedungsari 1">
+            <img src="<?= base_url('assets/gambar/logo.png') ?>" alt="Logo SD Negeri Kedungsari 1">
             <span>SD NEGERI KEDUNGSARI 1</span>
         </a>
 
@@ -309,7 +309,7 @@ $menuLain = [
     <div class="footer__inner">
         <div class="footer__brand">
             <div class="footer__logo">
-                <img src="<?= base_url('assets/bingkai.png') ?>" alt="Logo">
+                <img src="<?= base_url('assets/gambar/logo.png') ?>" alt="Logo">
                 <strong>SD NEGERI KEDUNGSARI 1</strong>
             </div>
             <p>Situs resmi SD Negeri Kedungsari 1 untuk informasi akademik dan kegiatan sekolah.</p>

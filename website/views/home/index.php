@@ -97,7 +97,7 @@ $data = [
         'Memberikan layanan manajerial yang bermutu dan berkolaborasi dengan Dunia Usaha dan Dunia Industri (DUDI).',
     ],
 
-    'youtubeId' => 'YOUTUBE_VIDEO_ID', // ganti dengan ID video sekolah
+    'youtubeId' => 'B1-57ogRm-Q', // ID video dari https://youtu.be/B1-57ogRm-Q
 ];
 extract($data);
 ?>
@@ -109,7 +109,7 @@ extract($data);
 <title><?= esc($title ?? 'SD Negeri Kedungsari 1') ?></title>
 <meta name="description" content="Website resmi SD Negeri Kedungsari 1 - Cerdas, Berkarakter, Berprestasi">
 
-<link rel="icon" href="<?= base_url('assets/bingkai.png') ?>">
+<link rel="icon" href="<?= base_url('assets/gambar/logo.png') ?>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -270,7 +270,7 @@ $menuLain = [
 ?>
     <nav class="navbar" id="navbar">
         <a href="<?= page_url('home') ?>" class="navbar__brand">
-            <img src="<?= base_url('assets/bingkai.png') ?>" alt="Logo SD Negeri Kedungsari 1">
+            <img src="<?= base_url('assets/gambar/logo.png') ?>" alt="Logo SD Negeri Kedungsari 1">
             <span>SD NEGERI KEDUNGSARI 1</span>
         </a>
 
@@ -411,7 +411,7 @@ $menuLain = [
         <p class="subtitle">Mengenal lebih dekat SD Negeri Kedungsari 1 melalui video profil kami.</p>
 
         <div class="video" id="videoBox" data-yt="<?= esc($youtubeId) ?>"
-             style="--bg:url('<?= base_url('assets/img/video-thumb.jpg') ?>')">
+             style="--bg:url('https://i.ytimg.com/vi/<?= esc($youtubeId) ?>/hqdefault.jpg')">
             <button type="button" class="video__play" aria-label="Putar video">
                 <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
             </button>
@@ -424,7 +424,7 @@ $menuLain = [
     <div class="footer__inner">
         <div class="footer__brand">
             <div class="footer__logo">
-                <img src="<?= base_url('assets/bingkai.png') ?>" alt="Logo">
+                <img src="<?= base_url('assets/gambar/logo.png') ?>" alt="Logo">
                 <strong>SD NEGERI KEDUNGSARI 1</strong>
             </div>
             <p>Situs resmi SD Negeri Kedungsari 1 untuk informasi akademik dan kegiatan sekolah.</p>
@@ -522,8 +522,9 @@ function initVideo() {
 
     box.addEventListener('click', () => {
         const iframe = document.createElement('iframe');
-        iframe.src = `https://www.youtube.com/embed/${box.dataset.yt}?autoplay=1`;
-        iframe.allow = 'autoplay; encrypted-media';
+        iframe.src = `https://www.youtube-nocookie.com/embed/${box.dataset.yt}?autoplay=1&rel=0`;
+        iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+        iframe.referrerPolicy = 'strict-origin-when-cross-origin';
         iframe.allowFullscreen = true;
         iframe.title = 'Video profil sekolah';
         box.replaceChildren(iframe);

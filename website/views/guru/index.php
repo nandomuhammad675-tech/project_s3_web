@@ -93,7 +93,7 @@ extract($data);
 <title><?= esc($title ?? 'SD Negeri Kedungsari 1') ?></title>
 <meta name="description" content="Website resmi SD Negeri Kedungsari 1 - Cerdas, Berkarakter, Berprestasi">
 
-<link rel="icon" href="<?= base_url('assets/bingkai.png') ?>">
+<link rel="icon" href="<?= base_url('assets/gambar/logo.png') ?>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -418,7 +418,7 @@ $menuLain = [
     <div class="footer__inner">
         <div class="footer__brand">
             <div class="footer__logo">
-                <img src="<?= base_url('assets/bingkai.png') ?>" alt="Logo">
+                <img src="<?= base_url('assets/gambar/logo.png') ?>" alt="Logo">
                 <strong>SD NEGERI KEDUNGSARI 1</strong>
             </div>
             <p>Situs resmi SD Negeri Kedungsari 1 untuk informasi akademik dan kegiatan sekolah.</p>
