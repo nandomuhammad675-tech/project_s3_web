@@ -8,7 +8,11 @@
  *   .../public/?page=galeri     -> views/galeri/index.php
  *   (nama setelah page= = nama folder di website/views/)
  */
-ini_set('display_errors', 1);
+require __DIR__ . '/../lib/bootstrap.php';
+
+// Tampilkan error hanya saat pengembangan (set SIKESA_DEBUG=1). Produksi: jangan bocorkan detail teknis.
+$debug = getenv('SIKESA_DEBUG') === '1';
+ini_set('display_errors', $debug ? '1' : '0');
 error_reporting(E_ALL);
 
 $page = $_GET['page'] ?? 'home';

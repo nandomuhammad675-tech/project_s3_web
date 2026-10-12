@@ -1,0 +1,10 @@
+/* Gaya khusus halaman: ekstrakurikuler (gaya umum ada di ../style.css) */
+:root{--card-grey:#dcdcdc}
+.ekstra-grid{position:relative;z-index:1;display:grid;grid-template-columns:repeat(2,1fr);gap:44px 40px; max-width:1100px;margin:0 auto}
+.ekstra-card{background:var(--card-grey);border:3px solid var(--green);border-radius:18px; box-shadow:0 6px 0 rgba(91,117,83,.35);transition:transform .2s,box-shadow .2s}
+.ekstra-card:hover{transform:translateY(-4px);box-shadow:0 10px 0 rgba(91,117,83,.35)}
+.ekstra-card__link{display:flex;flex-direction:column;height:100%;padding:10px 10px 22px}
+.ekstra-card__img{width:100%;aspect-ratio:3/2;object-fit:cover;background:#c9d1bf; border:3px solid var(--green);border-radius:16px}
+.ekstra-card h3{margin-top:14px;font-size:clamp(1.3rem,2.4vw,1.7rem);font-weight:700;letter-spacing:.5px; text-transform:uppercase;color:#111a2e;line-height:1.2}
+.ekstra-card p{margin:8px 14px 0;font-size:.85rem;color:#1e2a4a;line-height:1.5}
+@media (max-width:860px){  .ekstra-grid{grid-template-columns:1fr}  }
