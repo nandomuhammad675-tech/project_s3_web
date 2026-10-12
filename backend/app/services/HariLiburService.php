@@ -87,6 +87,21 @@ final class HariLiburService
         $ket     = $v->string('keterangan', 'Keterangan', false, 100);
         $kelas   = $v->daftarId('id_kelas', 'Kelas target');
         $v->selesai();
+        $this->pastikanKelasAda($kelas);
         return [(string) $tanggal, $ket, $kelas];
+    }
+
+    /** Kelas target harus ada; bila tidak, 422 (bukan 500 dari FK). */
+    private function pastikanKelasAda(?array $kelas): void
+    {
+        if (!$kelas) {
+            return;
+        }
+        $in = implode(',', array_fill(0, count($kelas), '?'));
+        $st = Database::connection()->prepare("SELECT COUNT(*) FROM kelas WHERE id_kelas IN ($in)");
+        $st->execute($kelas);
+        if ((int) $st->fetchColumn() !== count($kelas)) {
+            throw HttpException::unprocessable('Kelas target tidak ditemukan.', ['id_kelas' => 'Ada kelas target yang tidak ditemukan.']);
+        }
     }
 }
