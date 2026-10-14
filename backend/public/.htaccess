@@ -1,0 +1,10 @@
+Options -Indexes
+# buka kembali akses untuk folder public saja (induknya menolak semua)
+Require all granted
+
+RewriteEngine On
+# teruskan header Authorization ke PHP (Apache CGI/FastCGI sering membuangnya)
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]

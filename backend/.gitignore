@@ -1,0 +1,24 @@
+# Rahasia & konfigurasi lokal (beda di tiap laptop)
+.env
+
+# Dependensi: dibuat ulang dengan `composer install`
+vendor/
+
+# Berkas sementara/hasil jalan aplikasi
+storage/logs/*
+!storage/logs/.gitkeep
+storage/ratelimit/*
+!storage/ratelimit/.gitkeep
+storage/exports/*
+!storage/exports/.gitkeep
+storage/uploads/*
+!storage/uploads/.gitkeep
+!storage/uploads/*/
+!storage/uploads/*/.gitkeep
+
+public/uploads/*
+!public/uploads/.htaccess
+!public/uploads/.gitkeep
+
+# Skrip bantu lokal (berisi password uji)
+buat_hash.php

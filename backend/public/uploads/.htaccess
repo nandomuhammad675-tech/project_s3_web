@@ -1,0 +1,9 @@
+# Folder unggahan: hanya gambar yang boleh disajikan; skrip tidak pernah dieksekusi.
+RewriteEngine Off
+Options -Indexes -ExecCGI
+<FilesMatch "\.(?i:php|phtml|phar|pl|py|cgi|sh)$">
+    Require all denied
+</FilesMatch>
+<FilesMatch "^(?!.*\.(?i:jpg|png|webp)$).*$">
+    Require all denied
+</FilesMatch>
