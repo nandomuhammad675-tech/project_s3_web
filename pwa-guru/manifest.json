@@ -1,0 +1,14 @@
+{
+  "name": "SI-KESA Guru",
+  "short_name": "SI-KESA Guru",
+  "description": "Aplikasi Guru/Wali Kelas SDN Kedungsari 1",
+  "start_url": "index.php?page=beranda",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#475a1f",
+  "lang": "id",
+  "icons": [
+    { "src": "assets/img/logo.png", "sizes": "any", "type": "image/png", "purpose": "any" }
+  ]
+}

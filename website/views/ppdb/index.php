@@ -90,7 +90,7 @@ layout_start([
 <main>
 
     <!-- ================= HERO ================= -->
-    <section class="hero page-hero" style="--bg:url('<?= asset('gambar/home.jpg') ?>')">
+    <section class="hero page-hero" style="--bg:url('<?= asset('img/home.jpg') ?>')">
         <div class="page-hero__content">
             <h1>PPDB</h1>
             <p>Mulai langkah pendidikan putra-putri Anda bersama<br>SD Negeri Kedungsari 1.<br>Proses pendaftaran mudah, cepat, dan sepenuhnya online.</p>

@@ -25,12 +25,12 @@ $data = [
     'kepsek' => null,   // diisi dari database (Guru berjabatan "Kepala Sekolah")
 
     'guru' => [
-        ['nama' => 'Aji Ariya K. D.',   'nip' => 'E41252202', 'foto' => 'assets/gambar/guru-default.svg'],
-        ['nama' => 'Muhammad A. R.',    'nip' => 'E41252251', 'foto' => 'assets/gambar/guru-default.svg'],
-        ['nama' => 'Muhammad R. F.',    'nip' => 'E41252552', 'foto' => 'assets/gambar/guru-default.svg'],
-        ['nama' => 'Putra Suis A.',     'nip' => 'E41252606', 'foto' => 'assets/gambar/guru-default.svg'],
-        ['nama' => 'Muhammad A.N.M.',   'nip' => 'E41253115', 'foto' => 'assets/gambar/guru-default.svg'],
-        ['nama' => 'Muhammad V. S.',    'nip' => 'E41252273', 'foto' => 'assets/gambar/guru-default.svg'],
+        ['nama' => 'Aji Ariya K. D.',   'nip' => 'E41252202', 'foto' => 'assets/img/guru-default.svg'],
+        ['nama' => 'Muhammad A. R.',    'nip' => 'E41252251', 'foto' => 'assets/img/guru-default.svg'],
+        ['nama' => 'Muhammad R. F.',    'nip' => 'E41252552', 'foto' => 'assets/img/guru-default.svg'],
+        ['nama' => 'Putra Suis A.',     'nip' => 'E41252606', 'foto' => 'assets/img/guru-default.svg'],
+        ['nama' => 'Muhammad A.N.M.',   'nip' => 'E41253115', 'foto' => 'assets/img/guru-default.svg'],
+        ['nama' => 'Muhammad V. S.',    'nip' => 'E41252273', 'foto' => 'assets/img/guru-default.svg'],
     ],
 ];
 require_once __DIR__ . '/../../lib/api.php';
@@ -48,7 +48,7 @@ layout_start([
 <main>
 
     <!-- ================= HERO ================= -->
-    <section class="hero page-hero" style="--bg:url('<?= asset('gambar/home.jpg') ?>')">
+    <section class="hero page-hero" style="--bg:url('<?= asset('img/home.jpg') ?>')">
         <div class="page-hero__content">
             <h1>PROFIL</h1>
             <p>Mengenal lebih dekat<br>SD NEGERI KEDUNGSARI 1</p>
@@ -80,7 +80,7 @@ layout_start([
 
         <div class="sambutan">
             <div class="sambutan__photo">
-                <img src="<?= $kepsek ? esc(sikesa_img($kepsek['foto'])) : asset('gambar/guru-default.svg') ?>" alt="<?= $kepsek ? esc($kepsek['nama']) : 'Kepala Sekolah' ?>">
+                <img src="<?= $kepsek ? esc(sikesa_img($kepsek['foto'])) : asset('img/guru-default.svg') ?>" alt="<?= $kepsek ? esc($kepsek['nama']) : 'Kepala Sekolah' ?>">
             </div>
 
             <div class="sambutan__card">

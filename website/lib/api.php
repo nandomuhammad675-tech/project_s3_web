@@ -29,7 +29,7 @@ function sikesa_api(string $path, array $query = [])
 function sikesa_img(?string $p): string
 {
     $p = (string) $p;
-    if ($p === '') { return asset('gambar/home.jpg'); }
+    if ($p === '') { return asset('img/home.jpg'); }
     if (preg_match('#^https?://#i', $p)) { return $p; }
     if (strpos($p, 'uploads/') === 0) { return sikesa_api_base() . '/' . $p; }
     return base_url($p);
@@ -50,7 +50,7 @@ function sikesa_guru(array $data): array
         // Foto kosong => gambar bawaan (siluet). Email dan telepon memang tidak ada di API publik.
         $item = ['nama' => (string) $r['nama_guru'], 'nip' => trim((string) ($r['nip'] ?? '')),
                  'jabatan' => trim((string) ($r['jabatan'] ?? '')),
-                 'foto' => $r['foto_profil'] ?: 'assets/gambar/guru-default.svg'];
+                 'foto' => $r['foto_profil'] ?: 'assets/img/guru-default.svg'];
         if ($kepsek === null && preg_match('/kepala/i', (string) ($r['jabatan'] ?? ''))) {
             $kepsek = $item;
         } else {

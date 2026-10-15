@@ -1,0 +1,28 @@
+/* Navigasi bawah (ponsel) - dipakai views/layouts/bottomnav.php. Tampil hanya < 900px. */
+.bottomnav { display: none; }
+
+@media (max-width: 899px) {
+  .bottomnav {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    height: calc(62px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: #fff; border-top: 1px solid var(--line);
+    box-shadow: 0 -2px 10px rgba(31, 40, 20, .06);
+  }
+  .bn-item {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+    font-size: 10.5px; font-weight: 500; color: var(--muted);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .bn-item .i { width: 21px; height: 21px; }
+  .bn-item.is-active { color: var(--olive-700); font-weight: 600; }
+  .bn-item.is-active .i { stroke-width: 2.2; }
+  .bn-item.is-active span { position: relative; }
+  .bn-item.is-active span::after {
+    content: ''; position: absolute; left: 25%; right: 25%; bottom: -5px; height: 3px; border-radius: 3px; background: var(--gold);
+  }
+
+  /* ruang agar konten tidak tertutup bar bawah */
+  .content { padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px)); }
+}

@@ -13,7 +13,7 @@ $menu = [
 ?>
 <nav class="navbar" id="navbar" aria-label="Menu utama">
     <a href="<?= page_url('home') ?>" class="navbar__brand">
-        <img src="<?= asset('gambar/bingkai.png') ?>" alt="Logo SD Negeri Kedungsari 1">
+        <img src="<?= asset('icon/logo_sekolah.png') ?>" alt="Logo SD Negeri Kedungsari 1">
         <span>SD NEGERI KEDUNGSARI 1</span>
     </a>
 

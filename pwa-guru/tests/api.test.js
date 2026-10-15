@@ -247,3 +247,14 @@ test('referensi.mapel mengambil items', async () => {
   const m = await S.referensi.mapel();
   assert.equal(m[0].nama_mapel, 'IPA'); assert.match(panggilan[0].url, /\/api\/guru\/mapel\?per_page=200$/);
 });
+
+// Regresi: login.php menyimpan token di 'sikesa_token'; tanpa tokenKey di SIKESA_CONFIG klien harus membaca kunci yang sama.
+test('kunci token bawaan sama dengan yang disimpan halaman login (sikesa_token)', () => {
+  const simpan = {};
+  globalThis.localStorage = { getItem: (k) => (k in simpan ? simpan[k] : null), setItem: (k, v) => { simpan[k] = String(v); }, removeItem: (k) => { delete simpan[k]; } };
+  const lama = globalThis.SIKESA_CONFIG;
+  globalThis.SIKESA_CONFIG = { apiBase: 'http://x' };
+  simpan.sikesa_token = 'abc.def.ghi';
+  assert.equal(globalThis.SIKESA.api.ambilToken(), 'abc.def.ghi');
+  globalThis.SIKESA_CONFIG = lama;
+});

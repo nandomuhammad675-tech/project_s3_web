@@ -55,7 +55,7 @@ layout_start([
 <main>
 
     <!-- ================= HERO ================= -->
-    <section class="hero page-hero" style="--bg:url('<?= asset('gambar/home.jpg') ?>')">
+    <section class="hero page-hero" style="--bg:url('<?= asset('img/home.jpg') ?>')">
         <div class="page-hero__content">
             <h1>Berita &amp; Artikel</h1>
             <p>Informasi terbaru dan kabar terkini seputar kegiatan<br>SD NEGERI KEDUNGSARI 1.</p>

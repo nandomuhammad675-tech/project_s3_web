@@ -6,7 +6,7 @@ $info = require __DIR__ . '/site-info.php';
     <div class="footer__inner">
         <div class="footer__brand">
             <div class="footer__logo">
-                <img src="<?= asset('gambar/bingkai.png') ?>" alt="Logo">
+                <img src="<?= asset('icon/logo_sekolah.png') ?>" alt="Logo">
                 <strong>SD NEGERI KEDUNGSARI 1</strong>
             </div>
             <p>Situs resmi SD Negeri Kedungsari 1 untuk informasi akademik dan kegiatan sekolah.</p>

@@ -52,7 +52,7 @@ layout_start([
 <main>
 
     <!-- ================= HERO ================= -->
-    <section class="hero" style="--bg:url('<?= asset('gambar/home.jpg') ?>')">
+    <section class="hero" style="--bg:url('<?= asset('img/home.jpg') ?>')">
         <div class="hero__content">
             <p class="hero__small">SELAMAT DATANG DI WEBSITE</p>
             <h1>SD NEGERI<br>KEDUNGSARI 1</h1>
@@ -67,7 +67,7 @@ layout_start([
 
         <div class="sambutan">
             <div class="sambutan__photo">
-                <img src="<?= $kepsek ? esc(sikesa_img($kepsek['foto'])) : asset('gambar/guru-default.svg') ?>" alt="<?= $kepsek ? esc($kepsek['nama']) : 'Kepala Sekolah' ?>">
+                <img src="<?= $kepsek ? esc(sikesa_img($kepsek['foto'])) : asset('img/guru-default.svg') ?>" alt="<?= $kepsek ? esc($kepsek['nama']) : 'Kepala Sekolah' ?>">
             </div>
 
             <div class="sambutan__card">

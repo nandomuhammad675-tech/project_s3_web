@@ -50,7 +50,7 @@ layout_start([
 <main>
 
     <!-- ================= HERO ================= -->
-    <section class="hero page-hero" style="--bg:url('<?= asset('gambar/home.jpg') ?>')">
+    <section class="hero page-hero" style="--bg:url('<?= asset('img/home.jpg') ?>')">
         <div class="page-hero__content">
             <h1>EKSTRAKURIKULER</h1>
             <p>Mengembangkan minat, bakat, dan potensi siswa<br>SD NEGERI KEDUNGSARI 1</p>

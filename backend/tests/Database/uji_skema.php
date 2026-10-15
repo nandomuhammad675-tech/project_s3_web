@@ -212,7 +212,7 @@ try {
     ditolak('hapus akun pemroses kenaikan kelas', fn () => q($pdo, 'DELETE FROM akun_pengguna WHERE id_user = ?', [$uA]), KODE_FK_RESTRICT);
     ditolak('hapus siswa yang masuk piket', fn () => q($pdo, 'DELETE FROM data_siswa WHERE id_siswa = ?', [$s1]), KODE_FK_RESTRICT);
     ditolak('nilai untuk siswa yang tidak ada', fn () => q($pdo, $nilaiSql, [999999999, $k1, $m1, $t1, 'ganjil', $gA, 'ASAS', null, 80]), KODE_FK_ANAK_HILANG);
-    ditolak('absensi untuk kelas yang tidak ada', fn () => q($pdo, "INSERT INTO absensi_siswa (id_siswa, id_kelas, id_tahun_ajaran, semester, id_guru, tanggal_absen, status_kehadiran) VALUES (?, 999999, ?, 'ganjil', ?, '2098-02-02', 'hadir')", [$s1, $t1, $gA]), KODE_FK_ANAK_HILANG);
+    ditolak('absensi untuk kelas yang tidak ada', fn () => q($pdo, "INSERT INTO absensi_siswa (id_siswa, id_kelas, id_tahun_ajaran, semester, id_guru, tanggal_absen, status_kehadiran) VALUES (?, 65000, ?, 'ganjil', ?, '2098-02-02', 'hadir')", [$s1, $t1, $gA]), KODE_FK_ANAK_HILANG);
 
     echo "== FOREIGN KEY: CASCADE dan SET NULL (hanya data turunan milik induknya)\n";
     q($pdo, 'DELETE FROM jadwal_piket WHERE id_piket = ?', [$piket]);

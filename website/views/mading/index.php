@@ -20,7 +20,7 @@ layout_start([
 ]);
 ?>
 <main>
-    <section class="hero page-hero" style="--bg:url('<?= asset('gambar/home.jpg') ?>')">
+    <section class="hero page-hero" style="--bg:url('<?= asset('img/home.jpg') ?>')">
         <div class="page-hero__content">
             <h1>MADING</h1>
             <p>Karya siswa-siswi yang membanggakan<br>SD NEGERI KEDUNGSARI 1</p>

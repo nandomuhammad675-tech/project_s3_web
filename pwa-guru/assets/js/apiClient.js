@@ -3,7 +3,7 @@
  * Skrip biasa (bukan ES module): muat PERTAMA, sebelum file lain. Hasilnya di window.SIKESA.api.
  *
  * Konfigurasi (opsional), definisikan SEBELUM memuat skrip ini:
- *   window.SIKESA_CONFIG = { apiBase: 'https://…/backend/public', loginUrl: '…', tokenKey: 'sikesa_guru_token' };
+ *   window.SIKESA_CONFIG = { apiBase: 'https://…/backend/public', loginUrl: '…', tokenKey: 'sikesa_token' };
  *
  * Kontrak endpoint: docs/KONTRAK_API.md
  */
@@ -13,7 +13,7 @@
   var SIKESA = (global.SIKESA = global.SIKESA || {});
   var DEFAULTS = {
     apiBase: 'http://localhost/si-kesa/backend/public',
-    tokenKey: 'sikesa_guru_token',
+    tokenKey: 'sikesa_token',
     loginUrl: null // bila diisi, klien pindah ke alamat ini saat sesi berakhir (401)
   };
   var pendengarSesi = [];
@@ -53,6 +53,11 @@
   }
   function sesiBerakhir(pesan) {
     hapusToken();
+    try { // bersihkan juga data pengguna agar halaman login tidak mengira sesi masih ada (cegah loop)
+      global.localStorage.removeItem('sikesa_user');
+      global.localStorage.removeItem('sikesa_token');
+      global.sessionStorage && global.sessionStorage.setItem('sikesa_bounce', String(Date.now()));
+    } catch (e) { /* diabaikan */ }
     pendengarSesi.forEach(function (fn) { try { fn(pesan); } catch (e) { /* jangan menggagalkan yang lain */ } });
     if (typeof global.dispatchEvent === 'function' && typeof global.CustomEvent === 'function') {
       global.dispatchEvent(new global.CustomEvent('sikesa:sesi-berakhir', { detail: { pesan: pesan } }));
@@ -167,5 +172,18 @@
     hapusToken: hapusToken,
     onSesiBerakhir: onSesiBerakhir,
     config: cfg
+  };
+  // ---- Kompatibilitas dengan tampilan (layout/footer/login memakai sikesa_token + sikesa_user) ----
+  var USER_KEY = 'sikesa_user';
+  SIKESA.ApiError = ApiError;
+  SIKESA.getToken = ambilToken;
+  SIKESA.getUser = function () {
+    try { return JSON.parse(global.localStorage.getItem(USER_KEY) || 'null'); } catch (e) { return null; }
+  };
+  SIKESA.logout = function () {
+    hapusToken();
+    try { global.localStorage.removeItem(USER_KEY); } catch (e) { /* diabaikan */ }
+    var u = cfg().loginUrl || 'index.php?page=login';
+    if (global.location && global.location.replace) { global.location.replace(u); }
   };
 })(typeof window !== 'undefined' ? window : globalThis);
