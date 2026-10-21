@@ -20,6 +20,13 @@ final class GuruKelasService
             'no_telepon'  => $g['no_telepon'],
             'foto_profil' => $g['foto_profil'],
         ],
+            
+            // null = belum ditetapkan sebagai wali kelas (aplikasi menampilkan pesannya)
+            'tahun_ajaran' => $g['id_tahun_ajaran'] === null ? null : [
+                'id_tahun_ajaran' => $g['id_tahun_ajaran'],
+                'nama_tahun'      => $g['nama_tahun'],
+                'semester'        => $g['semester'],
+            ],
             // null = belum ditetapkan sebagai wali kelas (aplikasi menampilkan pesannya)
             'kelas' => $g['id_kelas'] === null ? null : [
                 'id_kelas'      => $g['id_kelas'],
