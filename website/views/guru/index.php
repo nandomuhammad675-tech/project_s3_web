@@ -25,12 +25,12 @@ $data = [
     'kepsek' => null,   // diisi dari database (Guru berjabatan "Kepala Sekolah")
 
     'guru' => [
-        ['nama' => 'Aji Ariya K. D.',   'nip' => 'E41252202', 'foto' => 'assets/img/guru-default.svg'],
-        ['nama' => 'Muhammad A. R.',    'nip' => 'E41252251', 'foto' => 'assets/img/guru-default.svg'],
-        ['nama' => 'Muhammad R. F.',    'nip' => 'E41252552', 'foto' => 'assets/img/guru-default.svg'],
-        ['nama' => 'Putra Suis A.',     'nip' => 'E41252606', 'foto' => 'assets/img/guru-default.svg'],
-        ['nama' => 'Muhammad A.N.M.',   'nip' => 'E41253115', 'foto' => 'assets/img/guru-default.svg'],
-        ['nama' => 'Muhammad V. S.',    'nip' => 'E41252273', 'foto' => 'assets/img/guru-default.svg'],
+        ['nama' => 'Aji Ariya K. D.',   'foto' => 'assets/img/guru-default.svg'],
+        ['nama' => 'Muhammad A. R.',    'foto' => 'assets/img/guru-default.svg'],
+        ['nama' => 'Muhammad R. F.',    'foto' => 'assets/img/guru-default.svg'],
+        ['nama' => 'Putra Suis A.',     'foto' => 'assets/img/guru-default.svg'],
+        ['nama' => 'Muhammad A.N.M.',   'foto' => 'assets/img/guru-default.svg'],
+        ['nama' => 'Muhammad V. S.',    'foto' => 'assets/img/guru-default.svg'],
     ],
 ];
 require_once __DIR__ . '/../../lib/api.php';
@@ -127,7 +127,7 @@ layout_start([
             <figcaption>
                 <strong><?= esc($kepsek['nama']) ?></strong>
                 <?php if (!empty($kepsek['jabatan'])): ?><em><?= esc($kepsek['jabatan']) ?></em><?php endif; ?>
-                <?php if (!empty($kepsek['nip'])): ?><span>NIP. <?= esc($kepsek['nip']) ?></span><?php endif; ?>
+                <?php if (!empty($kepsek['ekskul'])): ?><span>Guru Ekstra <?= esc(implode(', ', $kepsek['ekskul'])) ?></span><?php endif; ?>
             </figcaption>
         </figure>
         <?php endif; ?>
@@ -141,7 +141,7 @@ layout_start([
                     <figcaption>
                         <strong><?= esc($g['nama']) ?></strong>
                         <?php if (!empty($g['jabatan'])): ?><em><?= esc($g['jabatan']) ?></em><?php endif; ?>
-                        <?php if (!empty($g['nip'])): ?><span>NIP. <?= esc($g['nip']) ?></span><?php endif; ?>
+                        <?php if (!empty($g['ekskul'])): ?><span>Guru Ekstra <?= esc(implode(', ', $g['ekskul'])) ?></span><?php endif; ?>
                     </figcaption>
                 </figure>
             <?php endforeach; ?>

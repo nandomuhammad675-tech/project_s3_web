@@ -1,7 +1,8 @@
 <?php
 /**
  * Penghubung Website -> Backend SI-KESA (GET /api/public/*, tanpa token).
- * Pola: API gagal dijangkau => data.php lama dipakai (fallback). API berhasil tetapi kosong => tampil kosong.
+ * Pola: API gagal dijangkau => data.php lama dipakai (fallback; galeri, ekstrakurikuler, guru). API berhasil tetapi kosong => tampil kosong.
+ * Kegiatan & Prestasi (event) tanpa data cadangan: API gagal => null => halaman menampilkan "gagal dimuat" + Coba Lagi.
  * Alamat API: environment SIKESA_API_URL, atau ubah nilai bawaan di bawah.
  */
 if (defined('SIKESA_API_LOADED')) { return; }
@@ -48,7 +49,13 @@ function sikesa_guru(array $data): array
     $kepsek = null; $guru = [];
     foreach ($rows as $r) {
         // Foto kosong => gambar bawaan (siluet). Email dan telepon memang tidak ada di API publik.
-        $item = ['nama' => (string) $r['nama_guru'], 'nip' => trim((string) ($r['nip'] ?? '')),
+        // NIP sengaja tidak ditampilkan di website. 'ekskul' = nama ekstrakurikuler yang diajar (field opsional dari API; kosong bila tidak mengajar ekstra).
+        $ekskul = [];
+        foreach ((array) ($r['ekskul'] ?? []) as $x) {
+            $n = trim((string) (is_array($x) ? ($x['nama_ekskul'] ?? '') : $x));
+            if ($n !== '') { $ekskul[] = $n; }
+        }
+        $item = ['nama' => (string) $r['nama_guru'], 'ekskul' => $ekskul,
                  'jabatan' => trim((string) ($r['jabatan'] ?? '')),
                  'foto' => $r['foto_profil'] ?: 'assets/img/guru-default.svg'];
         if ($kepsek === null && preg_match('/kepala/i', (string) ($r['jabatan'] ?? ''))) {
@@ -74,27 +81,63 @@ function sikesa_galeri(array $fallback): array
     ], $d['items']);
 }
 
-/** Event -> daftar berita. Tanggal event boleh kosong (view menyembunyikannya). */
-function sikesa_berita(array $fallback): array
+/** Respons berhalaman -> ['items' => [...], 'total' => n, 'page' => n, 'per_page' => n]; null bila gagal. */
+function sikesa_halaman(string $path, array $query): ?array
 {
-    $d = sikesa_api('event', ['per_page' => 100]);
-    if ($d === null) { return $fallback; }
-    $out = [];
-    foreach ($d['items'] as $e) {
-        $desk = trim((string) ($e['deskripsi'] ?? ''));
-        $isi = $desk === '' ? [] : array_values(array_filter(array_map('trim', preg_split('/\R{2,}/', $desk))));
-        $out[] = [
-            'slug' => 'e' . $e['id_event'],
-            'judul' => (string) $e['nama_event'],
-            'ringkas' => mb_strimwidth(preg_replace('/\s+/', ' ', $desk), 0, 220, '…', 'UTF-8'),
-            'tanggal' => $e['tanggal'] ?? '',
-            'kategori' => (string) ($e['kategori'] ?? ''),
-            'galeri' => array_values(array_filter(array_map(static fn($g) => $g['file_gambar'] ?? '', $e['galeri'] ?? []))),
-            'foto' => $e['banner'] ?: ($e['galeri'][0]['file_gambar'] ?? ''),
-            'isi' => $isi,
-        ];
+    $d = sikesa_api($path, $query);
+    if (!is_array($d) || !isset($d['items']) || !is_array($d['items'])) { return null; }
+    return ['items' => $d['items'], 'total' => (int) ($d['total'] ?? count($d['items'])),
+            'page' => (int) ($d['page'] ?? 1), 'per_page' => (int) ($d['per_page'] ?? count($d['items']))];
+}
+
+/** Kategori event (urutan tampil) = nilai ?kategori= pada /api/public/event. */
+function sikesa_kategori(): array
+{
+    return ['kegiatan' => 'Kegiatan', 'event' => 'Event', 'prestasi' => 'Prestasi', 'kolaborasi' => 'Kolaborasi'];
+}
+
+/** Satu event dari API -> bentuk tampilan. slug = "e<id_event>". */
+function sikesa_event_norm(array $e): array
+{
+    $desk = trim((string) ($e['deskripsi'] ?? ''));
+    $isi  = $desk === '' ? [] : array_values(array_filter(array_map('trim', preg_split('/\R{2,}/', $desk))));
+    $galeri = array_values(array_filter(array_map(static fn($g) => (string) ($g['file_gambar'] ?? ''), $e['galeri'] ?? [])));
+    return [
+        'id'       => (int) $e['id_event'],
+        'slug'     => 'e' . (int) $e['id_event'],
+        'judul'    => (string) $e['nama_event'],
+        'ringkas'  => mb_strimwidth(preg_replace('/\s+/', ' ', $desk), 0, 200, '…', 'UTF-8'),
+        'tanggal'  => (string) ($e['tanggal'] ?? ''),
+        'kategori' => (string) ($e['kategori'] ?? ''),
+        'foto'     => (string) (($e['banner'] ?? '') ?: ($galeri[0] ?? '')),
+        'galeri'   => $galeri,
+        'isi'      => $isi,
+    ];
+}
+
+/** Event tampil (status_tampil = 1), terbaru di atas; urutan & halaman dari server. null = API gagal. */
+function sikesa_event(?string $kategori = null, int $page = 1, int $perPage = 6): ?array
+{
+    $q = ['page' => $page, 'per_page' => $perPage];
+    if ($kategori) { $q['kategori'] = $kategori; }
+    $h = sikesa_halaman('event', $q);
+    if ($h === null) { return null; }
+    $h['items'] = array_map('sikesa_event_norm', $h['items']);
+    return $h;
+}
+
+/** Cari satu event menurut slug "e<id>". Hasil: array event | false (tidak ada) | null (API gagal). */
+function sikesa_event_cari(string $slug)
+{
+    if (!preg_match('/^e(\d{1,9})$/', $slug, $m)) { return false; }
+    $id = (int) $m[1];
+    for ($page = 1; $page <= 5; $page++) {
+        $h = sikesa_event(null, $page, 100);
+        if ($h === null) { return null; }
+        foreach ($h['items'] as $e) { if ($e['id'] === $id) { return $e; } }
+        if ($page * 100 >= $h['total']) { break; }
     }
-    return $out;
+    return false;
 }
 
 /** Hybrid ekskul: daftar+nama+deskripsi+foto dari API; konten detail (tentang/kegiatan/materi/manfaat) dari data.php. */
@@ -168,9 +211,11 @@ function sikesa_program(): ?array
 }
 
 /** Karya mading yang tampil (status_tampil = 1) + info halaman; null bila API tidak terjangkau. */
-function sikesa_mading(int $page = 1, int $perPage = 9): ?array
+function sikesa_mading(int $page = 1, int $perPage = 9, ?string $kategori = null): ?array
 {
-    $d = sikesa_api('mading', ['page' => $page, 'per_page' => $perPage]);
+    $q = ['page' => $page, 'per_page' => $perPage];
+    if ($kategori !== null && $kategori !== '') { $q['kategori'] = $kategori; }
+    $d = sikesa_api('mading', $q);
     return is_array($d) && isset($d['items']) ? $d : null;
 }
 

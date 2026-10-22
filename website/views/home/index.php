@@ -10,22 +10,47 @@ require_once __DIR__ . '/../../lib/bootstrap.php';
 $current = 'home';
 
 // ===== DATA =====
-// Teks tetap (visi & misi). Selebihnya dibaca dari database lewat /api/public/* (lib/api.php).
-$visi = 'Menumbuhkan kebaikan budi dan kecerdasan anak dalam kehangatan keluarga sekolah.';
-$misi = [
-    'Membangun iklim akademik yang mendalam dengan mengintegrasikan eksplorasi, kolaborasi, dan refleksi untuk mendukung pencapaian visi sekolah.',
-    'Menyiapkan lulusan yang memiliki karakter yang kuat, kemampuan berpikir kritis, inovatif, serta memiliki daya saing yang tinggi melalui pendidikan yang mengutamakan pembelajaran mendalam.',
-    'Menyelenggarakan pembelajaran berbasis teknologi dan informasi yang mendorong kolaborasi, kreativitas, dan penguasaan soft skill.',
-    'Melaksanakan dan menjamin mutu layanan akademik standar nasional dan internasional yang mendukung pembelajaran mendalam.',
-    'Memberikan layanan manajerial yang bermutu dan berkolaborasi dengan Dunia Usaha dan Dunia Industri (DUDI).',
+$data = [
+    'title' => 'SD Negeri Kedungsari 1',
+
+    'kedisiplinan' => [
+        ['img' => 'assets/img/kedisiplinan/upacara.jpg', 'nama' => 'Senin Disiplin',  'ket' => '(Upacara)'],
+        ['img' => 'assets/img/kedisiplinan/senam.jpg',   'nama' => 'Selasa Bugar',    'ket' => '(Senam)'],
+        ['img' => 'assets/img/kedisiplinan/yasin.jpg',   'nama' => 'Rabu Religi',     'ket' => '(Tahlil dan pembacaan Yasin)'],
+        ['img' => 'assets/img/kedisiplinan/budaya.jpg',  'nama' => 'Kamis Berbudaya', 'ket' => '(Pengenalan Bahasa daerah dan sopan santun/etika)'],
+        ['img' => 'assets/img/kedisiplinan/infaq.jpg',   'nama' => "Jum'at Ikhlas",   'ket' => '(Infaq)'],
+        ['img' => 'assets/img/kedisiplinan/sabtu.jpg',   'nama' => 'Sabtu Ceria',     'ket' => '(Ekstra Pramuka, Tari, dll)'],
+    ],
+
+    'ekstra' => [
+        ['img' => 'assets/img/ekstra/tari.jpg',     'nama' => 'Ekstra', 'ket' => '(Tari)'],
+        ['img' => 'assets/img/ekstra/hadroh.jpg',   'nama' => 'Ekstra', 'ket' => '(Hadroh)'],
+        ['img' => 'assets/img/ekstra/senirupa.jpg', 'nama' => 'Ekstra', 'ket' => '(Seni Rupa)'],
+        ['img' => 'assets/img/ekstra/pramuka.jpg',  'nama' => 'Ekstra', 'ket' => '(Pramuka)'],
+        ['img' => 'assets/img/ekstra/menyanyi.jpg', 'nama' => 'Ekstra', 'ket' => '(Menyanyi)'],
+        ['img' => 'assets/img/ekstra/komputer.jpg', 'nama' => 'Ekstra Hari Kamis', 'ket' => '(Komputer)'],
+    ],
+
+    'visi' => 'Menumbuhkan kebaikan budi dan kecerdasan anak dalam kehangatan keluarga sekolah.',
+
+    'misi' => [
+        'Membangun iklim akademik yang mendalam dengan mengintegrasikan eksplorasi, kolaborasi, dan refleksi untuk mendukung pencapaian visi sekolah.',
+        'Menyiapkan lulusan yang memiliki karakter yang kuat, kemampuan berpikir kritis, inovatif, serta memiliki daya saing yang tinggi melalui pendidikan yang mengutamakan pembelajaran mendalam.',
+        'Menyelenggarakan pembelajaran berbasis teknologi dan informasi yang mendorong kolaborasi, kreativitas, dan penguasaan soft skill.',
+        'Melaksanakan dan menjamin mutu layanan akademik standar nasional dan internasional yang mendukung pembelajaran mendalam.',
+        'Memberikan layanan manajerial yang bermutu dan berkolaborasi dengan Dunia Usaha dan Dunia Industri (DUDI).',
+    ],
+
+    'youtubeId' => 'B1-57ogRm-Q', // ID video dari https://youtu.be/B1-57ogRm-Q
 ];
+
+$visi = $data['visi'];
+$misi = $data['misi'];
 
 require_once __DIR__ . '/../../lib/api.php';
 
-// 3 kegiatan terbaru (event status_tampil = 1; terbaru di atas)
-$beritaAll = sikesa_berita(require __DIR__ . '/../kegiatan/data.php');
-usort($beritaAll, fn($a, $b) => strcmp((string) $b['tanggal'], (string) $a['tanggal']));
-$berita = array_slice($beritaAll, 0, 3);
+// 3 kegiatan & prestasi terbaru (event status_tampil = 1; terbaru di atas). null = API tidak terjangkau
+$berita = sikesa_event(null, 1, 3);
 
 // Cuplikan program pembiasaan (null = API tidak terjangkau)
 $HARI    = ['senin' => 'Senin', 'selasa' => 'Selasa', 'rabu' => 'Rabu', 'kamis' => 'Kamis', 'jumat' => "Jum'at", 'sabtu' => 'Sabtu'];
@@ -83,36 +108,36 @@ layout_start([
         </div>
     </section>
 
-    <!-- ================= ARTIKEL & BERITA ================= -->
+    <!-- ================= KEGIATAN & PRESTASI TERBARU ================= -->
     <section class="section section--tint" id="berita">
-        <h2 class="title">Artikel &amp; Berita</h2>
+        <h2 class="title">Kegiatan &amp; Prestasi Terbaru</h2>
         <p class="subtitle">Ikuti update terbaru seputar kegiatan dan informasi sekolah</p>
 
-        <?php if (!$berita): ?>
-            <p class="kosong">Belum ada kegiatan yang dipublikasikan.</p>
-            <div class="carousel__nav"><a href="<?= page_url('berita') ?>" class="pill pill--solid">Lihat Semua Berita</a></div>
-        <?php else: ?>
-        <div class="carousel">
-            <?php foreach ($berita as $b): ?>
-                <figure class="carousel__slide">
-                    <a href="<?= page_url('berita') ?>&amp;slug=<?= rawurlencode($b['slug']) ?>">
-                        <img src="<?= esc(sikesa_img($b['foto'])) ?>" alt="<?= esc($b['judul']) ?>">
-                    </a>
-                </figure>
-            <?php endforeach; ?>
-        </div>
+        <?php if ($berita === null): ui_gagal('Kegiatan', page_url('home') . '#berita');
+        elseif (!$berita['items']): ui_kosong('Belum ada kegiatan yang dipublikasikan.');
+        else: $n = count($berita['items']); ?>
+            <div class="carousel" id="carousel" aria-roledescription="carousel" aria-label="Kegiatan terbaru">
+                <?php foreach ($berita['items'] as $i => $b): ?>
+                    <figure class="carousel__slide<?= $n === 1 ? ' is-active' : '' ?>">
+                        <a href="<?= esc(page_url('berita', ['slug' => $b['slug']])) ?>" aria-label="<?= esc($b['judul']) ?>">
+                            <img src="<?= esc(sikesa_img($b['foto'])) ?>" alt="<?= esc($b['judul']) ?>"<?= $i > 0 ? ' loading="lazy"' : '' ?>>
+                        </a>
+                        <figcaption><?= esc(mb_strimwidth($b['judul'], 0, 70, '…', 'UTF-8')) ?></figcaption>
+                    </figure>
+                <?php endforeach; ?>
+            </div>
 
-        <div class="carousel__dots">
-            <?php foreach ($berita as $i => $b): ?>
-                <button type="button" aria-label="Berita ke-<?= $i + 1 ?>"></button>
-            <?php endforeach; ?>
-        </div>
+            <?php if ($n > 1): ?>
+            <div class="carousel__dots">
+                <?php for ($i = 0; $i < $n; $i++): ?><button type="button" aria-label="Kegiatan ke-<?= $i + 1 ?>"></button><?php endfor; ?>
+            </div>
+            <?php endif; ?>
 
-        <div class="carousel__nav">
-            <button type="button" id="prevBtn" class="pill">Sebelumnya</button>
-            <a href="<?= page_url('berita') ?>" class="pill pill--solid">Lihat Semua Berita</a>
-            <button type="button" id="nextBtn" class="pill">Selanjutnya</button>
-        </div>
+            <div class="carousel__nav">
+                <?php if ($n > 1): ?><button type="button" id="prevBtn" class="pill">Sebelumnya</button><?php endif; ?>
+                <a href="<?= esc(page_url('berita')) ?>" class="pill pill--solid">Lihat Semua Kegiatan</a>
+                <?php if ($n > 1): ?><button type="button" id="nextBtn" class="pill">Selanjutnya</button><?php endif; ?>
+            </div>
         <?php endif; ?>
     </section>
 

@@ -124,14 +124,32 @@ final class DataGuruRepository
         ];
     }
 
-    /** Profil publik (FR-WEB-01): hanya nama, NIP, jabatan, foto; tanpa email/telepon. Hanya Guru berakun aktif. */
+    /**
+     * Profil publik (FR-WEB-01): nama, NIP, jabatan, foto, dan nama ekstrakurikuler yang diajar (`ekskul`, array; kosong bila tidak mengajar ekstra);
+     * tanpa email/telepon. Hanya Guru berakun aktif.
+     */
     public function publik(): array
     {
-        return $this->db->query(
-            "SELECT g.nama_guru, g.nip, g.jabatan, g.foto_profil
+        $rows = $this->db->query(
+            "SELECT g.id_guru, g.nama_guru, g.nip, g.jabatan, g.foto_profil
              FROM data_guru g JOIN akun_pengguna a ON a.id_user = g.id_user AND a.status_akun = 'aktif'
              ORDER BY g.nama_guru, g.id_guru"
         )->fetchAll();
+
+        $peta = [];
+        $st = $this->db->query(
+            'SELECT ge.id_guru, e.nama_ekskul FROM guru_ekskul ge JOIN ekstrakurikuler e ON e.id_ekskul = ge.id_ekskul
+             ORDER BY e.nama_ekskul, e.id_ekskul'
+        );
+        foreach ($st->fetchAll() as $r) {
+            $peta[(int) $r['id_guru']][] = $r['nama_ekskul'];
+        }
+
+        return array_map(static function (array $r) use ($peta): array {
+            $r['ekskul'] = $peta[(int) $r['id_guru']] ?? [];
+            unset($r['id_guru']);
+            return $r;
+        }, $rows);
     }
 
     private function filter(?string $q): array
