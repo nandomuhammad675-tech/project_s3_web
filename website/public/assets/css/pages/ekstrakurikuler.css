@@ -1,0 +1,5 @@
+/* Daftar Ekstrakurikuler */
+.ekstra-card__link{display:flex;flex-direction:column;height:100%;padding:10px 10px 22px}
+.ekstra-card__img{width:100%;aspect-ratio:3/2;object-fit:cover;border:3px solid var(--green);border-radius:16px}
+.ekstra-card h3{margin-top:14px;padding:0 6px;font-size:clamp(1.2rem,2.4vw,1.6rem);font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#111a2e;line-height:1.2}
+.ekstra-card p{margin:8px 6px 0;font-size:.86rem;color:#1e2a4a;line-height:1.55}

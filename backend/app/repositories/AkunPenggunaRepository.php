@@ -26,6 +26,21 @@ final class AkunPenggunaRepository
         return $this->hidrasi($st->fetch());
     }
 
+    /** Login Admin/Guru: username dahulu; bila tidak ada, cocokkan NIP Guru (data_guru.nip, unik). */
+    public function cariByUsernameAtauNip(string $identitas): ?AkunPengguna
+    {
+        $akun = $this->cariByUsername($identitas);
+        if ($akun !== null || $identitas === '') {
+            return $akun;
+        }
+        $st = $this->db->prepare(
+            'SELECT a.id_user FROM akun_pengguna a JOIN data_guru g ON g.id_user = a.id_user WHERE g.nip = ? LIMIT 1'
+        );
+        $st->execute([$identitas]);
+        $row = $st->fetch();
+        return $row ? $this->cariById((int) $row['id_user']) : null;
+    }
+
     public function cariById(int $id): ?AkunPengguna
     {
         $st = $this->db->prepare('SELECT ' . self::KOLOM . ' FROM akun_pengguna WHERE id_user = ? LIMIT 1');

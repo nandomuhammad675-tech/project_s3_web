@@ -14,7 +14,7 @@
  */
 
 // ===== PENGATURAN (ubah di sini) =====
-$apiBase = '/backend/public/api';          // alamat dasar API backend, tanpa garis miring di akhir
+$apiBase = '../backend/public';              // alamat dasar backend (TANPA /api), relatif terhadap halaman PWA
 
 // Alamat folder pwa-guru/ relatif terhadap halaman ini
 // (login.php dibuka langsung -> '../../'; jika di-include oleh pwa-guru/index.php -> '')
@@ -144,8 +144,9 @@ form{text-align:left}
 <body>
 
 <!-- Video latar belakang -->
-<div class="bg" style="--poster:url('<?= esc(aset($root, 'img/login-poster.jpg')) ?>')" aria-hidden="true">
-    <video autoplay muted loop playsinline preload="auto" poster="<?= esc(aset($root, 'img/login-poster.jpg')) ?>">
+<?php $adaPoster = is_file(__DIR__ . '/../../assets/img/login-poster.jpg'); // poster opsional: tanpa file, tidak memicu 404 ?>
+<div class="bg"<?= $adaPoster ? ' style="--poster:url(\'' . esc(aset($root, 'img/login-poster.jpg')) . '\')"' : '' ?> aria-hidden="true">
+    <video autoplay muted loop playsinline preload="auto"<?= $adaPoster ? ' poster="' . esc(aset($root, 'img/login-poster.jpg')) . '"' : '' ?>>
         <source src="<?= esc(aset($root, 'vidio/VIDEO BG.mp4')) ?>" type="video/mp4">
     </video>
 </div>
@@ -175,11 +176,11 @@ form{text-align:left}
             <div class="alert" id="alert" role="alert" hidden></div>
 
             <div class="field">
-                <label for="username">Username</label>
+                <label for="username">Username / NIP</label>
                 <div class="input">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M19 6v6M16 9h6"/></svg>
                     <input type="text" id="username" name="username" required maxlength="50"
-                           autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Masukan Username">
+                           autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Masukkan Username atau NIP">
                 </div>
             </div>
 
@@ -204,7 +205,7 @@ form{text-align:left}
 <script>
 /**
  * Login SI-KESA (PWA Guru / Admin)
- * Memanggil POST {apiBase}/auth/login  dengan body {username, password}
+ * Memanggil POST {apiBase}/api/auth/login  dengan body {username, password}
  * dan membaca token + user dari balasan: {token, user} atau {data:{token, user}}.
  * Token disimpan di localStorage (kunci: sikesa_token, sikesa_user).
  * Logout cukup menghapus kedua kunci itu (token tidak dicabut di server; berlaku 8 jam).
@@ -235,9 +236,13 @@ form{text-align:left}
 
     /* ----- Sudah login? langsung ke tujuan ----- */
     try {
+        // Pemutus loop: bila baru saja dilempar dari halaman lain ke login (<8 dtk), JANGAN lempar balik.
+        const bounce = Number(sessionStorage.getItem('sikesa_bounce') || 0);
+        const baruDilempar = bounce && (Date.now() - bounce) < 8000;
+        sessionStorage.removeItem('sikesa_bounce');
         const t = localStorage.getItem(TOKEN_KEY);
         const u = JSON.parse(localStorage.getItem(USER_KEY) || 'null');
-        if (t && u && CFG.tujuan && CFG.tujuan[u.role] && tokenMasihBerlaku(t)) {
+        if (!baruDilempar && t && u && u.role === 'guru' && CFG.tujuan && CFG.tujuan[u.role] && tokenMasihBerlaku(t)) {
             window.location.replace(CFG.tujuan[u.role]);
             return;
         }
@@ -272,7 +277,7 @@ form{text-align:left}
         e.preventDefault();
         const username = $('username').value.trim();
         const password = pw.value;
-        if (!username || !password) { tampilError('Isi username dan kata sandi.'); return; }
+        if (!username || !password) { tampilError('Isi username/NIP dan kata sandi.'); return; }
 
         const btn = $('btnMasuk');
         btn.disabled = true;
@@ -281,7 +286,7 @@ form{text-align:left}
         try {
             const ctrl = new AbortController();
             const timer = setTimeout(() => ctrl.abort(), 15000);
-            const res = await fetch(CFG.apiBase + '/auth/login', {
+            const res = await fetch(CFG.apiBase + '/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                 body: JSON.stringify({ username, password }),
@@ -305,7 +310,7 @@ form{text-align:left}
             } else if (res.status === 429) {
                 tampilError('Terlalu banyak percobaan. Coba lagi beberapa saat lagi.');
             } else if (res.status === 401 || res.status === 422) {
-                tampilError(body.message || 'Username atau kata sandi salah.');
+                tampilError(body.message || 'Username/NIP atau kata sandi salah.');
             } else {
                 tampilError('Server sedang bermasalah. Coba lagi nanti.');
             }

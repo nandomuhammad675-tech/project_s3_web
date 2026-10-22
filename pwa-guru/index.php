@@ -6,7 +6,7 @@
  */
 
 // ===== PENGATURAN =====
-$apiBase = '/backend/public/api';   // alamat dasar API, tanpa garis miring di akhir
+$apiBase = '../backend/public';      // alamat dasar backend (TANPA /api; path endpoint sudah berawalan /api/...), relatif terhadap halaman PWA
 $root    = '';                      // alamat folder pwa-guru/ relatif terhadap index.php
 
 // ===== Fungsi bantu (nama sengaja berbeda dari login.php: esc / aset) =====

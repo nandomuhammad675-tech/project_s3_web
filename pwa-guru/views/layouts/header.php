@@ -31,6 +31,7 @@ $loginUrl = $root . 'index.php?page=login';
         if (!u || u.role !== 'guru' || (p.exp && p.exp * 1000 < Date.now() + 30000)) { throw 0; }
         document.documentElement.classList.remove('auth-pending');
     } catch (err) {
+        try { sessionStorage.setItem('sikesa_bounce', String(Date.now())); } catch (e2) { /* abaikan */ }
         window.location.replace(LOGIN);
     }
 })();

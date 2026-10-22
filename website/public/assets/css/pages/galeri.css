@@ -1,0 +1,9 @@
+/* Gaya khusus halaman: galeri (gaya umum ada di ../style.css) */
+:root{--card-grey:#dcdcdc}
+.galeri-grid{position:relative;z-index:1;display:grid;grid-template-columns:repeat(2,minmax(0,430px)); justify-content:center;gap:56px clamp(30px,8vw,110px);margin:0 auto}
+.galeri-card{display:flex;flex-direction:column;background:var(--card-grey);border:3px solid var(--green); border-radius:18px;padding:10px 10px 12px;box-shadow:0 6px 0 rgba(91,117,83,.35);text-align:left}
+.galeri-card__img{width:100%;aspect-ratio:9/10;object-fit:cover;background:#c9d1bf; border:3px solid var(--green);border-radius:16px;box-shadow:0 4px 10px rgba(0,0,0,.2)}
+.galeri-card h3{margin:12px 6px 0;font-size:1.05rem;font-weight:600;line-height:1.25;color:#111a2e;text-align:center}
+.galeri-card time{margin:auto 0 0 4px;padding-top:18px;font-size:.78rem;color:var(--muted)}
+.galeri-kosong{position:relative;z-index:1;color:var(--muted)}
+@media (max-width:860px){  .galeri-grid{grid-template-columns:minmax(0,430px)}  }

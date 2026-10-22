@@ -1,80 +1,189 @@
-/**
- * apiClient.js - klien API + sesi untuk PWA Guru SI-KESA
- * Memakai kunci localStorage yang sama dengan login: sikesa_token, sikesa_user.
- *   SIKESA.api.get('/guru/dashboard')  -> data (isi "data" jika ada)
- * Gagal -> melempar ApiError { status, message }. Status 401 otomatis keluar ke login.
+/*
+ * SI-KESA PWA Guru: klien API (TANPA DOM / tampilan).
+ * Skrip biasa (bukan ES module): muat PERTAMA, sebelum file lain. Hasilnya di window.SIKESA.api.
+ *
+ * Konfigurasi (opsional), definisikan SEBELUM memuat skrip ini:
+ *   window.SIKESA_CONFIG = { apiBase: 'https://…/backend/public', loginUrl: '…', tokenKey: 'sikesa_token' };
+ *
+ * Kontrak endpoint: docs/KONTRAK_API.md
  */
-(function (w) {
-    'use strict';
+(function (global) {
+  'use strict';
 
-    var CFG = w.SIKESA_CONFIG || {};
-    var TOKEN_KEY = 'sikesa_token';
-    var USER_KEY = 'sikesa_user';
+  var SIKESA = (global.SIKESA = global.SIKESA || {});
+  var DEFAULTS = {
+    apiBase: 'http://localhost/si-kesa/backend/public',
+    tokenKey: 'sikesa_token',
+    loginUrl: null // bila diisi, klien pindah ke alamat ini saat sesi berakhir (401)
+  };
+  var pendengarSesi = [];
 
-    function getToken() { try { return localStorage.getItem(TOKEN_KEY); } catch (e) { return null; } }
-    function getUser()  { try { return JSON.parse(localStorage.getItem(USER_KEY) || 'null'); } catch (e) { return null; } }
-    function clearSession() {
-        try { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(USER_KEY); } catch (e) { /* diabaikan */ }
+  function cfg() {
+    var c = {};
+    var u = global.SIKESA_CONFIG || {};
+    for (var k in DEFAULTS) c[k] = u[k] !== undefined ? u[k] : DEFAULTS[k];
+    c.apiBase = String(c.apiBase).replace(/\/+$/, '');
+    return c;
+  }
+
+  /** Kesalahan API. status 0 = jaringan/format respons bukan JSON. */
+  function ApiError(status, message, errors) {
+    var e = new Error(message);
+    e.name = 'ApiError';
+    e.status = status;
+    e.errors = errors || {};
+    return e;
+  }
+  ApiError.prototype = Object.create(Error.prototype);
+
+  // ---- token (localStorage) ----
+  function ambilToken() {
+    try { return global.localStorage.getItem(cfg().tokenKey); } catch (e) { return null; }
+  }
+  function simpanToken(t) {
+    try { global.localStorage.setItem(cfg().tokenKey, t); } catch (e) { /* mode privat: abaikan */ }
+  }
+  function hapusToken() {
+    try { global.localStorage.removeItem(cfg().tokenKey); } catch (e) { /* abaikan */ }
+  }
+
+  /** Daftarkan fungsi yang dipanggil saat sesi berakhir (401). Tampilan memakainya untuk kembali ke login. */
+  function onSesiBerakhir(fn) {
+    if (typeof fn === 'function') pendengarSesi.push(fn);
+  }
+  function sesiBerakhir(pesan) {
+    hapusToken();
+    try { // bersihkan juga data pengguna agar halaman login tidak mengira sesi masih ada (cegah loop)
+      global.localStorage.removeItem('sikesa_user');
+      global.localStorage.removeItem('sikesa_token');
+      global.sessionStorage && global.sessionStorage.setItem('sikesa_bounce', String(Date.now()));
+    } catch (e) { /* diabaikan */ }
+    pendengarSesi.forEach(function (fn) { try { fn(pesan); } catch (e) { /* jangan menggagalkan yang lain */ } });
+    if (typeof global.dispatchEvent === 'function' && typeof global.CustomEvent === 'function') {
+      global.dispatchEvent(new global.CustomEvent('sikesa:sesi-berakhir', { detail: { pesan: pesan } }));
     }
-    function logout() {
-        clearSession();
-        w.location.replace(CFG.loginUrl || 'index.php?page=login');
-    }
+    var url = cfg().loginUrl;
+    if (url && global.location) global.location.assign(url);
+  }
 
-    function ApiError(status, message) {
-        this.name = 'ApiError';
-        this.status = status;
-        this.message = message;
-    }
-    ApiError.prototype = Object.create(Error.prototype);
+  function qs(query) {
+    var bagian = [];
+    Object.keys(query || {}).forEach(function (k) {
+      var v = query[k];
+      if (v === null || v === undefined || v === '') return;
+      bagian.push(encodeURIComponent(k) + '=' + encodeURIComponent(v));
+    });
+    return bagian.length ? '?' + bagian.join('&') : '';
+  }
 
-    function request(method, path, opts) {
-        opts = opts || {};
-        var url = (CFG.apiBase || '') + path;
-        if (opts.query) {
-            var qs = new URLSearchParams(opts.query).toString();
-            if (qs) { url += (url.indexOf('?') > -1 ? '&' : '?') + qs; }
+  function buatHeader(opsi, adaBody) {
+    var h = { Accept: 'application/json' };
+    if (adaBody) h['Content-Type'] = 'application/json';
+    var t = opsi.auth === false ? null : ambilToken();
+    if (t) h.Authorization = 'Bearer ' + t;
+    return h;
+  }
+
+  function pesanJaringan() {
+    return 'Tidak dapat terhubung ke server. Periksa koneksi internet lalu coba lagi.';
+  }
+
+  function ubahKeError(res, json, opsi) {
+    var pesan = (json && json.message) || 'Terjadi gangguan, coba lagi.';
+    if (res.status === 401 && opsi.auth !== false) sesiBerakhir(pesan);
+    return ApiError(res.status, pesan, json && json.errors);
+  }
+
+  /**
+   * request(metode, path, { query, body, auth = true, penuh = false })
+   * Mengembalikan `data` dari respons sukses ({success,message,data}); penuh:true mengembalikan seluruh badan.
+   * Melempar ApiError. 401 pada permintaan bertoken => token dihapus + pemberitahuan sesi berakhir.
+   */
+  function request(metode, path, opsi) {
+    opsi = opsi || {};
+    var adaBody = opsi.body !== undefined && opsi.body !== null;
+    var url = cfg().apiBase + path + qs(opsi.query);
+
+    return global.fetch(url, {
+      method: metode,
+      headers: buatHeader(opsi, adaBody),
+      body: adaBody ? JSON.stringify(opsi.body) : undefined
+    }).then(function (res) {
+      return res.text().then(function (teks) {
+        var json = null;
+        try { json = teks ? JSON.parse(teks) : null; } catch (e) { json = null; }
+        if (!res.ok || !json || json.success !== true) {
+          if (json === null && res.ok) throw ApiError(0, 'Respons server tidak dapat dibaca.');
+          throw ubahKeError(res, json, opsi);
         }
+        return opsi.penuh ? json : json.data;
+      });
+    }, function () {
+      throw ApiError(0, pesanJaringan());
+    });
+  }
 
-        var headers = { 'Accept': 'application/json' };
-        var token = getToken();
-        if (token) { headers['Authorization'] = 'Bearer ' + token; }
-        if (opts.body !== undefined) { headers['Content-Type'] = 'application/json'; }
-
-        var ctrl = new AbortController();
-        var timer = setTimeout(function () { ctrl.abort(); }, opts.timeout || 15000);
-
-        return fetch(url, {
-            method: method,
-            headers: headers,
-            body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
-            signal: ctrl.signal
-        }).then(function (res) {
-            clearTimeout(timer);
-            return res.json().catch(function () { return {}; }).then(function (body) {
-                if (res.status === 401) { logout(); throw new ApiError(401, 'Sesi berakhir. Silakan masuk lagi.'); }
-                if (!res.ok) {
-                    throw new ApiError(res.status, (body && body.message) || 'Terjadi kesalahan pada server.');
-                }
-                return (body && body.data !== undefined) ? body.data : body;
-            });
-        }, function (err) {
-            clearTimeout(timer);
-            throw new ApiError(0, err && err.name === 'AbortError'
-                ? 'Server tidak merespons. Coba lagi.'
-                : 'Tidak bisa terhubung ke server. Periksa koneksi internet Anda.');
+  /** Unduh berkas (mis. Excel). Mengembalikan { blob, namaFile }. Token dikirim lewat header, bukan URL. */
+  function unduh(path, query) {
+    return global.fetch(cfg().apiBase + path + qs(query), {
+      method: 'GET',
+      headers: buatHeader({}, false)
+    }).then(function (res) {
+      var tipe = (res.headers.get('Content-Type') || '').toLowerCase();
+      if (!res.ok || tipe.indexOf('application/json') === 0) {
+        return res.text().then(function (teks) {
+          var json = null;
+          try { json = JSON.parse(teks); } catch (e) { json = null; }
+          throw ubahKeError(res, json, {});
         });
-    }
+      }
+      return res.blob().then(function (blob) {
+        var m = /filename="?([^";]+)"?/i.exec(res.headers.get('Content-Disposition') || '');
+        return { blob: blob, namaFile: m ? m[1] : 'laporan.xlsx' };
+      });
+    }, function () {
+      throw ApiError(0, pesanJaringan());
+    });
+  }
 
-    w.SIKESA = w.SIKESA || {};
-    w.SIKESA.getToken = getToken;
-    w.SIKESA.getUser = getUser;
-    w.SIKESA.logout = logout;
-    w.SIKESA.ApiError = ApiError;
-    w.SIKESA.api = {
-        get:  function (path, query) { return request('GET', path, { query: query }); },
-        post: function (path, body)  { return request('POST', path, { body: body || {} }); },
-        put:  function (path, body)  { return request('PUT', path, { body: body || {} }); },
-        del:  function (path)        { return request('DELETE', path); }
-    };
-})(window);
+  /** Memicu penyimpanan berkas di browser (satu-satunya bagian yang menyentuh document). */
+  function simpanBlob(blob, namaFile) {
+    var url = global.URL.createObjectURL(blob);
+    var a = global.document.createElement('a');
+    a.href = url;
+    a.download = namaFile;
+    global.document.body.appendChild(a);
+    a.click();
+    global.document.body.removeChild(a);
+    global.setTimeout(function () { global.URL.revokeObjectURL(url); }, 1000);
+  }
+
+  SIKESA.api = {
+    ApiError: ApiError,
+    request: request,
+    get: function (p, query) { return request('GET', p, { query: query }); },
+    post: function (p, body) { return request('POST', p, { body: body }); },
+    put: function (p, body) { return request('PUT', p, { body: body }); },
+    del: function (p) { return request('DELETE', p); },
+    unduh: unduh,
+    simpanBlob: simpanBlob,
+    ambilToken: ambilToken,
+    simpanToken: simpanToken,
+    hapusToken: hapusToken,
+    onSesiBerakhir: onSesiBerakhir,
+    config: cfg
+  };
+  // ---- Kompatibilitas dengan tampilan (layout/footer/login memakai sikesa_token + sikesa_user) ----
+  var USER_KEY = 'sikesa_user';
+  SIKESA.ApiError = ApiError;
+  SIKESA.getToken = ambilToken;
+  SIKESA.getUser = function () {
+    try { return JSON.parse(global.localStorage.getItem(USER_KEY) || 'null'); } catch (e) { return null; }
+  };
+  SIKESA.logout = function () {
+    hapusToken();
+    try { global.localStorage.removeItem(USER_KEY); } catch (e) { /* diabaikan */ }
+    var u = cfg().loginUrl || 'index.php?page=login';
+    if (global.location && global.location.replace) { global.location.replace(u); }
+  };
+})(typeof window !== 'undefined' ? window : globalThis);

@@ -128,11 +128,28 @@
         errorBox.hidden = true;
         [kartuKelas, kartuAbsen].forEach(function (k) { k.hidden = false; k.setAttribute('aria-busy', 'true'); });
 
-        S.api.get('/guru/dashboard').then(function (data) {
-            data = data || {};
+        // Endpoint nyata backend: /api/guru/me, /siswa, /dasbor/absensi, /absensi (lihat KONTRAK_API.md bagian 4)
+        S.api.get('/api/guru/me').then(function (me) {
+            me = me || {};
+            var kelas = me.kelas || null;
+            if (!kelas) { return { me: me, siswa: null, status: null, rekap: null }; }
+            return Promise.all([
+                S.api.get('/api/guru/siswa'),
+                S.api.get('/api/guru/dasbor/absensi')
+            ]).then(function (r) {
+                var status = r[1] || {};
+                if (status.status !== 'sudah') { return { me: me, siswa: r[0], status: status, rekap: null }; }
+                return S.api.get('/api/guru/absensi', { date: status.tanggal }).then(function (a) {
+                    var rk = { hadir: 0, sakit: 0, izin: 0, alpa: 0 };
+                    ((a && a.items) || []).forEach(function (it) { if (it.status && rk[it.status] !== undefined) { rk[it.status]++; } });
+                    return { me: me, siswa: r[0], status: status, rekap: rk };
+                });
+            });
+        }).then(function (h) {
             var now = new Date();
-            var guru = data.guru || {};
-            var kelas = data.kelas || null;
+            var guru = h.me.guru || {};
+            var kelas = h.me.kelas || null;
+            if (kelas && h.siswa) { kelas.jumlah_siswa = h.siswa.total; }
 
             var u = S.getUser() || {};
             renderSapaan(now, {
@@ -143,8 +160,11 @@
                 nama: guru.nama_guru,
                 peran: guru.jabatan || (kelas ? 'Wali Kelas ' + kelas.nama_kelas : 'Guru')
             });
-            renderKelas(kelas, data.tahun_ajaran);
-            renderAbsensi(now, kelas, data.absensi_hari_ini, data.libur || data.hari_libur);
+            renderKelas(kelas, h.me.tahun_ajaran);
+            var st = h.status || {};
+            renderAbsensi(now, kelas,
+                { sudah_absen: st.status === 'sudah', ringkasan: h.rekap },
+                st.status === 'libur' ? { keterangan: '' } : null);
         }).catch(function (err) {
             tampilError(err && err.message ? err.message : 'Data belum bisa dimuat.');
         }).then(function () { sedangMuat = false; });

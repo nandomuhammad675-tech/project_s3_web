@@ -100,42 +100,60 @@ final class DataGuruRepository
     public function konteksAktif(int $idUser): ?array
     {
         $st = $this->db->prepare(
-    'SELECT g.id_guru, g.nama_guru, g.nip, g.email, g.no_telepon, g.foto_profil, t.id_tahun_ajaran, t.nama_tahun, t.semester_aktif,
-            k.id_kelas, k.nama_kelas, k.tingkat_kelas
-     FROM data_guru g
-     LEFT JOIN tahun_ajaran t ON t.status_aktif = 1
-     LEFT JOIN kelas k ON k.id_guru_wali = g.id_guru AND k.id_tahun_ajaran = t.id_tahun_ajaran
-     WHERE g.id_user = ? LIMIT 1'
-);
+            'SELECT g.id_guru, g.nama_guru, g.nip, g.email, g.no_telepon, g.foto_profil, t.id_tahun_ajaran, t.nama_tahun, t.semester_aktif,
+                    k.id_kelas, k.nama_kelas, k.tingkat_kelas
+             FROM data_guru g
+             LEFT JOIN tahun_ajaran t ON t.status_aktif = 1
+             LEFT JOIN kelas k ON k.id_guru_wali = g.id_guru AND k.id_tahun_ajaran = t.id_tahun_ajaran
+             WHERE g.id_user = ? LIMIT 1'
+        );
         $st->execute([$idUser]);
         $r = $st->fetch();
         if ($r === false) {
             return null;
         }
         return [
-    'id_guru'         => (int) $r['id_guru'],
-    'nama_guru'       => (string) $r['nama_guru'],
-    'nip'             => $r['nip'],
-    'email'           => $r['email'],
-    'no_telepon'      => $r['no_telepon'],
-    'foto_profil'     => $r['foto_profil'],
-    'id_tahun_ajaran' => $r['id_tahun_ajaran'] === null ? null : (int) $r['id_tahun_ajaran'],
-    'nama_tahun'      => $r['nama_tahun'],
-    'semester'        => $r['semester_aktif'],
-    'id_kelas'        => $r['id_kelas'] === null ? null : (int) $r['id_kelas'],
-    'nama_kelas'      => $r['nama_kelas'],
-    'tingkat_kelas'   => $r['tingkat_kelas'] === null ? null : (int) $r['tingkat_kelas'],
-];
+            'id_guru'         => (int) $r['id_guru'],
+            'nama_guru'       => (string) $r['nama_guru'],
+            'nip'             => $r['nip'],
+            'email'           => $r['email'],
+            'no_telepon'      => $r['no_telepon'],
+            'foto_profil'     => $r['foto_profil'],
+            'id_tahun_ajaran' => $r['id_tahun_ajaran'] === null ? null : (int) $r['id_tahun_ajaran'],
+            'nama_tahun'      => $r['nama_tahun'],
+            'semester'        => $r['semester_aktif'],
+            'id_kelas'        => $r['id_kelas'] === null ? null : (int) $r['id_kelas'],
+            'nama_kelas'      => $r['nama_kelas'],
+            'tingkat_kelas'   => $r['tingkat_kelas'] === null ? null : (int) $r['tingkat_kelas'],
+        ];
     }
 
-    /** Profil publik (FR-WEB-01): hanya nama, NIP, jabatan, foto; tanpa email/telepon. Hanya Guru berakun aktif. */
+    /**
+     * Profil publik (FR-WEB-01): nama, NIP, jabatan, foto, dan nama ekstrakurikuler yang diajar (`ekskul`, array; kosong bila tidak mengajar ekstra);
+     * tanpa email/telepon. Hanya Guru berakun aktif.
+     */
     public function publik(): array
     {
-        return $this->db->query(
-            "SELECT g.nama_guru, g.nip, g.jabatan, g.foto_profil
+        $rows = $this->db->query(
+            "SELECT g.id_guru, g.nama_guru, g.nip, g.jabatan, g.foto_profil
              FROM data_guru g JOIN akun_pengguna a ON a.id_user = g.id_user AND a.status_akun = 'aktif'
              ORDER BY g.nama_guru, g.id_guru"
         )->fetchAll();
+
+        $peta = [];
+        $st = $this->db->query(
+            'SELECT ge.id_guru, e.nama_ekskul FROM guru_ekskul ge JOIN ekstrakurikuler e ON e.id_ekskul = ge.id_ekskul
+             ORDER BY e.nama_ekskul, e.id_ekskul'
+        );
+        foreach ($st->fetchAll() as $r) {
+            $peta[(int) $r['id_guru']][] = $r['nama_ekskul'];
+        }
+
+        return array_map(static function (array $r) use ($peta): array {
+            $r['ekskul'] = $peta[(int) $r['id_guru']] ?? [];
+            unset($r['id_guru']);
+            return $r;
+        }, $rows);
     }
 
     private function filter(?string $q): array
@@ -147,4 +165,3 @@ final class DataGuruRepository
         return [' WHERE (g.nama_guru LIKE ? OR g.nip LIKE ?)', [$like, $like]];
     }
 }
-
