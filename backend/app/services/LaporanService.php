@@ -74,6 +74,7 @@ final class LaporanService
             $kunci = $r['id_siswa'] . '|' . $r['id_mapel'];
             $baris = &$peta[$r['id_kelas']]['nilai'];
             $baris[$kunci] ??= [
+                'id_siswa' => $r['id_siswa'],
                 'nisn' => $r['nisn'], 'nama_siswa' => $r['nama_siswa'], 'nomor_absen' => $r['nomor_absen'],
                 'id_mapel' => $r['id_mapel'], 'nama_mapel' => $r['nama_mapel'], 'uh' => [], 'asts' => null, 'asas' => null,
             ];
