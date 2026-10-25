@@ -1,37 +1,16 @@
-<?php
-/**
- * Layout: topbar — breadcrumb, lonceng, avatar + menu akun.
- */
-?>
-    <header class="topbar">
-      <a class="topbar-brand" href="<?= e($root) ?>index.php?page=beranda" aria-label="SI-KESA">
-        <img src="<?= e(asset('img/logo.png')) ?>" alt="" width="28" height="28">
-      </a>
-
-      <nav class="breadcrumb" aria-label="Lokasi halaman">
-        <span>Guru</span>
-        <?= icon('chevron-right', 'i--xs') ?>
-        <strong aria-current="page"><?= e($pageTitle) ?></strong>
-      </nav>
-
-      <div class="topbar-actions">
-        <button type="button" class="icon-btn" id="btnNotif" aria-label="Notifikasi">
-          <?= icon('bell') ?>
-          <span class="dot" id="notifDot" hidden></span>
+<header class="bg-white px-8 py-4 flex justify-between items-center shadow-sm z-20">
+    <div class="text-sm text-gray-500 font-medium flex gap-2">
+        <span>Guru</span> 
+        <span>&gt;</span> 
+        <span class="text-gray-800 font-semibold"><?= $page_title ?? 'Beranda' ?></span>
+    </div>
+    <div class="flex items-center gap-4">
+        <button class="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 relative">
+            <i class="ph ph-bell text-xl"></i>
+            <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
         </button>
-
-        <div class="menu-wrap">
-          <button type="button" class="avatar avatar--btn" id="btnAvatar" aria-haspopup="true" aria-expanded="false" aria-controls="menuAvatar" aria-label="Menu akun">
-            <span data-user-initials>-</span>
-          </button>
-          <div class="menu" id="menuAvatar" role="menu" hidden>
-            <div class="menu-head">
-              <strong data-user-name>Guru</strong>
-              <small data-user-role>Guru</small>
-            </div>
-            <a role="menuitem" href="<?= e($root) ?>index.php?page=akun"><?= icon('user-round') ?>Akun saya</a>
-            <button role="menuitem" type="button" data-logout><?= icon('log-out') ?>Keluar</button>
-          </div>
-        </div>
-      </div>
-    </header>
+        <button class="w-10 h-10 rounded-full bg-[#E5E0D8] text-[#455a2d] font-bold text-sm flex items-center justify-center">
+            BR
+        </button>
+    </div>
+</header>
