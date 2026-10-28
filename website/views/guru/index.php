@@ -1,59 +1,9 @@
 <?php
+require_once __DIR__ . '/../../lib/bootstrap.php';
 /**
  * Halaman Profil (Sejarah, Sambutan, Visi & Misi, Guru) - SD Negeri Kedungsari 1
  * SATU FILE. Letakkan di: website/views/guru/index.php
  */
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
-// Fungsi bantu (dilewati jika framework Anda sudah punya)
-if (!function_exists('base_url')) {
-    function base_url(string $path = ''): string {
-        static $base = null;
-        if ($base === null) {
-            $base = '';
-            // Cari folder yang berisi "assets" (website/public), lalu hitung URL-nya dari document root
-            $root = rtrim(str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT'] ?? '') ?: ''), '/');
-            foreach ([__DIR__ . '/../../public', __DIR__ . '/public', __DIR__, __DIR__ . '/..'] as $dir) {
-                $assets = realpath($dir . '/assets');
-                if ($assets) {
-                    $pub = str_replace('\\', '/', dirname($assets));
-                    if ($root !== '' && stripos($pub, $root) === 0) {
-                        $base = substr($pub, strlen($root)) . '/';
-                        break;
-                    }
-                }
-            }
-            // Cadangan jika tidak ketemu
-            if ($base === '') {
-                $base = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/') . '/';
-            }
-        }
-        return $base . ltrim($path, '/');
-    }
-}
-if (!function_exists('esc')) {
-    function esc($text): string {
-        return htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8');
-    }
-}
-
-// ===== ALAMAT HALAMAN (ubah di sini jika route proyek Anda berbeda) =====
-// Alamat dibaca oleh public/index.php: '?page=guru' membuka views/guru/index.php
-if (!function_exists('page_url')) {
-    function page_url(string $key): string {
-        static $map = [
-            'home'    => '',
-            'profil'  => '?page=guru',
-            'berita'  => '?page=kegiatan',
-            'ekstra'  => '?page=ekstrakurikuler',
-            'galeri'  => '?page=galeri',
-            'kontak'  => '?page=kontak',
-            'ppdb'    => '?page=ppdb',
-        ];
-        return base_url($map[$key] ?? $key);
-    }
-}
 
 $current = 'profil';
 
@@ -72,18 +22,28 @@ $data = [
     ],
 
     // ---- Guru ----
-    'kepsek' => ['nama' => 'Micella Bunga A.', 'nip' => 'E41252504', 'foto' => 'assets/img/guru/kepala-sekolah.jpg'],
+    'kepsek' => null,   // diisi dari database (Guru berjabatan "Kepala Sekolah")
 
     'guru' => [
-        ['nama' => 'Aji Ariya K. D.',   'nip' => 'E41252202', 'foto' => 'assets/img/guru/guru-1.jpg'],
-        ['nama' => 'Muhammad A. R.',    'nip' => 'E41252251', 'foto' => 'assets/img/guru/guru-2.jpg'],
-        ['nama' => 'Muhammad R. F.',    'nip' => 'E41252552', 'foto' => 'assets/img/guru/guru-3.jpg'],
-        ['nama' => 'Putra Suis A.',     'nip' => 'E41252606', 'foto' => 'assets/img/guru/guru-4.jpg'],
-        ['nama' => 'Muhammad A.N.M.',   'nip' => 'E41253115', 'foto' => 'assets/img/guru/guru-5.jpg'],
-        ['nama' => 'Muhammad V. S.',    'nip' => 'E41252273', 'foto' => 'assets/img/guru/guru-6.jpg'],
+        ['nama' => 'Aji Ariya K. D.',   'nip' => 'E41252202', 'foto' => 'assets/gambar/guru-default.svg'],
+        ['nama' => 'Muhammad A. R.',    'nip' => 'E41252251', 'foto' => 'assets/gambar/guru-default.svg'],
+        ['nama' => 'Muhammad R. F.',    'nip' => 'E41252552', 'foto' => 'assets/gambar/guru-default.svg'],
+        ['nama' => 'Putra Suis A.',     'nip' => 'E41252606', 'foto' => 'assets/gambar/guru-default.svg'],
+        ['nama' => 'Muhammad A.N.M.',   'nip' => 'E41253115', 'foto' => 'assets/gambar/guru-default.svg'],
+        ['nama' => 'Muhammad V. S.',    'nip' => 'E41252273', 'foto' => 'assets/gambar/guru-default.svg'],
     ],
 ];
+require_once __DIR__ . '/../../lib/api.php';
+$data = sikesa_guru($data);
 extract($data);
+
+layout_start([
+    'title'       => $title ?? 'SD Negeri Kedungsari 1',
+    'current'     => 'profil',
+    'description' => 'Website resmi SD Negeri Kedungsari 1 - Cerdas, Berkarakter, Berprestasi',
+    'css'         => 'guru',
+    'js'          => 'home',
+]);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -316,7 +276,7 @@ $menuLain = [
 <main>
 
     <!-- ================= HERO ================= -->
-    <section class="hero page-hero" style="--bg:url('<?= base_url('assets/home.jpg') ?>')">
+    <section class="hero page-hero" style="--bg:url('<?= asset('gambar/home.jpg') ?>')">
         <div class="page-hero__content">
             <h1>PROFIL</h1>
             <p>Mengenal lebih dekat<br>SD NEGERI KEDUNGSARI 1</p>
@@ -348,7 +308,7 @@ $menuLain = [
 
         <div class="sambutan">
             <div class="sambutan__photo">
-                <img src="<?= base_url('assets/profil.jpg') ?>" alt="Lestari, S.Pd., M.Pd.">
+                <img src="<?= $kepsek ? esc(sikesa_img($kepsek['foto'])) : asset('gambar/guru-default.svg') ?>" alt="<?= $kepsek ? esc($kepsek['nama']) : 'Kepala Sekolah' ?>">
             </div>
 
             <div class="sambutan__card">
@@ -357,8 +317,8 @@ $menuLain = [
                 <p>Melalui kerja sama erat bersama para orang tua, kami berkomitmen memberikan generasi yang berakhlak mulia, berwawasan luas, serta siap menyongsong masa depan dengan percaya diri.</p>
 
                 <div class="sambutan__name">
-                    <strong>Lestari, S.Pd., M.Pd.</strong>
-                    <small>Kepala Sekolah SDN Kedungsari 1</small>
+                    <?php if ($kepsek): ?><strong><?= esc($kepsek['nama']) ?></strong><?php endif; ?>
+                    <small><?= esc(($kepsek['jabatan'] ?? '') ?: 'Kepala Sekolah') ?> SDN Kedungsari 1</small>
                 </div>
             </div>
         </div>
@@ -387,25 +347,29 @@ $menuLain = [
 
     <!-- ================= GURU ================= -->
     <section class="section section--leaf" id="guru">
+        <?php if ($kepsek): ?>
         <h2 class="title">Kepala Sekolah</h2>
 
         <figure class="guru guru--kepsek">
-            <img src="<?= base_url($kepsek['foto']) ?>" alt="<?= esc($kepsek['nama']) ?>" loading="lazy">
+            <img src="<?= sikesa_img($kepsek['foto']) ?>" alt="<?= esc($kepsek['nama']) ?>" loading="lazy">
             <figcaption>
                 <strong><?= esc($kepsek['nama']) ?></strong>
-                <span>NIP. <?= esc($kepsek['nip']) ?></span>
+                <?php if (!empty($kepsek['jabatan'])): ?><em><?= esc($kepsek['jabatan']) ?></em><?php endif; ?>
+                <?php if (!empty($kepsek['nip'])): ?><span>NIP. <?= esc($kepsek['nip']) ?></span><?php endif; ?>
             </figcaption>
         </figure>
+        <?php endif; ?>
 
         <h2 class="title title--gap">Guru - Guru</h2>
 
         <div class="guru-grid">
             <?php foreach ($guru as $g): ?>
                 <figure class="guru">
-                    <img src="<?= base_url($g['foto']) ?>" alt="<?= esc($g['nama']) ?>" loading="lazy">
+                    <img src="<?= sikesa_img($g['foto']) ?>" alt="<?= esc($g['nama']) ?>" loading="lazy">
                     <figcaption>
                         <strong><?= esc($g['nama']) ?></strong>
-                        <span>NIP. <?= esc($g['nip']) ?></span>
+                        <?php if (!empty($g['jabatan'])): ?><em><?= esc($g['jabatan']) ?></em><?php endif; ?>
+                        <?php if (!empty($g['nip'])): ?><span>NIP. <?= esc($g['nip']) ?></span><?php endif; ?>
                     </figcaption>
                 </figure>
             <?php endforeach; ?>

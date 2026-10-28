@@ -1,70 +1,17 @@
 <?php
+require_once __DIR__ . '/../../lib/bootstrap.php';
 /**
  * Halaman Hubungi Kami - SD Negeri Kedungsari 1
  * SATU FILE. Letakkan di: website/views/kontak/index.php
  * Dibuka lewat '?page=kontak'
  */
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
-// ===== Fungsi bantu (dilewati jika sudah ada) =====
-if (!function_exists('base_url')) {
-    function base_url(string $path = ''): string {
-        static $base = null;
-        if ($base === null) {
-            $base = '';
-            $root = rtrim(str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT'] ?? '') ?: ''), '/');
-            foreach ([__DIR__ . '/../../public', __DIR__ . '/public', __DIR__, __DIR__ . '/..'] as $dir) {
-                $assets = realpath($dir . '/assets');
-                if ($assets) {
-                    $pub = str_replace('\\', '/', dirname($assets));
-                    if ($root !== '' && stripos($pub, $root) === 0) {
-                        $base = substr($pub, strlen($root)) . '/';
-                        break;
-                    }
-                }
-            }
-            if ($base === '') {
-                $base = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/') . '/';
-            }
-        }
-        return $base . ltrim($path, '/');
-    }
-}
-if (!function_exists('esc')) {
-    function esc($text): string {
-        return htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8');
-    }
-}
-if (!function_exists('page_url')) {
-    function page_url(string $key): string {
-        static $map = [
-            'home'    => '',
-            'profil'  => '?page=guru',
-            'berita'  => '?page=kegiatan',
-            'ekstra'  => '?page=ekstrakurikuler',
-            'galeri'  => '?page=galeri',
-            'kontak'  => '?page=kontak',
-            'ppdb'    => '?page=ppdb',
-        ];
-        return base_url($map[$key] ?? $key);
-    }
-}
 
 $current = 'kontak';
 
-// ===== DATA KONTAK (ubah di sini) =====
-$kontak = [
-    'alamat'    => 'Jl. Raya Kedungsari No. 154, Kedungsari, Kec. Tarokan, Kab. Kediri, Jawa Timur.',
-    'telepon'   => '(0000) 0000',
-    'email'     => 'dnkedungsarisatu@yahoo.co.id',
-    'whatsapp'  => '0000-0000-0000',
-    'instagram' => '#',   // ganti dengan link Instagram sekolah
-    'facebook'  => '#',   // ganti dengan link Facebook sekolah
-];
-
-// Peta: ganti dengan link "Sematkan peta" (embed) Google Maps sekolah jika ingin titik yang tepat
-$petaUrl = 'https://www.google.com/maps?q=' . rawurlencode('SDN Kedungsari 1, Tarokan, Kediri') . '&output=embed';
+// ===== DATA KONTAK: satu sumber (views/partials/site-info.php), sama dengan footer semua halaman =====
+// Sesuai dokumen, kontak ditulis tetap di kode (bukan dari database / API) dan tidak ada formulir kirim pesan.
+$kontak  = require __DIR__ . '/../partials/site-info.php';
+$petaUrl = $kontak['peta'];
 
 // Link bantu: nomor telepon & WhatsApp
 $telHref = 'tel:' . preg_replace('/[^0-9+]/', '', $kontak['telepon']);
@@ -75,7 +22,16 @@ if (strpos($waDigit, '0') === 0) {
 $waHref = 'https://wa.me/' . $waDigit;
 
 $title = 'Hubungi Kami - SD Negeri Kedungsari 1';
+
+layout_start([
+    'title'       => $title ?? 'SD Negeri Kedungsari 1',
+    'current'     => 'kontak',
+    'description' => 'Hubungi SD Negeri Kedungsari 1 - alamat, telepon, email, WhatsApp, dan lokasi sekolah',
+    'css'         => 'kontak',
+    'js'          => null,
+]);
 ?>
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -235,6 +191,8 @@ $menuLain = [
         </ul>
     </nav>
 
+=======
+>>>>>>> 82200f0e38e90c8bbf80824aab51d892a727d18d
 <main>
     <section class="section section--leaf kontak-section" id="kontak">
         <h1 class="title">Hubungi Kami</h1>
@@ -322,6 +280,7 @@ $menuLain = [
         </div>
     </section>
 </main>
+<<<<<<< HEAD
 
 <footer class="footer">
     <div class="footer__inner">
@@ -380,3 +339,6 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+=======
+<?php layout_end(); ?>
+>>>>>>> 82200f0e38e90c8bbf80824aab51d892a727d18d

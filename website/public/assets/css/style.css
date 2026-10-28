@@ -1,0 +1,77 @@
+/* style.css - gaya bersama SELURUH halaman website publik (dimuat sekali oleh layouts/main.php).
+   Gaya khusus halaman ada di assets/css/pages/<halaman>.css */
+/* ===== Token warna & ukuran (satu sumber untuk semua halaman) ===== */
+:root{
+    --green:#5b7553;--green-dark:#46603f;--green-soft:#a9b79a;
+    --sage:#eeecdc;--cream:#f6ecdc;--paper:#fbfaf4;--card-blue:#eef2f8;
+    --orange:#f08a1c;--ink:#2f3a2c;--muted:#6b7566;--radius:14px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Poppins',sans-serif;color:var(--ink);background:var(--paper);line-height:1.6}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+ul{list-style:none}
+:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+.navbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between; padding:10px 6vw;background:linear-gradient(90deg,#4f6b49,#5f7d57);color:#fff}
+.navbar__brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:.95rem}
+.navbar__brand img{width:42px;height:42px;object-fit:contain}
+.navbar__menu{display:flex;align-items:center;gap:26px;font-size:.9rem;font-weight:500}
+.navbar__menu a{padding:6px 2px;border-bottom:2px solid transparent;transition:border-color .2s}
+.navbar__menu a:hover,.navbar__menu a.is-active{border-color:#fff}
+.btn-ppdb{display:inline-block;background:var(--orange);color:#fff!important;padding:7px 18px!important; border-radius:999px;border:0!important;font-weight:600;transition:background .2s}
+.btn-ppdb:hover{background:#d9780f}
+.navbar__toggle{display:none;background:none;border:0;cursor:pointer;flex-direction:column;gap:5px}
+.navbar__toggle span{width:24px;height:2px;background:#fff;display:block}
+.hero{position:relative;min-height:calc(100vh - 64px);min-height:calc(100svh - 64px);display:flex;align-items:flex-end; background:linear-gradient(180deg,rgba(60,90,55,.55),rgba(60,90,55,.82)),var(--bg) center/cover}
+.section{position:relative;padding:72px 6vw;text-align:center;overflow:hidden}
+.section--tint{background:var(--sage)}
+.section--leaf::before,.section--leaf::after{content:"";position:absolute;width:190px;height:260px;opacity:.28;pointer-events:none; background:no-repeat center/contain url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140'><path d='M50 4C95 40 98 100 50 136 2 100 5 40 50 4Z' fill='%236f8a62'/><path d='M50 14V132' stroke='%23fbfaf4' stroke-width='2'/></svg>")}
+.section--leaf::before{left:-60px;top:40px;transform:rotate(-25deg)}
+.section--leaf::after{right:-60px;top:20px;transform:rotate(30deg) scaleX(-1)}
+.title{position:relative;display:inline-block;font-size:clamp(1.7rem,3.5vw,2.4rem);font-weight:700;color:var(--green);margin-bottom:34px;padding-bottom:12px}
+.title::after{content:"";position:absolute;left:50%;bottom:0;width:60%;height:3px;background:var(--green);transform:translateX(-50%);border-radius:3px}
+.pill{display:inline-block;font:inherit;font-size:.85rem;font-weight:600;padding:6px 20px;border-radius:999px;cursor:pointer; background:#fff;color:var(--green-dark);border:1.5px solid var(--green);transition:background .2s,color .2s}
+.pill--solid{background:var(--green);color:#fff}
+.pill:hover{background:var(--green-dark);color:#fff}
+.footer{background:linear-gradient(90deg,#4f6b49,#5f7d57);color:#fff;font-size:.8rem}
+.footer__inner{display:grid;grid-template-columns:1.3fr 1fr .8fr 1.4fr;gap:30px;padding:40px 6vw 28px}
+.footer__logo{display:flex;align-items:center;gap:10px;font-size:1rem;margin-bottom:8px}
+.footer__logo img{width:46px;height:46px;object-fit:contain}
+.footer h4{font-size:.9rem;margin-bottom:10px}
+.footer li{margin-bottom:6px;opacity:.9}
+.footer a:hover{text-decoration:underline}
+.footer__map{width:100%;height:90px;border:0;border-radius:8px;margin-top:10px}
+.footer__copy{text-align:center;padding:12px;border-top:1px solid rgba(255,255,255,.25);font-size:.72rem}
+.page-hero__content{position:relative;color:#fff;padding:0 6vw}
+.page-hero h1{font-size:clamp(2.6rem,7vw,4.4rem);font-weight:700;letter-spacing:1px;line-height:1.1}
+.page-hero p{font-size:clamp(1rem,2.2vw,1.35rem);font-weight:500;margin-top:6px}
+.page-hero{align-items:center;justify-content:center;text-align:center}
+
+/* ===== Tombol pill & paginasi (dipakai Berita, Galeri, Ekstra, Mading) ===== */
+.pager__dots{position:relative;z-index:1;display:flex;justify-content:center;gap:10px;margin:46px 0 18px}
+.pager__dots a{width:11px;height:11px;border-radius:50%;background:#c8cabb;display:block}
+.pager__dots a.is-on{background:var(--green);width:26px;border-radius:9px}
+.pager__nav{position:relative;z-index:1;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:46px}
+.pager__dots + .pager__nav{margin-top:0}
+.pill.is-disabled{opacity:.4;pointer-events:none}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* ===== Responsif layout bersama (navbar & footer) ===== */
+@media (max-width:1080px){.navbar__menu{gap:16px;font-size:.86rem}}
+@media (max-width:900px){
+    .navbar__toggle{display:flex}
+    .navbar__menu{position:absolute;top:100%;left:0;right:0;flex-direction:column;align-items:flex-start;gap:0;
+        background:#4f6b49;padding:10px 6vw 18px;display:none;font-size:.9rem}
+    .navbar__menu.is-open{display:flex}
+    .navbar__menu li{width:100%;padding:8px 0}
+    .footer__inner{grid-template-columns:1fr 1fr}
+}
+@media (max-width:520px){
+    .page-hero h1{font-size:clamp(1.8rem,9vw,2.6rem);overflow-wrap:anywhere}
+    .section{padding:56px 5vw}
+    .footer__inner{grid-template-columns:1fr}
+}
+[id]{scroll-margin-top:72px}

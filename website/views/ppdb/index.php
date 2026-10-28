@@ -1,65 +1,26 @@
 <?php
+require_once __DIR__ . '/../../lib/bootstrap.php';
 /**
  * Halaman PPDB - SD Negeri Kedungsari 1
  * SATU FILE. Letakkan di: website/views/ppdb/index.php
  * Dibuka lewat '?page=ppdb'
- * Formulir pendaftaran dibuka lewat '?page=ppdb&step=formulir' (file formulir.php di folder yang sama)
+ * Formulir pendaftaran = Google Form dari pengaturan_sistem.ppdb_form_url (bagian #daftar di halaman ini)
  */
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
 
-// ===== Fungsi bantu (dilewati jika sudah ada) =====
-if (!function_exists('base_url')) {
-    function base_url(string $path = ''): string {
-        static $base = null;
-        if ($base === null) {
-            $base = '';
-            $root = rtrim(str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT'] ?? '') ?: ''), '/');
-            foreach ([__DIR__ . '/../../public', __DIR__ . '/public', __DIR__, __DIR__ . '/..'] as $dir) {
-                $assets = realpath($dir . '/assets');
-                if ($assets) {
-                    $pub = str_replace('\\', '/', dirname($assets));
-                    if ($root !== '' && stripos($pub, $root) === 0) {
-                        $base = substr($pub, strlen($root)) . '/';
-                        break;
-                    }
-                }
-            }
-            if ($base === '') {
-                $base = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/') . '/';
-            }
-        }
-        return $base . ltrim($path, '/');
-    }
-}
-if (!function_exists('esc')) {
-    function esc($text): string {
-        return htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8');
-    }
-}
-if (!function_exists('page_url')) {
-    function page_url(string $key): string {
-        static $map = [
-            'home'    => '',
-            'profil'  => '?page=guru',
-            'berita'  => '?page=kegiatan',
-            'ekstra'  => '?page=ekstrakurikuler',
-            'galeri'  => '?page=galeri',
-            'kontak'  => '?page=kontak',
-            'ppdb'    => '?page=ppdb',
-        ];
-        return base_url($map[$key] ?? $key);
-    }
-}
-
-// ===== Tampilkan formulir jika dibuka lewat ?page=ppdb&step=formulir =====
+// Alamat lama '?page=ppdb&step=formulir' dialihkan ke bagian formulir pada halaman ini.
 if (($_GET['step'] ?? '') === 'formulir') {
-    require __DIR__ . '/formulir.php';
-    return;
+    header('Location: ' . page_url('ppdb') . '#daftar', true, 301);
+    exit;
 }
+
+require_once __DIR__ . '/../../lib/api.php';
 
 $current = 'ppdb';
-$formulirUrl = page_url('ppdb') . '&step=formulir';
+
+// Formulir PPDB = Google Form milik sekolah. Alamatnya dibaca dari database (pengaturan_sistem.ppdb_form_url)
+// lewat GET /api/public/pengaturan, diubah Admin dari PWA Admin. SI-KESA tidak menerima/menyimpan jawaban pendaftar.
+$ppdb        = sikesa_ppdb();                 // status: ada | kosong | gagal
+$formulirUrl = '#daftar';
 
 // ===== DATA (ubah di sini) =====
 
@@ -117,6 +78,14 @@ function ikon_info(string $nama): string {
 }
 
 $title = 'PPDB - SD Negeri Kedungsari 1';
+
+layout_start([
+    'title'       => $title ?? 'SD Negeri Kedungsari 1',
+    'current'     => 'ppdb',
+    'description' => 'Pendaftaran Peserta Didik Baru (PPDB) SD Negeri Kedungsari 1 - mudah, cepat, dan sepenuhnya online',
+    'css'         => 'ppdb',
+    'js'          => null,
+]);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -368,7 +337,7 @@ $menuLain = [
 <main>
 
     <!-- ================= HERO ================= -->
-    <section class="hero page-hero" style="--bg:url('<?= base_url('assets/home.jpg') ?>')">
+    <section class="hero page-hero" style="--bg:url('<?= asset('gambar/home.jpg') ?>')">
         <div class="page-hero__content">
             <h1>PPDB</h1>
             <p>Mulai langkah pendidikan putra-putri Anda bersama<br>SD Negeri Kedungsari 1.<br>Proses pendaftaran mudah, cepat, dan sepenuhnya online.</p>
@@ -476,11 +445,24 @@ $menuLain = [
     <!-- ================= SIAP MENDAFTAR ================= -->
     <section class="cta" id="daftar">
         <h2>Siap Mendaftar?</h2>
-        <p>Pastikan data sudah disiapkan sebelum mengisi formulir.<br>Pendaftaran dilakukan melalui formulir online.</p>
-        <a class="btn-cta" href="<?= esc($formulirUrl) ?>">
-            Daftar PPDB Sekarang
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
-        </a>
+        <?php if ($ppdb['status'] === 'ada'): ?>
+            <p>Pastikan data sudah disiapkan sebelum mengisi formulir.<br>Pendaftaran dilakukan melalui formulir online sekolah.</p>
+            <a class="btn-cta" href="<?= esc($ppdb['url']) ?>" target="_blank" rel="noopener">
+                Buka Formulir
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+            </a>
+            <?php if ($ppdb['embed']): ?>
+                <div class="form-embed">
+                    <iframe src="<?= esc($ppdb['embed']) ?>" title="Formulir PPDB SD Negeri Kedungsari 1" loading="lazy">Memuat formulir&hellip;</iframe>
+                </div>
+            <?php endif; ?>
+        <?php elseif ($ppdb['status'] === 'kosong'): ?>
+            <p>Formulir PPDB belum tersedia. Silakan hubungi sekolah.</p>
+            <a class="btn-cta" href="<?= page_url('kontak') ?>">Hubungi Kami</a>
+        <?php else: ?>
+            <p>Formulir gagal dimuat. Periksa koneksi internet Anda lalu coba lagi.</p>
+            <a class="btn-cta" href="<?= page_url('ppdb') ?>#daftar">Coba Lagi</a>
+        <?php endif; ?>
     </section>
 
     <!-- ================= PERTANYAAN UMUM ================= -->

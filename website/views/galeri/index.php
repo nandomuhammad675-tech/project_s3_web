@@ -1,63 +1,11 @@
 <?php
+require_once __DIR__ . '/../../lib/bootstrap.php';
 /**
  * Halaman Galeri - SD Negeri Kedungsari 1
  * Letakkan di: website/views/galeri/index.php
  * Dibuka lewat '?page=galeri'
  */
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
 
-// ===== Fungsi bantu (dilewati jika sudah ada) =====
-if (!function_exists('base_url')) {
-    function base_url(string $path = ''): string {
-        static $base = null;
-        if ($base === null) {
-            $base = '';
-            $root = rtrim(str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT'] ?? '') ?: ''), '/');
-            foreach ([__DIR__ . '/../../public', __DIR__ . '/public', __DIR__, __DIR__ . '/..'] as $dir) {
-                $assets = realpath($dir . '/assets');
-                if ($assets) {
-                    $pub = str_replace('\\', '/', dirname($assets));
-                    if ($root !== '' && stripos($pub, $root) === 0) {
-                        $base = substr($pub, strlen($root)) . '/';
-                        break;
-                    }
-                }
-            }
-            if ($base === '') {
-                $base = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/') . '/';
-            }
-        }
-        return $base . ltrim($path, '/');
-    }
-}
-if (!function_exists('esc')) {
-    function esc($text): string {
-        return htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8');
-    }
-}
-if (!function_exists('page_url')) {
-    function page_url(string $key): string {
-        static $map = [
-            'home'    => '',
-            'profil'  => '?page=guru',
-            'berita'  => '?page=kegiatan',
-            'ekstra'  => '?page=ekstrakurikuler',
-            'galeri'  => '?page=galeri',
-            'kontak'  => '?page=kontak',
-            'ppdb'    => '?page=ppdb',
-        ];
-        return base_url($map[$key] ?? $key);
-    }
-}
-if (!function_exists('tanggal_id')) {
-    function tanggal_id(string $ymd): string {
-        static $bulan = [1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-                         'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-        $t = strtotime($ymd);
-        return date('j', $t) . ' ' . $bulan[(int) date('n', $t)] . ' ' . date('Y', $t);
-    }
-}
 if (!function_exists('galeri_url')) {
     function galeri_url(array $params = []): string {
         return page_url('galeri') . ($params ? '&' . http_build_query($params) : '');
@@ -67,7 +15,8 @@ if (!function_exists('galeri_url')) {
 $current = 'galeri';
 
 // ===== DATA (urutan mengikuti data.php) =====
-$galeriList = require __DIR__ . '/data.php';
+require_once __DIR__ . '/../../lib/api.php';
+$galeriList = sikesa_galeri(require __DIR__ . '/data.php');
 
 // ===== Paginasi =====
 // ?hal=2 -> halaman ke-2 | ?hal=semua -> tampilkan semuanya
@@ -86,7 +35,16 @@ if ($semua) {
 }
 
 $title = 'Galeri - SD Negeri Kedungsari 1';
+
+layout_start([
+    'title'       => $title ?? 'SD Negeri Kedungsari 1',
+    'current'     => 'galeri',
+    'description' => 'Galeri kegiatan SD Negeri Kedungsari 1 - merekam momen berharga dan dokumentasi kegiatan',
+    'css'         => 'galeri',
+    'js'          => null,
+]);
 ?>
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -243,10 +201,12 @@ $menuLain = [
         </ul>
     </nav>
 
+=======
+>>>>>>> 82200f0e38e90c8bbf80824aab51d892a727d18d
 <main>
 
     <!-- ================= HERO ================= -->
-    <section class="hero page-hero" style="--bg:url('<?= base_url('assets/home.jpg') ?>')">
+    <section class="hero page-hero" style="--bg:url('<?= asset('gambar/home.jpg') ?>')">
         <div class="page-hero__content">
             <h1>GALERI</h1>
             <p>Merekam momen berharga dan dokumentasi kegiatan<br>SD NEGERI KEDUNGSARI 1</p>
@@ -263,10 +223,10 @@ $menuLain = [
             <div class="galeri-grid">
                 <?php foreach ($tampil as $g): ?>
                     <figure class="galeri-card">
-                        <img class="galeri-card__img" src="<?= base_url($g['foto']) ?>"
+                        <img class="galeri-card__img" src="<?= sikesa_img($g['foto']) ?>"
                              alt="<?= esc($g['judul']) ?>" loading="lazy">
                         <h3><?= esc($g['judul']) ?></h3>
-                        <time datetime="<?= esc($g['tanggal']) ?>"><?= esc(tanggal_id($g['tanggal'])) ?></time>
+                        <?php if (!empty($g['tanggal'])): ?><time datetime="<?= esc($g['tanggal']) ?>"><?= esc(tanggal_id($g['tanggal'])) ?></time><?php endif; ?>
                     </figure>
                 <?php endforeach; ?>
             </div>
@@ -304,6 +264,7 @@ $menuLain = [
     </section>
 
 </main>
+<<<<<<< HEAD
 
 <footer class="footer">
     <div class="footer__inner">
@@ -363,3 +324,6 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+=======
+<?php layout_end(); ?>
+>>>>>>> 82200f0e38e90c8bbf80824aab51d892a727d18d

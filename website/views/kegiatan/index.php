@@ -1,116 +1,22 @@
 <?php
+require_once __DIR__ . '/../../lib/bootstrap.php';
 /**
  * Halaman Berita & Artikel - SD Negeri Kedungsari 1
  * SATU FILE. Letakkan di: website/views/kegiatan/index.php
  * (dibuka lewat '?page=kegiatan', sesuai peta di page_url())
  */
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
-// ===== Fungsi bantu (dilewati jika framework Anda sudah punya) =====
-if (!function_exists('base_url')) {
-    function base_url(string $path = ''): string {
-        static $base = null;
-        if ($base === null) {
-            $base = '';
-            $root = rtrim(str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT'] ?? '') ?: ''), '/');
-            foreach ([__DIR__ . '/../../public', __DIR__ . '/public', __DIR__, __DIR__ . '/..'] as $dir) {
-                $assets = realpath($dir . '/assets');
-                if ($assets) {
-                    $pub = str_replace('\\', '/', dirname($assets));
-                    if ($root !== '' && stripos($pub, $root) === 0) {
-                        $base = substr($pub, strlen($root)) . '/';
-                        break;
-                    }
-                }
-            }
-            if ($base === '') {
-                $base = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/') . '/';
-            }
-        }
-        return $base . ltrim($path, '/');
-    }
-}
-if (!function_exists('esc')) {
-    function esc($text): string {
-        return htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8');
-    }
-}
-if (!function_exists('page_url')) {
-    function page_url(string $key): string {
-        static $map = [
-            'home'    => '',
-            'profil'  => '?page=guru',
-            'berita'  => '?page=kegiatan',
-            'ekstra'  => '?page=ekstrakurikuler',
-            'galeri'  => '?page=galeri',
-            'kontak'  => '?page=kontak',
-            'ppdb'    => '?page=ppdb',
-        ];
-        return base_url($map[$key] ?? $key);
-    }
-}
 
 $current = 'berita';
 
-// ===== Format tanggal Indonesia =====
-function tanggal_id(string $ymd): string {
-    static $bulan = [1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-                     'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-    $t = strtotime($ymd);
-    return date('j', $t) . ' ' . $bulan[(int) date('n', $t)] . ' ' . date('Y', $t);
-}
+// ?page=kegiatan&slug=... -> halaman detail
+if (isset($_GET['slug'])) { require __DIR__ . '/detail.php'; return; }
 
-// ===== DATA BERITA =====
-// Tambah / ubah berita di sini (nanti bisa diganti dengan data dari database).
-// 'tanggal' memakai format YYYY-MM-DD. 'foto' relatif terhadap folder public.
-$beritaList = [
-    [
-        'slug'    => 'kelas-digital-nanga-pinoh',
-        'judul'   => 'Guru di Nanga Pinoh, Kabupaten Melawi Menyelenggarakan Pembelajaran Kelas secara Digital yang Menyenangkan untuk Siswa SD Kelas 1',
-        'ringkas' => 'Veronica Dewi Sartika, S. Pd. SD merupakan guru kelas 1 SD yang bertugas di Kabupaten Melawi, Kalimantan Barat.',
-        'tanggal' => '2026-09-18',
-        'foto'    => 'assets/img/berita/berita-1.jpg',
-    ],
-    [
-        'slug'    => 'sd-makassar-disegel',
-        'judul'   => 'Kompleks SD di Makassar disegel dan seribu murid \'dirumahkan\' – Mengapa perlindungan hak pendidikan anak \'lemah\'?',
-        'ringkas' => 'Sekitar seribu murid Sekolah Dasar (SD) di Makassar, Sulawesi Selatan, disebut belajar dari rumah karena kompleks sekolah mereka disegel. Kompleks sekolah tersebut menjadi pusat sengketa lahan.',
-        'tanggal' => '2024-07-24',
-        'foto'    => 'assets/img/berita/berita-2.jpg',
-    ],
-    [
-        'slug'    => 'anak-sd-berkunjung-balai-kota',
-        'judul'   => 'Keseruan Anak SD Berkunjung ke Balai Kota Jakarta',
-        'ringkas' => 'Sebanyak 50 murid Sekolah Dasar (SD) dari wilayah Jakarta Pusat berkunjung ke Balai Kota DKI Jakarta, Jalan Medan Merdeka Selatan, Gambir, Rabu (23/7). Dalam kunjungannya anak-anak diajak berkeliling dan berdialog langsung dengan Gubernur DKI Jakarta, Pramono Anung.',
-        'tanggal' => '2025-07-23',
-        'foto'    => 'assets/img/berita/berita-3.jpg',
-    ],
-    [
-        'slug'    => 'empat-siswa-disetrum-kepsek',
-        'judul'   => 'Empat siswa SD di Malang yang disetrum kepsek untuk \'terapi\'',
-        'ringkas' => 'Polisi melakukan penyelidikan atas dugaan penyetruman terhadap empat siswa sekolah dasar oleh kepala sekolah, kendati orang tua siswa dan sekolah menyebut persoalannya sudah \'diselesaikan secara kekeluargaan\'.',
-        'tanggal' => '2017-05-03',
-        'foto'    => 'assets/img/berita/berita-4.jpg',
-    ],
-    [
-        'slug'    => 'keracunan-mbg-blora',
-        'judul'   => '19 Siswa SD Diduga Keracunan MBG, Dinkes Blora Buka Suara',
-        'ringkas' => 'BLORA, Beritajateng.id – Dinas Kesehatan (Dinkes) Kabupaten Blora buka suara mengenai dugaan keracunan makanan dalam program Makan Bergizi Gratis (MBG) di SDN Sendangrejo, Kecamatan Ngawen, pada Senin, 20 Juli 2026.',
-        'tanggal' => '2026-07-20',
-        'foto'    => 'assets/img/berita/berita-5.jpg',
-    ],
-    [
-        'slug'    => 'sekolah-siaga-bencana',
-        'judul'   => 'Dinsos Abdya Lakukan Penyuluhan Sekolah Siaga Bencana kepada Murid SD',
-        'ringkas' => 'BLANGPIDIE – Dinas Sosial (Dinsos) Aceh Barat Daya (Abdya) menerjunkan Penyuluh Sosial dan Pekerja Sosial untuk memberikan penyuluhan Sekolah Siaga Bencana (SSB) kepada pelajar tingkat sekolah dasar (SD) di wilayah kabupaten setempat.',
-        'tanggal' => '2026-08-29',
-        'foto'    => 'assets/img/berita/berita-6.jpg',
-    ],
-];
+// Data dibaca dari database lewat /api/public/event; data.php hanya cadangan bila API tidak terjangkau.
+require_once __DIR__ . '/../../lib/api.php';
+$beritaList = sikesa_berita(require __DIR__ . '/data.php');
 
 // Urutkan dari yang terbaru
-usort($beritaList, fn($a, $b) => strcmp($b['tanggal'], $a['tanggal']));
+usort($beritaList, fn($a, $b) => strcmp((string) $b['tanggal'], (string) $a['tanggal']));
 
 // ===== Halaman berita (paginasi) =====
 // ?hal=2 -> halaman ke-2 | ?hal=semua -> tampilkan seluruh berita
@@ -137,6 +43,14 @@ function detail_url(string $slug): string {
 }
 
 $title = 'Berita & Artikel - SD Negeri Kedungsari 1';
+
+layout_start([
+    'title'       => $title ?? 'SD Negeri Kedungsari 1',
+    'current'     => 'berita',
+    'description' => 'Informasi terbaru dan kabar terkini seputar kegiatan SD Negeri Kedungsari 1',
+    'css'         => 'kegiatan',
+    'js'          => null,
+]);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -304,7 +218,7 @@ $menuLain = [
 <main>
 
     <!-- ================= HERO ================= -->
-    <section class="hero page-hero" style="--bg:url('<?= base_url('assets/home.jpg') ?>')">
+    <section class="hero page-hero" style="--bg:url('<?= asset('gambar/home.jpg') ?>')">
         <div class="page-hero__content">
             <h1>Berita &amp; Artikel</h1>
             <p>Informasi terbaru dan kabar terkini seputar kegiatan<br>SD NEGERI KEDUNGSARI 1.</p>
@@ -323,12 +237,12 @@ $menuLain = [
                     <article class="berita-card">
                         <a class="berita-card__link" href="<?= esc(detail_url($b['slug'])) ?>">
                             <img class="berita-card__img"
-                                 src="<?= base_url($b['foto']) ?>"
+                                 src="<?= sikesa_img($b['foto']) ?>"
                                  alt="<?= esc($b['judul']) ?>" loading="lazy">
                             <div class="berita-card__body">
                                 <h3><?= esc($b['judul']) ?></h3>
                                 <p><?= esc(mb_strimwidth($b['ringkas'], 0, 190, '…', 'UTF-8')) ?></p>
-                                <time datetime="<?= esc($b['tanggal']) ?>"><?= esc(tanggal_id($b['tanggal'])) ?></time>
+                                <?php if (!empty($b['tanggal'])): ?><time datetime="<?= esc($b['tanggal']) ?>"><?= esc(tanggal_id($b['tanggal'])) ?></time><?php endif; ?>
                             </div>
                         </a>
                     </article>
