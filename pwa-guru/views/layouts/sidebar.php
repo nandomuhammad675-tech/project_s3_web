@@ -17,6 +17,7 @@ $active_menu = $active_menu ?? 'beranda';
 
     <!-- Bagian Menu -->
     <div class="flex-1 overflow-y-auto px-4 py-2 space-y-6 scrollbar-hide">
+        <!-- KELOMPOK UTAMA -->
         <div>
             <p class="text-[10px] font-bold text-gray-400 tracking-wider mb-2 ml-2">UTAMA</p>
             <nav class="space-y-1">
@@ -34,6 +35,8 @@ $active_menu = $active_menu ?? 'beranda';
                 </a>
             </nav>
         </div>
+
+        <!-- KELOMPOK KELAS -->
         <div>
             <p class="text-[10px] font-bold text-gray-400 tracking-wider mb-2 ml-2">KELAS</p>
             <nav class="space-y-1">
@@ -48,11 +51,21 @@ $active_menu = $active_menu ?? 'beranda';
                 </a>
             </nav>
         </div>
+
+        <!-- KELOMPOK AKUN (Tambahan Baru) -->
+        <div>
+            <p class="text-[10px] font-bold text-gray-400 tracking-wider mb-2 ml-2">AKUN</p>
+            <nav class="space-y-1">
+                <a href="../akun/index.php" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition <?= $active_menu == 'akun' ? 'bg-[#eba048] text-white font-medium' : 'text-gray-300 hover:bg-white/10' ?>">
+                    <i class="ph ph-user-circle text-xl"></i> Akun
+                </a>
+            </nav>
+        </div>
     </div>
 
     <!-- Bagian Profil Bawah -->
     <div class="p-4 border-t border-white/10">
-        <a href="../profil/ubah-password.php" class="flex items-center justify-between hover:bg-white/10 p-2 rounded-xl cursor-pointer transition">
+        <a href="../akun/index.php" class="flex items-center justify-between hover:bg-white/10 p-2 rounded-xl cursor-pointer transition">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-full bg-white text-[#455a2d] flex items-center justify-center font-bold text-xs">BR</div>
                 <div>

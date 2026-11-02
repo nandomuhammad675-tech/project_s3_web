@@ -36,18 +36,18 @@ require_once __DIR__ . '/../layouts/sidebar.php';
     <!-- AREA SCROLL KONTEN JADWAL -->
     <main class="flex-1 overflow-y-auto px-10 py-6 flex flex-col relative">
         
-        <!-- Header Halaman (Standar Seragam) -->
+        <!-- Header Halaman -->
         <div class="shrink-0 mb-5">
             <h2 class="text-[26px] font-bold text-[#1f2937] mb-1 leading-tight">Jadwal Pelajaran Kelas 4A</h2>
             <p class="text-[13px] text-gray-500">Susun jadwal belajar semester berjalan.</p>
         </div>
 
-        <!-- Tab Semester (Gaya Garis Bawah yang Berfungsi) -->
-        <div class="flex gap-8 border-b border-gray-200 mb-6 shrink-0">
-            <button type="button" id="tabGanjil" onclick="pindahSemester('ganjil')" class="pb-2.5 border-b-2 border-[#eba048] text-[#eba048] font-bold text-[13px] transition-colors">
+        <!-- Tab Semester (Disamakan Presisi dengan Halaman Nilai) -->
+        <div class="flex items-center gap-8 border-b border-gray-200/80 mb-6 shrink-0">
+            <button type="button" id="tabGanjil" onclick="pindahSemester('ganjil')" class="pb-3 text-sm font-bold text-[#eba048] border-b-2 border-[#eba048] transition-all">
                 Ganjil
             </button>
-            <button type="button" id="tabGenap" onclick="pindahSemester('genap')" class="pb-2.5 text-gray-500 hover:text-gray-800 font-semibold text-[13px] transition-colors border-b-2 border-transparent">
+            <button type="button" id="tabGenap" onclick="pindahSemester('genap')" class="pb-3 text-sm font-bold text-gray-500 hover:text-gray-800 transition-all border-b-2 border-transparent">
                 Genap
             </button>
         </div>
@@ -110,7 +110,7 @@ require_once __DIR__ . '/../layouts/sidebar.php';
             </div>
         </div>
 
-        <!-- AREA KONTEN: SEMESTER GENAP (Disembunyikan secara default) -->
+        <!-- AREA KONTEN: SEMESTER GENAP -->
         <div id="kontenGenap" class="hidden flex-col items-center justify-center py-16">
             <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-sm border border-gray-100 mb-4">
                 <i class="ph ph-calendar-blank text-4xl text-gray-300"></i>
@@ -122,52 +122,46 @@ require_once __DIR__ . '/../layouts/sidebar.php';
             </button>
         </div>
 
-        <!-- Floating Action Button (FAB) Tambah Jadwal -->
+        <!-- Floating Action Button (FAB) -->
         <button type="button" onclick="bukaModalJadwal()" class="fixed bottom-10 right-10 w-[52px] h-[52px] bg-[#eba048] rounded-full shadow-[0_8px_16px_-4px_rgba(235,160,72,0.5)] flex items-center justify-center text-white hover:bg-orange-500 transition-all hover:scale-105 z-30">
             <i class="ph ph-plus text-xl font-bold"></i>
         </button>
 
     </main>
 
-    <!-- PANGGIL FORM MODAL MELAYANG -->
+    <!-- FORM MODAL MELAYANG -->
     <?php include 'form.php'; ?>
 
 </div>
 
-<!-- SCRIPT UNTUK PINDAH TAB SEMESTER -->
+<!-- SCRIPT PINDAH TAB SEMESTER -->
 <script>
     function pindahSemester(semester) {
-        // Ambil elemen Tab
         const tabGanjil = document.getElementById('tabGanjil');
         const tabGenap = document.getElementById('tabGenap');
         
-        // Ambil elemen Konten
         const kontenGanjil = document.getElementById('kontenGanjil');
         const kontenGenap = document.getElementById('kontenGenap');
 
-        // Class CSS untuk tab aktif dan tidak aktif
-        const activeClass = 'pb-2.5 border-b-2 border-[#eba048] text-[#eba048] font-bold text-[13px] transition-colors';
-        const inactiveClass = 'pb-2.5 text-gray-500 hover:text-gray-800 font-semibold text-[13px] transition-colors border-b-2 border-transparent';
+        // Class CSS yang disesuaikan dengan Halaman Nilai
+        const activeClass = 'pb-3 text-sm font-bold text-[#eba048] border-b-2 border-[#eba048] transition-all';
+        const inactiveClass = 'pb-3 text-sm font-bold text-gray-500 hover:text-gray-800 transition-all border-b-2 border-transparent';
 
         if (semester === 'ganjil') {
-            // Ubah gaya tab
             tabGanjil.className = activeClass;
             tabGenap.className = inactiveClass;
             
-            // Tampilkan konten ganjil, sembunyikan genap
             kontenGanjil.classList.remove('hidden');
             kontenGanjil.classList.add('block');
             
             kontenGenap.classList.remove('flex');
             kontenGenap.classList.add('hidden');
         } else {
-            // Ubah gaya tab
             tabGenap.className = activeClass;
             tabGanjil.className = inactiveClass;
             
-            // Tampilkan konten genap, sembunyikan ganjil
             kontenGenap.classList.remove('hidden');
-            kontenGenap.classList.add('flex'); // Pakai flex agar letaknya sejajar di tengah
+            kontenGenap.classList.add('flex');
             
             kontenGanjil.classList.remove('block');
             kontenGanjil.classList.add('hidden');

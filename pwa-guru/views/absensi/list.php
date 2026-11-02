@@ -13,7 +13,6 @@ $students = [
     ['no' => '06', 'name' => 'Fahri Ramadhan', 'status' => 'I'],
     ['no' => '07', 'name' => 'Gita Anindya', 'status' => 'H'],
     ['no' => '08', 'name' => 'Hanif Akbar', 'status' => 'H'],
-    // Tambahkan 1 siswa lagi agar bisa di-scroll
     ['no' => '09', 'name' => 'Iqbal Ramadhan', 'status' => 'A'],
 ];
 
@@ -22,24 +21,24 @@ require_once __DIR__ . '/../layouts/header.php';
 require_once __DIR__ . '/../layouts/sidebar.php'; 
 ?>
 
-<!-- WRAPPER KONTEN UTAMA (Tambahkan overflow-hidden disini) -->
+<!-- WRAPPER KONTEN UTAMA -->
 <div class="flex-1 flex flex-col h-full relative overflow-hidden bg-[#f7f6f0]">
     
    <!-- Topbar -->
     <?php require_once __DIR__ . '/../layouts/topbar.php'; ?>
 
     <!-- AREA SCROLL KONTEN ABSENSI -->
-    <main class="flex-1 overflow-y-auto px-10 py-6 flex flex-col relative">
+    <main class="flex-1 overflow-y-auto px-10 py-5 flex flex-col relative">
         
-        <!-- Header Halaman (Standar Seragam) -->
-        <div class="shrink-0 mb-5">
-            <h2 class="text-[26px] font-bold text-[#1f2937] mb-1 leading-tight">Absensi Kelas 4A</h2>
+        <!-- Header Halaman -->
+        <div class="shrink-0 mb-4">
+            <h2 class="text-[26px] font-bold text-[#1f2937] mb-0.5 leading-tight">Absensi Kelas 4A</h2>
             <p class="text-[13px] text-gray-500">Catat kehadiran seluruh siswa dalam satu kali simpan.</p>
         </div>
 
-        <!-- Pemilih Tanggal -->
-        <div class="px-10 mb-6 shrink-0">
-            <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex items-center justify-between">
+        <!-- Pemilih Tanggal (Margin Bawah Dirapatkan) -->
+        <div class="mb-3 shrink-0">
+            <div class="bg-white rounded-xl p-3 shadow-sm border border-gray-100 flex items-center justify-between">
                 <button class="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-50 text-gray-600 transition">
                     <i class="ph ph-caret-left text-lg"></i>
                 </button>
@@ -56,17 +55,17 @@ require_once __DIR__ . '/../layouts/sidebar.php';
             </div>
         </div>
 
-        <!-- Tombol Semua Hadir -->
-        <div class="px-10 mb-4 shrink-0">
-            <button class="border border-[#455a2d] text-[#455a2d] px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-[#e6e4dc] transition bg-transparent">
-                <i class="ph ph-check-circle text-lg"></i> Semua Hadir
+        <!-- Tombol Semua Hadir (Margin Bawah Dirapatkan) -->
+        <div class="mb-3 shrink-0">
+            <button class="border border-[#455a2d] text-[#455a2d] px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 hover:bg-[#e6e4dc] transition bg-transparent">
+                <i class="ph ph-check-circle text-base"></i> Semua Hadir
             </button>
         </div>
 
-        <!-- Daftar Siswa (Looping) - padding bawah dikurangi jadi pb-6 -->
-        <div class="px-10 pb-6 space-y-3 flex-1">
+        <!-- Daftar Siswa (Jarak Antar Card Dirapatkan ke space-y-2 & p-2.5) -->
+        <div class="pb-5 space-y-2 flex-1">
             <?php foreach($students as $index => $student): ?>
-            <div class="bg-white rounded-xl p-3 shadow-sm border border-gray-100 flex items-center justify-between">
+            <div class="bg-white rounded-xl p-2.5 shadow-sm border border-gray-100 flex items-center justify-between">
                 <div class="flex items-center gap-4">
                     <div class="w-8 h-8 rounded-lg bg-[#f7f6f0] flex items-center justify-center text-xs font-bold text-[#455a2d]">
                         <?= $student['no'] ?>
@@ -102,8 +101,8 @@ require_once __DIR__ . '/../layouts/sidebar.php';
         </div>
     </main>
 
-    <!-- FLOATING BOTTOM BAR (Sekarang DILUAR tag main, jadi tidak akan ikut ke-scroll) -->
-    <div class="shrink-0 bg-white border-t border-gray-200 px-10 py-4 flex items-center justify-between z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] relative">
+    <!-- FLOATING BOTTOM BAR -->
+    <div class="shrink-0 bg-white border-t border-gray-200 px-10 py-3 flex items-center justify-between z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] relative">
         <div class="flex items-center gap-4 text-[11px] font-bold text-gray-600">
             <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-green-600"></span> H 28</div>
             <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-[#eba048]"></span> S 1</div>
@@ -111,10 +110,10 @@ require_once __DIR__ . '/../layouts/sidebar.php';
             <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-red-600"></span> A 0</div>
         </div>
         <div class="text-right">
-            <button class="bg-[#eba048] hover:bg-orange-500 text-white px-6 py-2.5 rounded-lg text-sm font-semibold flex items-center gap-2 transition mb-1 ml-auto">
-                <i class="ph ph-floppy-disk text-lg"></i> Simpan Absensi
+            <button class="bg-[#eba048] hover:bg-orange-500 text-white px-5 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition ml-auto">
+                <i class="ph ph-floppy-disk text-base"></i> Simpan Absensi
             </button>
-            <p class="text-[9px] text-gray-400">Satu permintaan batch untuk seluruh siswa</p>
+            <p class="text-[9px] text-gray-400 mt-0.5">Satu permintaan batch untuk seluruh siswa</p>
         </div>
     </div>
     
