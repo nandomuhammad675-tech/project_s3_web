@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <?php 
 // Konfigurasi Halaman & Menu Active Sidebar
 $active_menu = 'beranda';
@@ -52,7 +51,7 @@ require_once __DIR__ . '/../layouts/sidebar.php';
                 </div>
                 <h3 class="text-lg font-bold text-gray-800 mb-1">Senin, 5 Oktober 2026</h3>
                 <p class="text-sm text-gray-500 mb-6">Absensi belum diisi. Catat kehadiran sebelum pelajaran dimulai.</p>
-                <a href="../absensi/index.php" class="inline-flex bg-[#eba048] hover:bg-orange-500 text-white px-5 py-2.5 rounded-lg text-sm font-semibold items-center gap-2 transition cursor-pointer shadow-sm">
+                <a href="../absensi/list.php" class="inline-flex bg-[#eba048] hover:bg-orange-500 text-white px-5 py-2.5 rounded-lg text-sm font-semibold items-center gap-2 transition cursor-pointer shadow-sm">
                     <i class="ph ph-check-square-offset text-lg"></i> Isi Absensi
                 </a>
             </div>
@@ -150,5 +149,3 @@ require_once __DIR__ . '/../layouts/sidebar.php';
 </div>
 
 <?php require_once __DIR__ . '/../layouts/footer.php'; ?>
-=======
->>>>>>> 8d7d43c3183adc7a19a337326a880273da51868a
