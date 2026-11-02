@@ -11,7 +11,17 @@ final class GuruKelasService
     public function profil(array $g, string $username): array
     {
         return [
-            'guru' => ['id_guru' => $g['id_guru'], 'nama_guru' => $g['nama_guru'], 'username' => $username],
+            'guru' => [
+            'id_guru'     => $g['id_guru'],
+            'nama_guru'   => $g['nama_guru'],
+            'username'    => $username,
+            'nip'         => $g['nip'],
+            'email'       => $g['email'],
+            'no_telepon'  => $g['no_telepon'],
+            'foto_profil' => $g['foto_profil'],
+        ],
+            
+            // null = belum ditetapkan sebagai wali kelas (aplikasi menampilkan pesannya)
             'tahun_ajaran' => $g['id_tahun_ajaran'] === null ? null : [
                 'id_tahun_ajaran' => $g['id_tahun_ajaran'],
                 'nama_tahun'      => $g['nama_tahun'],

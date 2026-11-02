@@ -1,8 +1,5 @@
 /**
- * dashboard.js - Beranda Guru. Memanggil GET {apiBase}/guru/dashboard. Balasan yang dibaca (semua opsional):
- * { guru:{nama_guru,jabatan,sapaan}, tahun_ajaran:{nama_tahun,semester_aktif},
- *   kelas:{id_kelas,nama_kelas,jumlah_siswa}|null,
- *   absensi_hari_ini:{sudah_absen,ringkasan:{hadir,sakit,izin,alpa}}, libur:{keterangan}|null }
+ * dashboard.js - Beranda Guru. Memanggil GET /api/guru/me, /api/guru/siswa, /api/guru/dasbor/absensi, /api/guru/absensi.
  */
 (function () {
     'use strict';

@@ -1,0 +1,97 @@
+/* SI-KESA PWA Admin | Tahun Ajaran & Kenaikan Kelas (wizard) */
+.wiz { display: flex; flex-direction: column; gap: 16px; }
+.btn--sm { min-height: 32px; padding: 0 12px; font-size: 12px; }
+
+/* ---------- Stepper ---------- */
+.wiz-stepper { padding: 20px 24px; overflow-x: auto; }
+.stepper { list-style: none; margin: 0; padding: 0; display: flex; min-width: 680px; }
+.stepper__item { flex: 1 1 0; min-width: 0; }
+.stepper__item:last-child { flex: 0 0 auto; min-width: 90px; }
+.stepper__track { display: flex; align-items: center; }
+.stepper__dot {
+  flex: none; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; padding: 0;
+  font-size: 11px; font-weight: 600; background: #fff; color: var(--ink-2); border: 1px solid #cfcbbd;
+}
+.stepper__dot:disabled { cursor: default; }
+.stepper__dot:not(:disabled):hover { border-color: var(--olive-800); }
+.stepper__dot.is-done { background: #72843f; border-color: #72843f; color: #fff; }
+.stepper__dot.is-done .ico { width: 13px; height: 13px; stroke-width: 3; }
+.stepper__dot.is-current { background: var(--amber-500); border-color: var(--amber-500); color: #fff; box-shadow: 0 0 0 4px rgba(235, 164, 60, .2); }
+.stepper__line { flex: 1; height: 2px; margin: 0 6px; background: var(--line); border-radius: 2px; }
+.stepper__line.is-done { background: #72843f; }
+.stepper__eyebrow { margin-top: 8px; font-size: 9.5px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+.stepper__title { font-size: 11.5px; font-weight: 700; }
+
+/* ---------- Panel langkah ---------- */
+.wiz-panel { padding: 24px; }
+.wiz-head { display: flex; align-items: flex-start; gap: 14px; }
+.wiz-head h2 { font-size: 17px; font-weight: 600; }
+.wiz-head p { color: var(--ink-2); font-size: 12px; margin-top: 2px; }
+.wiz-num { font-size: 22px; font-weight: 700; line-height: 1.1; color: var(--amber-500); font-variant-numeric: tabular-nums; }
+.wiz-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 22px; flex-wrap: wrap; }
+.wiz-foot__right { display: flex; align-items: center; gap: 12px; margin-left: auto; flex-wrap: wrap; justify-content: flex-end; }
+.hint { font-size: 12px; color: var(--ink-2); }
+.wiz-block + .wiz-block { margin-top: 22px; }
+.wiz-block > h3 { font-size: 13.5px; font-weight: 600; margin-bottom: 4px; }
+.wiz-block > p { font-size: 12px; color: var(--ink-2); margin-bottom: 10px; }
+.wiz-tools { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+
+/* ---------- Kartu angka ---------- */
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 4px; }
+.stat { padding: 14px 16px; background: #fff; border: 1px solid var(--line); border-left-width: 3px; border-radius: 10px; }
+.stat__n { font-size: 22px; font-weight: 700; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.stat__l { font-size: 11.5px; color: var(--ink-2); margin-top: 2px; }
+.stat--green  { border-left-color: #16a34a; }
+.stat--purple { border-left-color: #7c3aed; }
+.stat--blue   { border-left-color: #2563eb; }
+.stat--amber  { border-left-color: var(--amber-500); }
+
+/* ---------- Tabel di dalam wizard ---------- */
+.wiz-table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
+.wiz-table-wrap .table { min-width: 480px; }
+.wiz-table-wrap .table th { padding: 10px 14px; }
+.wiz-table-wrap .table td { padding: 10px 14px; }
+.table--plain td:first-child { font-weight: 400; }
+.tick { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; }
+.tick .ico { width: 16px; height: 16px; }
+.tick--ok { color: #12803c; }
+.tick--warn { color: #a8670f; }
+.tick small { color: var(--ink-2); font-weight: 400; }
+.input--sm { height: 34px; font-size: 13px; padding: 0 10px; min-width: 150px; }
+.map-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; font-size: 12.5px; }
+.map-bar label { display: flex; align-items: center; gap: 8px; white-space: nowrap; }
+.pill--neutral { background: #ececea; color: #4b5a5c; }
+details.wiz-details { margin-top: 16px; }
+details.wiz-details summary { cursor: pointer; font-size: 12.5px; font-weight: 600; color: var(--olive-800); margin-bottom: 10px; }
+
+/* ---------- Pemberitahuan dalam panel ---------- */
+.callout { display: flex; gap: 12px; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--yellow-bd); background: var(--yellow-50); color: var(--yellow-tx); font-size: 13px; line-height: 1.55; }
+.callout .ico { margin-top: 2px; }
+.banner-ok { display: flex; gap: 12px; padding: 12px 14px; border-radius: 10px; border: 1px solid #bfe7cb; background: #eefaf1; color: #14663a; font-size: 13px; margin-bottom: 14px; }
+.banner-ok .ico { margin-top: 2px; }
+.banner-ok strong { display: block; }
+.problems { padding: 16px; border: 1px solid #f2c5bf; background: #fdf4f2; border-radius: 10px; margin-bottom: 16px; color: #7a261c; }
+.problems__head { display: flex; gap: 12px; }
+.problems__head p { font-size: 12.5px; margin-top: 2px; }
+.problems h3 { font-size: 12.5px; font-weight: 600; margin: 14px 0 4px; display: flex; align-items: center; gap: 8px; }
+.problems ul { margin: 0; padding-left: 18px; font-size: 12.5px; }
+.problems .btn { margin-top: 14px; }
+
+.sum-line { font-size: 20px; font-weight: 600; letter-spacing: -.01em; line-height: 1.4; }
+.sum-line b { color: var(--olive-800); }
+.sum-list { list-style: none; margin: 14px 0 0; padding: 0; font-size: 12.5px; color: var(--ink-2); }
+.sum-list li { padding: 7px 0; border-bottom: 1px solid var(--line-2); }
+
+.badge--naik  { background: var(--green-100); color: #12803c; }
+.badge--lulus { background: #ede9fe; color: #5b32b3; }
+.badge--masuk { background: #dbeafe; color: #1d4f91; }
+.log-meta { display: block; font-size: 11px; color: var(--ink-3); margin-top: 1px; }
+
+@media (max-width: 900px) {
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .wiz-panel { padding: 18px; }
+}
+@media (max-width: 480px) {
+  .stats { grid-template-columns: 1fr; }
+  .wiz-foot .btn { flex: 1; }
+}

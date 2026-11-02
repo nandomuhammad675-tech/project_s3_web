@@ -100,7 +100,7 @@ final class DataGuruRepository
     public function konteksAktif(int $idUser): ?array
     {
         $st = $this->db->prepare(
-            'SELECT g.id_guru, g.nama_guru, t.id_tahun_ajaran, t.nama_tahun, t.semester_aktif,
+            'SELECT g.id_guru, g.nama_guru, g.nip, g.email, g.no_telepon, g.foto_profil, t.id_tahun_ajaran, t.nama_tahun, t.semester_aktif,
                     k.id_kelas, k.nama_kelas, k.tingkat_kelas
              FROM data_guru g
              LEFT JOIN tahun_ajaran t ON t.status_aktif = 1
@@ -115,6 +115,10 @@ final class DataGuruRepository
         return [
             'id_guru'         => (int) $r['id_guru'],
             'nama_guru'       => (string) $r['nama_guru'],
+            'nip'             => $r['nip'],
+            'email'           => $r['email'],
+            'no_telepon'      => $r['no_telepon'],
+            'foto_profil'     => $r['foto_profil'],
             'id_tahun_ajaran' => $r['id_tahun_ajaran'] === null ? null : (int) $r['id_tahun_ajaran'],
             'nama_tahun'      => $r['nama_tahun'],
             'semester'        => $r['semester_aktif'],
