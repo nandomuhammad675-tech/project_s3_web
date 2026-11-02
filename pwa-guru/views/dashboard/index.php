@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?php 
 // Konfigurasi Halaman & Menu Active Sidebar
 $active_menu = 'beranda';
@@ -149,3 +150,5 @@ require_once __DIR__ . '/../layouts/sidebar.php';
 </div>
 
 <?php require_once __DIR__ . '/../layouts/footer.php'; ?>
+=======
+>>>>>>> 8d7d43c3183adc7a19a337326a880273da51868a

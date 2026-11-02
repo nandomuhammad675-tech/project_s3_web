@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <header class="bg-white px-8 py-4 flex justify-between items-center shadow-sm z-20">
     <div class="text-sm text-gray-500 font-medium flex gap-2">
         <span>Guru</span> 
@@ -14,3 +15,5 @@
         </button>
     </div>
 </header>
+=======
+>>>>>>> 8d7d43c3183adc7a19a337326a880273da51868a

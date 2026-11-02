@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -16,3 +17,5 @@
     </style>
 </head>
 <body class="bg-[#f7f6f0] flex h-screen overflow-hidden text-gray-800"></body>
+=======
+>>>>>>> 8d7d43c3183adc7a19a337326a880273da51868a
