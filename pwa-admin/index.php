@@ -25,16 +25,27 @@ function e(?string $s): string
     return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
+/**
+ * Alamat API dan PWA Guru diturunkan otomatis dari lokasi folder ini
+ * (susunan XAMPP: htdocs/si-kesa/{backend,pwa-admin,pwa-guru,...}).
+ * Ubah lewat environment (SIKESA_API_BASE, SIKESA_GURU_URL) atau config.local.php:
+ *   <?php return ['apiBase' => 'https://api.sekolah.sch.id/api', 'guruUrl' => 'https://guru.sekolah.sch.id/index.php?hal=login'];
+ * apiBase = alamat backend/public DITAMBAH "/api", tanpa garis miring akhir.
+ */
+$induk = rtrim(str_replace('\\', '/', dirname($scriptDir)), '/');
+if ($induk === '.' || $induk === '/') {
+    $induk = '';
+}
+
 $config = [
     'schoolName'   => 'SDN Kedungsari 1',
     'appName'      => 'SI-KESA',
-    // Ganti lewat environment bila API berada di domain/folder lain.
-    'apiBase'      => getenv('SIKESA_API_BASE') ?: '/api',
-    'guruUrl'      => getenv('SIKESA_GURU_URL') ?: '/pwa-guru/',
+    'apiBase'      => rtrim((string)(getenv('SIKESA_API_BASE') ?: $induk . '/backend/public/api'), '/'),
+    'guruUrl'      => getenv('SIKESA_GURU_URL') ?: $induk . '/pwa-guru/index.php?hal=login',
     'base'         => $scriptDir,
     'endpoints'    => [
         'tahunAjaran' => '/api/admin/tahun-ajaran',
-        'mapel'       => '/api/admin/mata-pelajaran',
+        'mapel'       => '/api/admin/mapel',
         'guru'        => '/api/admin/guru',
         'siswa'       => '/api/admin/siswa',
         'kelas'       => '/api/admin/kelas',
@@ -42,9 +53,22 @@ $config = [
         'login'       => '/api/auth/login',
         'hariLibur'   => '/api/admin/hari-libur',
         'ekskul'      => '/api/admin/ekstrakurikuler',
+        'guruEkskul'  => '/api/admin/guru-ekskul',
         'riwayatKelas' => '/api/admin/riwayat-kelas',
+        'akun'        => '/api/admin/akun',
+        'upload'      => '/api/admin/upload',
     ],
 ];
+
+if (is_file(__DIR__ . '/config.local.php')) {
+    $lokal = require __DIR__ . '/config.local.php';
+    if (is_array($lokal)) {
+        $config = array_replace_recursive($config, $lokal);
+        $config['apiBase'] = rtrim((string)$config['apiBase'], '/');
+    }
+}
+// Alamat dasar berkas unggahan (path "uploads/xxx.png" dibuka di {uploadBase}/{path})
+$config['uploadBase'] = preg_replace('#/api$#', '', $config['apiBase']);
 
 /**
  * Daftar rute. Tidak ada rute Jadwal dan Piket (WAJIB, dokumen 01 bagian 3.1).

@@ -13,16 +13,18 @@
  * CSS dan JavaScript sudah digabung di file ini, jadi cukup satu file.
  */
 
-// ===== PENGATURAN (ubah di sini) =====
-$apiBase = '../backend/public';              // alamat dasar backend (TANPA /api), relatif terhadap halaman PWA
+// ===== PENGATURAN: diturunkan otomatis dari config.php (ubah lewat config.local.php / environment) =====
+require_once __DIR__ . '/../../config.php';
+$sk      = sk_cfg();
+$apiBase = $sk['api_base'] . '/api';          // alamat dasar API backend, tanpa garis miring di akhir
 
 // Alamat folder pwa-guru/ relatif terhadap halaman ini
-// (login.php dibuka langsung -> '../../'; jika di-include oleh pwa-guru/index.php -> '')
+// (login.php dibuka langsung -> '../../'; jika dimuat lewat pwa-guru/index.php -> '')
 $root = (basename($_SERVER['SCRIPT_NAME'] ?? '') === 'login.php') ? '../../' : '';
 
 $tujuan = [
-    'guru'  => $root . 'index.php',                    // halaman awal PWA Guru
-    'admin' => $root . '../pwa-admin/index.php',       // halaman awal PWA Admin
+    'guru'  => sk_url('dashboard'),                 // halaman awal PWA Guru
+    'admin' => $sk['admin_url'] . 'dashboard',      // halaman awal PWA Admin
 ];
 
 $portal = [
@@ -45,6 +47,10 @@ $config = [
     'apiBase' => $apiBase,
     'tujuan'  => $tujuan,
     'portal'  => $portal,
+    'keys'    => [
+        'guru'  => ['token' => $sk['token_key'],       'user' => $sk['user_key']],
+        'admin' => ['token' => $sk['admin_token_key'], 'user' => $sk['admin_user_key']],
+    ],
 ];
 ?>
 <!DOCTYPE html>
@@ -137,9 +143,8 @@ form{text-align:left}
 <body>
 
 <!-- Video latar belakang -->
-<?php $adaPoster = is_file(__DIR__ . '/../../assets/img/login-poster.jpg'); // poster opsional: tanpa file, tidak memicu 404 ?>
-<div class="bg"<?= $adaPoster ? ' style="--poster:url(\'' . esc(aset($root, 'img/login-poster.jpg')) . '\')"' : '' ?> aria-hidden="true">
-    <video autoplay muted loop playsinline preload="auto"<?= $adaPoster ? ' poster="' . esc(aset($root, 'img/login-poster.jpg')) . '"' : '' ?>>
+<div class="bg" style="--poster:url('<?= esc(aset($root, 'img/login-poster.jpg')) ?>')" aria-hidden="true">
+    <video autoplay muted loop playsinline preload="auto" poster="<?= esc(aset($root, 'img/login-poster.jpg')) ?>">
         <source src="<?= esc(aset($root, 'vidio/VIDEO BG.mp4')) ?>" type="video/mp4">
     </video>
 </div>
@@ -169,11 +174,11 @@ form{text-align:left}
             <div class="alert" id="alert" role="alert" hidden></div>
 
             <div class="field">
-                <label for="username">Username / NIP</label>
+                <label for="username">Username</label>
                 <div class="input">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M19 6v6M16 9h6"/></svg>
                     <input type="text" id="username" name="username" required maxlength="50"
-                           autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Masukkan Username atau NIP">
+                           autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Masukan Username">
                 </div>
             </div>
 
@@ -198,17 +203,16 @@ form{text-align:left}
 <script>
 /**
  * Login SI-KESA (PWA Guru / Admin)
- * Memanggil POST {apiBase}/api/auth/login  dengan body {username, password}
+ * Memanggil POST {apiBase}/auth/login  dengan body {username, password}
  * dan membaca token + user dari balasan: {token, user} atau {data:{token, user}}.
- * Token disimpan di localStorage (kunci: sikesa_token, sikesa_user).
+ * Token disimpan di localStorage dengan kunci sesuai peran (lihat CFG.keys).
  * Logout cukup menghapus kedua kunci itu (token tidak dicabut di server; berlaku 8 jam).
  */
 (function () {
     'use strict';
 
     const CFG = window.SIKESA_LOGIN || {};
-    const TOKEN_KEY = 'sikesa_token';
-    const USER_KEY  = 'sikesa_user';
+    const KEYS = CFG.keys;
 
     const $ = (id) => document.getElementById(id);
     const tabs = document.querySelectorAll('.tab');
@@ -227,20 +231,22 @@ form{text-align:left}
         a.hidden = !pesan;
     }
 
-    /* ----- Sudah login? langsung ke tujuan ----- */
+    /* ----- Pesan dari sesi sebelumnya (mis. sesi berakhir) ----- */
     try {
-        // Pemutus loop: bila baru saja dilempar dari halaman lain ke login (<8 dtk), JANGAN lempar balik.
-        const bounce = Number(sessionStorage.getItem('sikesa_bounce') || 0);
-        const baruDilempar = bounce && (Date.now() - bounce) < 8000;
-        sessionStorage.removeItem('sikesa_bounce');
-        const t = localStorage.getItem(TOKEN_KEY);
-        const u = JSON.parse(localStorage.getItem(USER_KEY) || 'null');
-        if (!baruDilempar && t && u && u.role === 'guru' && CFG.tujuan && CFG.tujuan[u.role] && tokenMasihBerlaku(t)) {
-            window.location.replace(CFG.tujuan[u.role]);
+        const pesan = sessionStorage.getItem('sikesa_login_msg');
+        if (pesan) { tampilError(pesan); sessionStorage.removeItem('sikesa_login_msg'); }
+    } catch (e) { /* abaikan */ }
+
+    /* ----- Sudah login sebagai Guru? langsung ke tujuan ----- */
+    try {
+        const t = localStorage.getItem(KEYS.guru.token);
+        const u = JSON.parse(localStorage.getItem(KEYS.guru.user) || 'null');
+        if (t && u && u.role === 'guru' && tokenMasihBerlaku(t) && !sessionStorage.getItem('sikesa_login_msg')) {
+            window.location.replace(CFG.tujuan.guru);
             return;
         }
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(USER_KEY);
+        localStorage.removeItem(KEYS.guru.token);
+        localStorage.removeItem(KEYS.guru.user);
     } catch (e) { /* localStorage tidak tersedia: lanjutkan ke form */ }
 
     /* ----- Ganti peran Guru / Admin ----- */
@@ -270,7 +276,7 @@ form{text-align:left}
         e.preventDefault();
         const username = $('username').value.trim();
         const password = pw.value;
-        if (!username || !password) { tampilError('Isi username/NIP dan kata sandi.'); return; }
+        if (!username || !password) { tampilError('Isi username dan kata sandi.'); return; }
 
         const btn = $('btnMasuk');
         btn.disabled = true;
@@ -279,7 +285,7 @@ form{text-align:left}
         try {
             const ctrl = new AbortController();
             const timer = setTimeout(() => ctrl.abort(), 15000);
-            const res = await fetch(CFG.apiBase + '/api/auth/login', {
+            const res = await fetch(CFG.apiBase + '/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                 body: JSON.stringify({ username, password }),
@@ -295,15 +301,17 @@ form{text-align:left}
                 if (data.user.role !== role) {
                     tampilError('Akun ini bukan akun ' + (role === 'guru' ? 'Guru' : 'Admin') + '. Pilih tab yang sesuai.');
                 } else {
-                    localStorage.setItem(TOKEN_KEY, data.token);
-                    localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+                    // Kunci penyimpanan mengikuti aplikasi tujuan (PWA Guru dan PWA Admin memakai kunci berbeda)
+                    const k = KEYS[data.user.role];
+                    localStorage.setItem(k.token, data.token);
+                    localStorage.setItem(k.user, JSON.stringify({ username: data.user.username, nama: '', role: data.user.role }));
                     window.location.replace(CFG.tujuan[data.user.role]);
                     return;
                 }
             } else if (res.status === 429) {
                 tampilError('Terlalu banyak percobaan. Coba lagi beberapa saat lagi.');
             } else if (res.status === 401 || res.status === 422) {
-                tampilError(body.message || 'Username/NIP atau kata sandi salah.');
+                tampilError(body.message || 'Username atau kata sandi salah.');
             } else {
                 tampilError('Server sedang bermasalah. Coba lagi nanti.');
             }
@@ -319,6 +327,11 @@ form{text-align:left}
     const v = document.querySelector('.bg video');
     if (v) { v.muted = true; const p = v.play(); if (p && p.catch) p.catch(() => {}); }
 })();
+</script>
+<button type="button" data-pwa-install hidden class="fixed bottom-4 right-4 bg-[#455a2d] text-white text-xs font-bold px-4 py-2.5 rounded-full shadow-lg">Pasang Aplikasi</button>
+<script src="<?= esc($root) ?>assets/js/pwa-install.js"></script>
+<script>
+    if ('serviceWorker' in navigator) { navigator.serviceWorker.register('<?= esc($root) ?>sw.js').catch(function () {}); }
 </script>
 </body>
 </html>

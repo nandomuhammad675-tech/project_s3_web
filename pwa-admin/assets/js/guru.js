@@ -15,15 +15,15 @@
     nama: ['nama_guru', 'nama'],
     nip: ['nip'],
     jabatan: ['jabatan'],
-    foto: ['foto', 'foto_url'],
+    foto: ['foto_profil', 'foto', 'foto_url'],
     email: ['email'],
     telepon: ['no_telepon', 'telepon'],
     username: ['username'],
     status: ['status_akun', 'akun_aktif', 'status_aktif', 'aktif', 'status'],
-    kelas: ['kelas_tahun_aktif', 'nama_kelas', 'kelas']
+    kelas: ['kelas_aktif', 'kelas_tahun_aktif', 'nama_kelas', 'kelas']
   };
   var SEND = {
-    nama: 'nama_guru', nip: 'nip', jabatan: 'jabatan', foto: 'foto',
+    nama: 'nama_guru', nip: 'nip', jabatan: 'jabatan', foto: 'foto_profil',
     email: 'email', telepon: 'no_telepon', username: 'username', password: 'password'
   };
   var PER_PAGE = 10;
@@ -68,7 +68,7 @@
       nama: String(pick(r, KEYS.nama, '') || '').trim(),
       nip: String(pick(r, KEYS.nip, '') || '').trim(),
       jabatan: String(pick(r, KEYS.jabatan, '') || '').trim(),
-      foto: String(pick(r, KEYS.foto, '') || ''),
+      foto: (function (v) { v = String(v || ''); return /^uploads\//.test(v) && window.SikesaApi ? window.SikesaApi.fileUrl(v) : v; })(pick(r, KEYS.foto, '')),
       email: String(pick(r, KEYS.email, '') || '').trim(),
       telepon: String(pick(r, KEYS.telepon, '') || '').trim(),
       username: String(pick(r, KEYS.username, '') || '').trim(),
@@ -426,14 +426,21 @@
     body[SEND.jabatan] = v.jabatan || null;
     body[SEND.email] = v.email || null;
     body[SEND.telepon] = v.telepon || null;
-    if (fotoState === 'new') body[SEND.foto] = fotoData;
-    else if (fotoState === 'clear') body[SEND.foto] = null;
+    if (fotoState === 'clear') body[SEND.foto] = null;
     if (!editing) { body[SEND.username] = v.username; body[SEND.password] = v.password; }
 
     setSaving(true);
     var wasEdit = !!editing;
-    var req = wasEdit ? Api.put(itemUrl(editing.id), body) : Api.post(E.guru, body);
-    req.then(function () {
+    // Foto baru: data URL -> berkas -> unggah ke server -> path disimpan pada foto_profil
+    var siapFoto = Promise.resolve();
+    if (fotoState === 'new') {
+      siapFoto = fetch(fotoData).then(function (r) { return r.blob(); }).then(function (blob) {
+        return window.SikesaApi.upload(new File([blob], 'foto.' + (blob.type === 'image/png' ? 'png' : blob.type === 'image/webp' ? 'webp' : 'jpg'), { type: blob.type }));
+      }).then(function (path) { body[SEND.foto] = path; });
+    }
+    siapFoto.then(function () {
+      return wasEdit ? Api.put(itemUrl(editing.id), body) : Api.post(E.guru, body);
+    }).then(function () {
       dlg.close();
       toast(wasEdit ? 'Data guru diperbarui' : 'Guru dan akunnya ditambahkan');
       return load(true);

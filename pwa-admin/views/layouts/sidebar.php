@@ -87,4 +87,5 @@ $icon = fn(string $n) => '<svg class="ico" aria-hidden="true"><use href="#i-' . 
     </div>
   <?php endforeach; ?>
   </nav>
+  <div style="padding:12px"><button type="button" class="nav-item" data-pwa-install hidden><span class="nav-item__text">Pasang Aplikasi</span></button></div>
 </aside>
