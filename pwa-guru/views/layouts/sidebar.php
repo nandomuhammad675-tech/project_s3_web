@@ -7,9 +7,8 @@ $active_menu = $active_menu ?? 'beranda';
 <aside class="w-64 bg-[#455a2d] text-white flex flex-col h-full shrink-0 shadow-md z-30">
     <!-- Bagian Logo -->
     <div class="p-6 flex items-center gap-3">
-        <div class="w-10 h-10 border-2 border-white rounded-full flex items-center justify-center">
-            <i class="ph ph-graduation-cap text-2xl"></i>
-        </div>
+        <!-- FOTO LOGO SEKOLAH -->
+        <img src="<?= sk_e($sk['base']) ?>/assets/icons/logosekolah.png" alt="Logo SI-KESA" class="w-12 h-12 object-contain shrink-0">
         <div>
             <h1 class="font-bold text-lg leading-tight">SI-KESA</h1>
             <p class="text-[10px] text-gray-300">SDN Kedungsari 1</p>
@@ -35,6 +34,7 @@ $active_menu = $active_menu ?? 'beranda';
                 </a>
             </nav>
         </div>
+
         <div>
             <p class="text-[10px] font-bold text-gray-400 tracking-wider mb-2 ml-2">KELAS</p>
             <nav class="space-y-1">
@@ -49,14 +49,28 @@ $active_menu = $active_menu ?? 'beranda';
                 </a>
             </nav>
         </div>
+
+        <div>
+            <p class="text-[10px] font-bold text-gray-400 tracking-wider mb-2 ml-2">AKUN</p>
+            <nav class="space-y-1">
+                <a href="<?= sk_url('profil') ?>" class="flex items-center gap-3 px-4 py-2.5 rounded-xl transition <?= in_array($active_menu, ['profil', 'akun']) ? 'bg-[#eba048] text-white font-medium' : 'text-gray-300 hover:bg-white/10' ?>">
+                    <i class="ph ph-user text-xl"></i> Akun
+                </a>
+            </nav>
+        </div>
     </div>
 
-    <!-- Pasang sebagai aplikasi (muncul bila browser mendukung) -->
-    <div class="px-4 pb-2"><button type="button" data-pwa-install hidden class="w-full flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 rounded-xl py-2 text-xs font-bold transition"><i class="ph ph-download-simple text-base"></i> Pasang Aplikasi</button></div>
+    <!-- Pasang sebagai aplikasi -->
+    <div class="px-4 pb-2">
+        <button type="button" data-pwa-install hidden class="w-full flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 rounded-xl py-2 text-xs font-bold transition">
+            <i class="ph ph-download-simple text-base"></i> Pasang Aplikasi
+        </button>
+    </div>
+
     <!-- Bagian Profil Bawah -->
     <div class="p-4 border-t border-white/10">
         <div class="flex items-center justify-between gap-2">
-            <a href="<?= sk_url('profil') ?>" class="flex items-center gap-3 hover:bg-white/10 p-2 rounded-xl cursor-pointer transition flex-1 min-w-0" title="Ganti password">
+            <a href="<?= sk_url('profil') ?>" class="flex items-center gap-3 p-2 rounded-xl cursor-pointer transition flex-1 min-w-0 <?= in_array($active_menu, ['profil', 'akun']) ? 'bg-white/10' : 'hover:bg-white/10' ?>" title="Profil Saya">
                 <div id="profilInisial" class="w-8 h-8 rounded-full bg-white text-[#455a2d] flex items-center justify-center font-bold text-xs shrink-0">--</div>
                 <div class="min-w-0">
                     <p id="profilNama" class="text-sm font-semibold truncate">Memuat...</p>
