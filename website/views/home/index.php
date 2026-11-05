@@ -41,11 +41,7 @@ $data = [
         'Memberikan layanan manajerial yang bermutu dan berkolaborasi dengan Dunia Usaha dan Dunia Industri (DUDI).',
     ],
 
-<<<<<<< HEAD
-    'youtubeId' => 'YOUTUBE_VIDEO_ID', // ganti dengan ID video sekolah
-=======
     'youtubeId' => 'B1-57ogRm-Q', // ID video dari https://youtu.be/B1-57ogRm-Q
->>>>>>> c0537a9e00559a0ef785f741664ec62ff3a44d17
 ];
 
 $visi = $data['visi'];
