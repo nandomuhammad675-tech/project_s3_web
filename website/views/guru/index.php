@@ -46,7 +46,10 @@ layout_start([
 ]);
 ?>
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> c0537a9e00559a0ef785f741664ec62ff3a44d17
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -275,7 +278,10 @@ $menuLain = [
         </ul>
     </nav>
 
+<<<<<<< HEAD
 >>>>>>> 8d7d43c3183adc7a19a337326a880273da51868a
+=======
+>>>>>>> c0537a9e00559a0ef785f741664ec62ff3a44d17
 <main>
 
     <!-- ================= HERO ================= -->
@@ -381,8 +387,11 @@ $menuLain = [
 
 </main>
 <<<<<<< HEAD
+<<<<<<< HEAD
 <?php layout_end(); ?>
 =======
+=======
+>>>>>>> c0537a9e00559a0ef785f741664ec62ff3a44d17
 
 <footer class="footer">
     <div class="footer__inner">
@@ -503,4 +512,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+<<<<<<< HEAD
 >>>>>>> 8d7d43c3183adc7a19a337326a880273da51868a
+=======
+>>>>>>> c0537a9e00559a0ef785f741664ec62ff3a44d17

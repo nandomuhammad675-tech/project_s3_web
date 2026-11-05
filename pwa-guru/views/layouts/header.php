@@ -38,4 +38,4 @@ $page_title = $page_title ?? 'Beranda';
         ], JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?>;
     </script>
 </head>
-<body class="bg-[#f7f6f0] flex h-screen overflow-hidden text-gray-800">
+<body class="bg-[#f7f6f0] flex h-screen overflow-hidden text-gray-800"></body>
