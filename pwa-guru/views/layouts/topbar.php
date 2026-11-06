@@ -7,10 +7,10 @@
     <div class="flex items-center gap-4">
         <button class="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 relative">
             <i class="ph ph-bell text-xl"></i>
-            <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+            <span id="bellDot" hidden class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
         </button>
-        <button class="w-10 h-10 rounded-full bg-[#E5E0D8] text-[#455a2d] font-bold text-sm flex items-center justify-center">
-            BR
-        </button>
+        <a href="<?= sk_url('profil') ?>" id="topbarInisial" class="w-10 h-10 rounded-full bg-[#E5E0D8] text-[#455a2d] font-bold text-sm flex items-center justify-center" title="Ganti password">
+            --
+        </a>
     </div>
 </header>

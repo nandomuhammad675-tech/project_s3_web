@@ -8,7 +8,9 @@ return [
     'telepon'   => '(0000) 0000',
     'email'     => 'dnkedungsarisatu@yahoo.co.id',
     'whatsapp'  => '0000-0000-0000',
+    'jam'       => 'Senin - Sabtu, 07.00 - 13.00 WIB',   // jam layanan (halaman Hubungi Kami); kosongkan bila tidak dipakai
     'instagram' => '#',   // ganti dengan link Instagram sekolah
     'facebook'  => '#',   // ganti dengan link Facebook sekolah
     'peta'      => 'https://www.google.com/maps?q=' . rawurlencode('SDN Kedungsari 1, Tarokan, Kediri') . '&output=embed',
+    'peta_link' => 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode('SDN Kedungsari 1, Tarokan, Kediri'),
 ];

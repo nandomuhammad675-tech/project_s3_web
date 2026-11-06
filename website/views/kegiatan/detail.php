@@ -1,117 +1,83 @@
 <?php
 require_once __DIR__ . '/../../lib/bootstrap.php';
-/**
- * Halaman Detail Berita - SD Negeri Kedungsari 1
- * SATU FILE. Letakkan di: website/views/kegiatan/detail.php
- * Dibuka lewat: ?page=kegiatan&slug=<slug-berita>
- * (index.php meneruskan ke file ini jika ada parameter "slug")
- */
-
-if (!function_exists('detail_url')) {
-    function detail_url(string $slug): string {
-        return page_url('berita') . '&slug=' . rawurlencode($slug);
-    }
-}
-
-$current = 'berita';
-
-// ===== Ambil data & cari berita berdasarkan slug =====
 require_once __DIR__ . '/../../lib/api.php';
-$beritaList = sikesa_berita(require __DIR__ . '/data.php');
-usort($beritaList, fn($a, $b) => strcmp((string) $b['tanggal'], (string) $a['tanggal']));
-
-$slug   = (string) ($_GET['slug'] ?? '');
-$berita = null;
-foreach ($beritaList as $item) {
-    if ($item['slug'] === $slug) { $berita = $item; break; }
+/** Detail kegiatan: /?page=kegiatan&slug=e12. Event tanpa galeri/deskripsi tetap tampil rapi (tidak error). */
+$slug  = (string) $_GET['slug'];
+$b     = sikesa_event_cari($slug);                  // array | false (tidak ada) | null (API gagal)
+$kat   = sikesa_kategori();
+$lain  = [];
+if (is_array($b)) {
+    $h = sikesa_event(null, 1, 4);
+    foreach (($h['items'] ?? []) as $e) { if ($e['slug'] !== $b['slug'] && count($lain) < 2) { $lain[] = $e; } }
 }
-
-if (!$berita) {
-    http_response_code(404);
-}
-
-// Paragraf isi (cadangan: ringkasan)
-$paragraf = [];
-if ($berita) {
-    $paragraf = !empty($berita['isi']) ? $berita['isi'] : [$berita['ringkas']];
-}
-
-// Berita lainnya (maksimal 2, selain yang sedang dibaca)
-$lainnya = array_slice(array_filter($beritaList, fn($b) => $b['slug'] !== $slug), 0, 2);
-
-$title = ($berita ? $berita['judul'] : 'Berita tidak ditemukan') . ' - SD Negeri Kedungsari 1';
+if ($b === false) { http_response_code(404); }
+elseif ($b === null) { http_response_code(503); }
 
 layout_start([
-    'title'       => $title ?? 'SD Negeri Kedungsari 1',
+    'title'       => (is_array($b) ? $b['judul'] : 'Kegiatan tidak ditemukan') . ' - SD Negeri Kedungsari 1',
     'current'     => 'berita',
-    'description' => $berita ? mb_strimwidth($berita['ringkas'], 0, 150, '…', 'UTF-8') : 'Berita SD Negeri Kedungsari 1',
-    'css'         => 'kegiatan-detail',
-    'js'          => null,
+    'description' => is_array($b) && $b['ringkas'] !== '' ? $b['ringkas'] : 'Kegiatan SD Negeri Kedungsari 1',
+    'css'         => 'detail',
+    'js'          => is_array($b) && $b['galeri'] ? 'galeri' : [],
+    'image'       => is_array($b) ? sikesa_img($b['foto']) : null,
 ]);
 ?>
 <main>
     <section class="section section--leaf" id="detail-berita">
-
-    <?php if (!$berita): ?>
-
-        <h1 class="title">Berita tidak ditemukan</h1>
+    <?php if ($b === null): ?>
+        <h1 class="title">Kegiatan gagal dimuat</h1>
+        <?php ui_gagal('Kegiatan', page_url('berita', ['slug' => $slug])); ?>
+    <?php elseif ($b === false): ?>
+        <h1 class="title">Kegiatan tidak ditemukan</h1>
         <div class="kosong">
-            <p>Berita yang Anda cari tidak tersedia atau sudah dipindahkan.</p>
-            <a class="pill pill--solid" href="<?= page_url('berita') ?>">Kembali ke Berita &amp; Artikel</a>
+            <p>Kegiatan yang Anda cari tidak tersedia atau sudah dipindahkan.</p>
+            <a class="pill pill--solid" href="<?= esc(page_url('berita')) ?>">Kembali ke Kegiatan &amp; Prestasi</a>
         </div>
-
     <?php else: ?>
-
         <div class="detail">
-            <p class="detail__crumb">
-                <a href="<?= page_url('berita') ?>">Berita &amp; Artikel</a> / Detail
-            </p>
-
+            <p class="detail__crumb"><a href="<?= esc(page_url('berita')) ?>">Kegiatan &amp; Prestasi</a> / Detail</p>
             <article class="detail__card">
-                <img class="detail__img" src="<?= sikesa_img($berita['foto']) ?>" alt="<?= esc($berita['judul']) ?>">
-
+                <img class="detail__img" src="<?= esc(sikesa_img($b['foto'])) ?>" alt="<?= esc($b['judul']) ?>">
                 <div class="detail__body">
-                    <h1><?= esc($berita['judul']) ?></h1>
-                    <?php if (!empty($berita['tanggal'])): ?><time class="detail__date" datetime="<?= esc($berita['tanggal']) ?>"><?= esc(tanggal_id($berita['tanggal'])) ?></time><?php endif; ?>
+                    <?php if ($b['kategori'] !== ''): ?><span class="badge"><?= esc($kat[$b['kategori']] ?? ucfirst($b['kategori'])) ?></span><?php endif; ?>
+                    <h1><?= esc($b['judul']) ?></h1>
+                    <?php if ($b['tanggal'] !== ''): ?><time class="detail__date" datetime="<?= esc($b['tanggal']) ?>"><?= esc(tanggal_id($b['tanggal'])) ?></time><?php endif; ?>
 
-                    <?php foreach ($paragraf as $p): ?>
-                        <p><?= esc($p) ?></p>
-                    <?php endforeach; ?>
+                    <?php foreach ($b['isi'] as $p): ?><p><?= esc($p) ?></p><?php endforeach; ?>
 
-                    <?php if (!empty($berita['galeri'])): ?>
+                    <?php if ($b['galeri']): ?>
+                        <h2 class="detail__sub">Dokumentasi</h2>
                         <div class="detail__galeri">
-                            <?php foreach ($berita['galeri'] as $f): ?>
-                                <img src="<?= esc(sikesa_img($f)) ?>" alt="Dokumentasi <?= esc($berita['judul']) ?>" loading="lazy">
+                            <?php foreach ($b['galeri'] as $f): $u = sikesa_img($f); ?>
+                                <a class="zoom" href="<?= esc($u) ?>" data-caption="<?= esc($b['judul']) ?>">
+                                    <img src="<?= esc($u) ?>" alt="Dokumentasi <?= esc($b['judul']) ?>" loading="lazy" width="320" height="240">
+                                </a>
                             <?php endforeach; ?>
                         </div>
                     <?php endif; ?>
 
-                    <div class="detail__actions">
-                        <a class="pill" href="<?= page_url('berita') ?>">Kembali ke Berita</a>
-                    </div>
+                    <div class="detail__actions"><a class="pill" href="<?= esc(page_url('berita')) ?>">Kembali ke Kegiatan &amp; Prestasi</a></div>
                 </div>
             </article>
         </div>
 
-        <?php if ($lainnya): ?>
+        <?php if ($lain): ?>
             <div class="lain">
-                <h2 class="title title--sm">Berita Lainnya</h2>
+                <h2 class="title title--sm">Kegiatan Lainnya</h2>
                 <div class="lain__grid">
-                    <?php foreach ($lainnya as $b): ?>
-                        <a class="lain-card" href="<?= esc(detail_url($b['slug'])) ?>">
-                            <img src="<?= sikesa_img($b['foto']) ?>" alt="<?= esc($b['judul']) ?>" loading="lazy">
+                    <?php foreach ($lain as $e): ?>
+                        <a class="kartu lain-card" href="<?= esc(page_url('berita', ['slug' => $e['slug']])) ?>">
+                            <img src="<?= esc(sikesa_img($e['foto'])) ?>" alt="" loading="lazy" width="600" height="400">
                             <div>
-                                <h3><?= esc(mb_strimwidth($b['judul'], 0, 90, '…', 'UTF-8')) ?></h3>
-                                <?php if (!empty($b['tanggal'])): ?><time datetime="<?= esc($b['tanggal']) ?>"><?= esc(tanggal_id($b['tanggal'])) ?></time><?php endif; ?>
+                                <h3><?= esc(mb_strimwidth($e['judul'], 0, 90, '…', 'UTF-8')) ?></h3>
+                                <?php if ($e['tanggal'] !== ''): ?><time datetime="<?= esc($e['tanggal']) ?>"><?= esc(tanggal_id($e['tanggal'])) ?></time><?php endif; ?>
                             </div>
                         </a>
                     <?php endforeach; ?>
                 </div>
             </div>
         <?php endif; ?>
-
     <?php endif; ?>
-
     </section>
 </main>
 <?php layout_end(); ?>

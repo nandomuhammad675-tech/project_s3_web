@@ -6,8 +6,8 @@
 $title   = $opt['title'] ?? 'SD Negeri Kedungsari 1';
 $current = $opt['current'] ?? '';
 $desc    = $opt['description'] ?? 'Website resmi SD Negeri Kedungsari 1 - Cerdas, Berkarakter, Berprestasi';
-$css     = $opt['css'] ?? null;
-$js      = $opt['js'] ?? null;
+$css     = array_filter((array) ($opt['css'] ?? []));
+$js      = array_filter((array) ($opt['js'] ?? []));
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -21,20 +21,24 @@ $js      = $opt['js'] ?? null;
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?= asset('css/style.css') ?>">
-<?php if ($css): ?>
-    <link rel="stylesheet" href="<?= asset('css/pages/' . $css . '.css') ?>">
-<?php endif; ?>
+<?php foreach ($css as $c): ?>
+    <link rel="stylesheet" href="<?= asset('css/pages/' . $c . '.css') ?>">
+<?php endforeach; ?>
 </head>
-<body>
+<body data-placeholder="<?= esc(asset('img/placeholder.svg')) ?>">
+<a class="skip-link" href="#konten">Lewati ke isi halaman</a>
+
 <?php require __DIR__ . '/../partials/site-nav.php'; ?>
 
+<div id="konten" tabindex="-1">
 <?= $content ?>
+</div>
 
 <?php require __DIR__ . '/../partials/site-footer.php'; ?>
 
 <script src="<?= asset('js/main.js') ?>" defer></script>
-<?php if ($js): ?>
-<script src="<?= asset('js/' . $js . '.js') ?>" defer></script>
-<?php endif; ?>
+<?php foreach ($js as $j): ?>
+<script src="<?= asset('js/' . $j . '.js') ?>" defer></script>
+<?php endforeach; ?>
 </body>
 </html>

@@ -10,9 +10,11 @@ use App\Services\MadingService;
 
 final class MadingController
 {
-    /** GET /api/public/mading : karya dengan status_tampil = 1. */
+    /** GET /api/public/mading?kategori=&page=&per_page= : karya dengan status_tampil = 1; kategori = teks bebas (lihat `kategori_tersedia`). */
     public function index(Request $req): void
     {
-        ResponseHelper::success('OK', (new MadingService())->publik(Pagination::dari($req, 20, 100)));
+        $k = $req->query('kategori');
+        $kategori = is_string($k) && trim($k) !== '' ? mb_substr(trim($k), 0, 50) : null;
+        ResponseHelper::success('OK', (new MadingService())->publik(Pagination::dari($req, 20, 100), $kategori));
     }
 }

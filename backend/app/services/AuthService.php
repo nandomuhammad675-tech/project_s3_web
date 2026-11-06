@@ -42,7 +42,7 @@ final class AuthService
             throw HttpException::tooManyRequests();
         }
 
-        $akun = $this->akunRepo->cariByUsername($username);
+        $akun = $this->akunRepo->cariByUsernameAtauNip($username);
         // verifikasi selalu dijalankan (hash dummy bila akun tidak ada) agar waktu respons tidak membocorkan username
         $cocok = password_verify($password, $akun?->kataSandiHash ?? self::dummyHash());
 

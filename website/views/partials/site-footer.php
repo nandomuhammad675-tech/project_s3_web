@@ -1,12 +1,12 @@
 <?php
 /** Footer bersama. Butuh: page_url(), base_url(), esc(). Data kontak dari partials/site-info.php. */
-$info = require __DIR__ . '/site-info.php';
+$info = site_info();
 ?>
 <footer class="footer">
     <div class="footer__inner">
         <div class="footer__brand">
             <div class="footer__logo">
-                <img src="<?= asset('gambar/bingkai.png') ?>" alt="Logo">
+                <img src="<?= asset('icon/logo_sekolah.png') ?>" alt="Logo">
                 <strong>SD NEGERI KEDUNGSARI 1</strong>
             </div>
             <p>Situs resmi SD Negeri Kedungsari 1 untuk informasi akademik dan kegiatan sekolah.</p>
@@ -17,11 +17,11 @@ $info = require __DIR__ . '/site-info.php';
             <ul>
                 <li><a href="<?= page_url('profil') ?>#visi-misi">Visi &amp; Misi</a></li>
                 <li><a href="<?= page_url('ppdb') ?>">Pendaftaran Siswa Baru</a></li>
-                <li><a href="<?= page_url('berita') ?>">Artikel &amp; Berita Terkini</a></li>
+                <li><a href="<?= page_url('berita') ?>">Kegiatan &amp; Prestasi</a></li>
                 <li><a href="<?= page_url('program') ?>">Program Pembiasaan</a></li>
                 <li><a href="<?= page_url('ekstra') ?>">Ekstrakurikuler</a></li>
                 <li><a href="<?= page_url('mading') ?>">Mading Karya Siswa</a></li>
-                <li><a href="<?= page_url('profil') ?>">Guru &amp; Karyawan</a></li>
+                <li><a href="<?= page_url('profil') ?>#guru">Guru &amp; Karyawan</a></li>
                 <li><a href="<?= page_url('kontak') ?>">Hubungi Kami</a></li>
             </ul>
         </div>
