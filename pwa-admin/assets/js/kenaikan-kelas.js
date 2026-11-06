@@ -14,13 +14,10 @@
   var EP = {
     tahun:    E.tahunAjaran,                                   // GET daftar, POST buat tahun baru
     kelas:    E.kelas,                                         // GET ?id_tahun_ajaran=
-    // Backend tidak punya endpoint kesiapan: ringkasan dihitung di klien dari siswa + riwayat-kelas (lihat bangunKesiapan)
-    siswa:    E.siswa,
-    riwayat:  E.riwayatKelas,
-    guru:     E.guru,
+    kesiapan: '/api/admin/kenaikan-kelas/kesiapan',            // GET ?id_tahun_ajaran_tujuan=
     jalan:    '/api/admin/kenaikan-kelas',                     // POST jalankan kenaikan kelas
     log:      '/api/admin/kenaikan-kelas/log',                 // GET log (hanya lihat)
-    aktifkan: function (id) { return E.tahunAjaran + '/' + id + '/aktifkan'; } // PUT
+    aktifkan: function (id) { return E.tahunAjaran + '/' + id + '/aktifkan'; } // POST
   };
 
   var STEPS = ['Tahun Baru', 'Kelas & Wali', 'Kesiapan', 'Petakan Siswa', 'Ringkasan', 'Aktifkan'];
@@ -76,14 +73,14 @@
     return {
       id: pick(r, ['id', 'id_tahun_ajaran']),
       nama: pick(r, ['nama_tahun', 'nama', 'tahun_ajaran', 'tahun'], '-'),
-      aktif: flag(pick(r, ['status_aktif', 'status', 'is_aktif', 'aktif'], null)) === true
+      aktif: flag(pick(r, ['status', 'status_aktif', 'is_aktif', 'aktif'], null)) === true
     };
   }
   function normKelas(r) {
     var nama = String(pick(r, ['nama_kelas', 'nama'], '-'));
-    var t = parseInt(pick(r, ['tingkat_kelas', 'tingkat'], ''), 10);
+    var t = parseInt(pick(r, ['tingkat'], ''), 10);
     if (isNaN(t)) { var m = nama.match(/\d/); t = m ? +m[0] : 0; }
-    var wali = pick(r, ['nama_guru_wali', 'nama_wali', 'wali_kelas', 'nama_guru', 'wali'], null);
+    var wali = pick(r, ['nama_wali', 'wali_kelas', 'nama_guru', 'wali'], null);
     if (wali && typeof wali === 'object') wali = wali.nama_guru || wali.nama || null;
     var aktif = flag(pick(r, ['wali_aktif', 'status_akun_wali', 'akun_wali_aktif'], null));
     return {
@@ -98,7 +95,7 @@
     return {
       id: pick(r, ['id_siswa', 'id']),
       nama: pick(r, ['nama_siswa', 'nama'], '-'),
-      nisn: pick(r, ['nisn', 'nisn_resmi'], ''),
+      nisn: pick(r, ['nisn'], ''),
       kelas: pick(r, ['kelas', 'nama_kelas', 'kelas_asal'], '')
     };
   }
@@ -120,39 +117,6 @@
       siswa5: toArr(pick(d, ['siswa_tingkat_5'], [])).map(normSiswa),
       siswaBaru: baruList.map(normSiswa)
     };
-  }
-
-  /* ---------- baca semua halaman + hitung kesiapan di klien ---------- */
-  function fetchAllRows(url, query) {
-    return Api.get(url, query).then(function (res) {
-      var rows = toList(res), last = Number(res && res.meta && res.meta.last_page) || 1, jobs = [];
-      for (var p = 2; p <= last; p++) jobs.push(Api.get(url, Object.assign({}, query || {}, { page: p })));
-      return Promise.all(jobs).then(function (rs) { rs.forEach(function (x) { rows = rows.concat(toList(x)); }); return rows; });
-    });
-  }
-  function bangunKesiapan() {
-    if (!S.aktif) return Promise.resolve({ data: {} });
-    return Promise.all([fetchAllRows(EP.siswa), fetchAllRows(EP.riwayat, { id_tahun_ajaran: S.aktif.id })]).then(function (rs) {
-      var siswa = rs[0], riw = rs[1], punya = {}, perTingkat = {};
-      riw.forEach(function (x) { punya[String(x.id_siswa)] = x; });
-      var aktif = siswa.filter(function (x) { return x.status_siswa === 'aktif'; });
-      var tanpa = [], naik = 0, lulus = 0, s5 = [];
-      aktif.forEach(function (x) {
-        var rw = punya[String(x.id_siswa)];
-        if (!rw) { tanpa.push({ id_siswa: x.id_siswa, nama_siswa: x.nama_siswa, nisn: x.nisn_resmi, kelas: '-' }); return; }
-        var t = Number(rw.tingkat_kelas) || 0;
-        var o = perTingkat[t] = perTingkat[t] || { tingkat: t, jumlah: 0, naik: 0, lulus: 0 };
-        o.jumlah++;
-        if (t === 6) { o.lulus++; lulus++; } else { o.naik++; naik++; }
-        if (t === 5) s5.push({ id_siswa: x.id_siswa, nama_siswa: x.nama_siswa, nisn: x.nisn_resmi, kelas: rw.nama_kelas });
-      });
-      var baru = siswa.filter(function (x) { return x.status_siswa === 'baru'; }).map(function (x) { return { id_siswa: x.id_siswa, nama_siswa: x.nama_siswa, nisn: x.nisn_resmi, kelas: '' }; });
-      return { data: {
-        siswa_siap_naik: naik, siswa_lulus: lulus, siswa_tanpa_penempatan: tanpa, siswa_baru: baru,
-        per_tingkat: Object.keys(perTingkat).map(Number).sort().map(function (k) { return perTingkat[k]; }),
-        siswa_tingkat_5: s5
-      } };
-    });
   }
 
   /* ---------- keadaan ---------- */
@@ -228,7 +192,7 @@
       S.executed = false;
       if (!S.target) return;
       // Sudah pernah dijalankan? (ada log untuk tahun tujuan ini)
-      return Api.get(EP.log, { tahun_ajaran_tujuan: S.target.id, per_page: 1 }).then(function (r) {
+      return Api.get(EP.log, { id_tahun_ajaran_tujuan: S.target.id, limit: 1 }).then(function (r) {
         S.executed = toList(r).length > 0;
       }).catch(function (err) { if (err && err.status === 401) throw err; S.executed = false; });
     }).then(function () {
@@ -265,11 +229,7 @@
     S.dataLoading = true; S.dataErr = null; render();
     var ps = [];
     if (needKelas) {
-      ps.push(Promise.all([fetchAllRows(EP.kelas, { id_tahun_ajaran: S.target.id }), fetchAllRows(EP.guru)]).then(function (rs) {
-        var st = {}; rs[1].forEach(function (g) { st[String(g.id_guru)] = g.status_akun === 'aktif'; });
-        rs[0].forEach(function (k) { k.wali_aktif = k.id_guru_wali != null ? !!st[String(k.id_guru_wali)] : null; });
-        return { data: rs[0] };
-      }).then(function (res) {
+      ps.push(Api.get(EP.kelas, { id_tahun_ajaran: S.target.id }).then(function (res) {
         S.kelas = toList(res).map(normKelas).filter(function (k) {
           return k.tahunId === null || String(k.tahunId) === String(S.target.id);
         });
@@ -278,7 +238,7 @@
       }));
     }
     if (needKes) {
-      ps.push(bangunKesiapan().then(function (res) {
+      ps.push(Api.get(EP.kesiapan, { id_tahun_ajaran_tujuan: S.target.id }).then(function (res) {
         S.kes = normKes(res); S.kesLoaded = true;
       }));
     }
@@ -624,12 +584,12 @@
     // Hanya dikirim bila tahun tujuan punya dua kelas tingkat 6.
     if (needMap6()) {
       payload.penempatan_tingkat_6 = S.kes.siswa5.map(function (s) {
-        return { id_siswa: num(s.id), id_kelas_tujuan: num(S.map6[s.id]) };
+        return { id_siswa: num(s.id), id_kelas: num(S.map6[s.id]) };
       });
     }
     var baru = Object.keys(S.mapBaru).filter(function (k) { return S.mapBaru[k]; });
     if (baru.length) {
-      payload.penempatan_siswa_baru = baru.map(function (k) { return { id_siswa: num(k), id_kelas_tujuan: num(S.mapBaru[k]) }; });
+      payload.penempatan_siswa_baru = baru.map(function (k) { return { id_siswa: num(k), id_kelas: num(S.mapBaru[k]) }; });
     }
     S.busy = true; S.problems = null; render();
     Api.post(EP.jalan, payload).then(function (res) {
@@ -653,7 +613,7 @@
   function activate() {
     if (S.busy) return;
     S.busy = true; S.actMsg = ''; render();
-    Api.put(EP.aktifkan(S.target.id), {}).then(function () {
+    Api.post(EP.aktifkan(S.target.id), {}).then(function () {
       S.activated = true; toast('Tahun ajaran ' + S.target.nama + ' aktif');
     }).catch(function (err) {
       if (err && err.status === 401) return;
@@ -745,8 +705,7 @@
     var body = $('log-body'), st = $('log-state'), tbl = $('log-table'), btn = $('log-toggle');
     st.hidden = true; tbl.hidden = false;
     body.innerHTML = '<tr><td colspan="5"><span class="skeleton skeleton--row"></span></td></tr><tr><td colspan="5"><span class="skeleton skeleton--row"></span></td></tr>';
-    var idLog = S.target ? S.target.id : (S.aktif ? S.aktif.id : null);
-    (idLog ? Api.get(EP.log, { tahun_ajaran_tujuan: idLog, per_page: all ? 100 : 5 }) : Promise.resolve({ data: [] })).then(function (res) {
+    Api.get(EP.log, { limit: all ? 100 : 5 }).then(function (res) {
       if (seq !== logSeq) return;
       var rows = toList(res).map(normLog);
       if (!rows.length) {

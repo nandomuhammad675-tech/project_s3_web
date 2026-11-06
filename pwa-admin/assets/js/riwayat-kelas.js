@@ -19,16 +19,16 @@
     tahun: ['nama_tahun', 'tahun_ajaran'],
     kelas: ['nama_kelas', 'kelas'],
     absen: ['nomor_absen', 'no_absen'],
-    nisn: ['nisn_resmi', 'nisn'],
+    nisn: ['nisn'],
     nama: ['nama_siswa', 'nama'],
     status: ['status_siswa', 'status']
   };
   var SISWA_KEYS = {
     id: ['id_siswa', 'id'],
-    nisn: ['nisn_resmi', 'nisn'],
+    nisn: ['nisn'],
     nama: ['nama_siswa', 'nama'],
-    status: ['status_siswa', 'status'],
-    kelas: ['kelas_aktif', 'kelas_tahun_aktif', 'nama_kelas', 'kelas']
+    status: ['status', 'status_siswa'],
+    kelas: ['kelas_tahun_aktif', 'nama_kelas', 'kelas']
   };
   var TA_KEYS = {
     id: ['id', 'id_tahun_ajaran'],
@@ -40,7 +40,7 @@
     idTA: ['id_tahun_ajaran'],
     tahun: ['nama_tahun', 'tahun_ajaran'],
     nama: ['nama_kelas', 'nama'],
-    tingkat: ['tingkat_kelas', 'tingkat']
+    tingkat: ['tingkat']
   };
   var SEND = { siswa: 'id_siswa', tahun: 'id_tahun_ajaran', kelas: 'id_kelas', absen: 'nomor_absen' };
   var LABEL = { baru: 'Baru', aktif: 'Aktif', lulus: 'Lulus', pindah: 'Pindah' };

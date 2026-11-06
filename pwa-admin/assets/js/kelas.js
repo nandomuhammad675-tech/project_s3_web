@@ -16,8 +16,8 @@
     idTA: ['id_tahun_ajaran'],
     tahun: ['nama_tahun', 'tahun_ajaran'],
     nama: ['nama_kelas', 'nama'],
-    tingkat: ['tingkat_kelas', 'tingkat'],
-    wali: ['nama_guru_wali', 'nama_wali', 'wali_kelas', 'wali'],
+    tingkat: ['tingkat'],
+    wali: ['nama_wali', 'wali_kelas', 'wali'],
     idWali: ['id_wali_kelas', 'id_wali', 'id_guru_wali'],
     waliAktif: ['wali_aktif'],
     jumlah: ['jumlah_siswa', 'total_siswa']
@@ -32,7 +32,7 @@
     nama: ['nama_guru', 'nama'],
     aktif: ['status_akun', 'akun_aktif', 'status_aktif', 'aktif']
   };
-  var SEND = { tahun: 'id_tahun_ajaran', tingkat: 'tingkat_kelas', nama: 'nama_kelas', wali: 'id_guru_wali' };
+  var SEND = { tahun: 'id_tahun_ajaran', tingkat: 'tingkat', nama: 'nama_kelas', wali: 'id_wali_kelas' };
   var PER_PAGE = 10;
 
   /* Aturan jumlah kelas per tingkat (min/max). Tingkat 1 boleh 0 saat tahun ajaran baru disiapkan. */

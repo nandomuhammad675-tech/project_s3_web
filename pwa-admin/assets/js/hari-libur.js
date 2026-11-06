@@ -12,14 +12,14 @@
 
   /* Nama kolom dari/ke server. Ubah di sini bila kontrak API berbeda. */
   var KEYS = {
-    id: ['id_libur', 'id_hari_libur', 'id'],
-    tanggal: ['tanggal_libur', 'tanggal'],
+    id: ['id_hari_libur', 'id'],
+    tanggal: ['tanggal'],
     ket: ['keterangan'],
-    target: ['id_kelas', 'target_kelas', 'kelas']   /* daftar id kelas, atau objek {id_kelas, nama_kelas}; kosong = semua kelas */
+    target: ['target_kelas', 'kelas', 'id_kelas']   /* daftar id kelas, atau objek {id_kelas, nama_kelas}; kosong = semua kelas */
   };
   var TA_KEYS = { id: ['id', 'id_tahun_ajaran'], aktif: ['status', 'status_aktif', 'is_aktif', 'aktif'] };
-  var KELAS_KEYS = { id: ['id_kelas', 'id'], idTA: ['id_tahun_ajaran'], nama: ['nama_kelas', 'nama'], tingkat: ['tingkat_kelas', 'tingkat'] };
-  var SEND = { tanggal: 'tanggal_libur', ket: 'keterangan', kelas: 'id_kelas' };
+  var KELAS_KEYS = { id: ['id_kelas', 'id'], idTA: ['id_tahun_ajaran'], nama: ['nama_kelas', 'nama'], tingkat: ['tingkat'] };
+  var SEND = { tanggal: 'tanggal', ket: 'keterangan', kelas: 'id_kelas' };
   var PER_PAGE = 10;
   var BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 

@@ -76,14 +76,7 @@
     if (token) headers.Authorization = 'Bearer ' + token;
     if (opts.body !== undefined && opts.body !== null) headers['Content-Type'] = 'application/json';
 
-    // Daftar berhalaman backend: {data:{items,page,per_page,total}}. Minta halaman besar agar modul
-    // (yang mengikuti res.meta.last_page) tidak berhenti di halaman pertama.
-    var query = opts.query;
-    if (method === 'GET' && !(query && query.per_page !== undefined) && !/\/(me|\d+)$/.test(path) && opts.paged !== false) {
-      query = Object.assign({ per_page: 100 }, query || {});
-    }
-
-    return fetch(buildUrl(path, query), {
+    return fetch(buildUrl(path, opts.query), {
       method: method,
       headers: headers,
       body: opts.body !== undefined && opts.body !== null ? JSON.stringify(opts.body) : undefined,
@@ -95,14 +88,7 @@
         var body = null;
         try { body = txt ? JSON.parse(txt) : null; } catch (e) { body = null; }
 
-        if (res.ok) {
-          // Selaraskan dengan modul: sediakan meta.last_page dari data.total / data.per_page
-          var d = body && body.data;
-          if (d && !Array.isArray(d) && Array.isArray(d.items) && d.per_page && !body.meta) {
-            body.meta = { page: d.page, per_page: d.per_page, total: d.total, last_page: Math.max(1, Math.ceil(d.total / d.per_page)) };
-          }
-          return body;
-        }
+        if (res.ok) return body;
 
         if (res.status === 401 && !opts.noAuthRedirect) {
           if (window.SikesaAuth) window.SikesaAuth.expire();
@@ -110,7 +96,6 @@
         }
         if (res.status === 401) throw new ApiError(401, serverMessage(body, 'Username atau password salah'), body);
         if (res.status === 403) throw new ApiError(403, 'Anda tidak memiliki akses ke halaman ini', body);
-        if (res.status === 400) throw new ApiError(400, serverMessage(body, 'Permintaan tidak valid'), body);
         if (res.status === 409 || res.status === 422) {
           throw new ApiError(res.status, serverMessage(body, 'Permintaan tidak dapat diproses'), body);
         }
@@ -120,34 +105,7 @@
     });
   }
 
-  /** Unggah gambar (multipart, field "file") => path "uploads/<acak>.png". Dipakai kolom foto/ikon/banner. */
-  function upload(file) {
-    var token = localStorage.getItem(TOKEN_KEY);
-    var fd = new FormData();
-    fd.append('file', file);
-    var headers = { Accept: 'application/json' };
-    if (token) headers.Authorization = 'Bearer ' + token;
-    return fetch(buildUrl(window.SIKESA.endpoints.upload || '/api/admin/upload'), { method: 'POST', headers: headers, body: fd })
-      .catch(function () { throw new ApiError(0, 'Terjadi gangguan, coba lagi'); })
-      .then(function (res) {
-        return res.json().catch(function () { return null; }).then(function (body) {
-          if (res.ok) return (body && body.data && body.data.path) || null;
-          if (res.status === 401) { if (window.SikesaAuth) window.SikesaAuth.expire(); throw new ApiError(401, 'Sesi berakhir, silakan masuk lagi', body); }
-          throw new ApiError(res.status, res.status === 422 ? serverMessage(body, 'Berkas tidak valid') : 'Terjadi gangguan, coba lagi', body);
-        });
-      });
-  }
-
-  /** URL tampil untuk path gambar dari server (path relatif => {uploadBase}/{path}; URL https dibiarkan). */
-  function fileUrl(path) {
-    if (!path) return '';
-    if (/^(https?:|data:)/i.test(path)) return path;
-    return ((window.SIKESA && window.SIKESA.uploadBase) || '') + '/' + String(path).replace(/^\//, '');
-  }
-
   window.SikesaApi = {
-    upload: upload,
-    fileUrl: fileUrl,
     ApiError: ApiError,
     TOKEN_KEY: TOKEN_KEY,
     USER_KEY: USER_KEY,

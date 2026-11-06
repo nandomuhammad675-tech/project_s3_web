@@ -50,7 +50,6 @@
   /* Hanya terima gambar dari server (alamat atau data URL gambar). */
   function safeSrc(s) {
     s = String(s || '');
-    if (/^uploads\//.test(s) && window.SikesaApi && window.SikesaApi.fileUrl) return window.SikesaApi.fileUrl(s);
     return /^(https?:\/\/|\/|data:image\/(png|jpe?g|webp);base64,)/i.test(s) ? s : '';
   }
 
@@ -101,18 +100,9 @@
     });
   }
 
-  var relasi = {};   /* id_ekskul -> [{idRel, idGuru}] */
-
   function load(silent) {
     if (!silent) { loadState = 'loading'; render(); }
-    return Promise.all([fetchAll(E.ekskul), fetchAll(E.guruEkskul || '/api/admin/guru-ekskul')]).then(function (res) {
-      var rel = {}; relasi = {};
-      res[1].forEach(function (g) {
-        var k = String(g.id_ekskul);
-        (rel[k] = rel[k] || []).push({ id_guru: g.id_guru, nama_guru: g.nama_guru });
-        (relasi[k] = relasi[k] || []).push({ idRel: g.id_guru_ekskul, idGuru: g.id_guru });
-      });
-      var rows = res[0].map(function (e) { e.guru_pembina = rel[String(e.id_ekskul)] || []; return e; });
+    return fetchAll(E.ekskul).then(function (rows) {
       all = rows.map(norm);
       loadState = 'ok';
       render();
@@ -413,32 +403,16 @@
     var body = {};
     body[SEND.nama] = nama;
     body[SEND.deskripsi] = deskripsi || null;
-    var pilihGuru = guruState === 'ok' ? checkedIds().map(String) : null;
+    if (ikonState === 'new') body[SEND.ikon] = ikonData;
+    else if (ikonState === 'clear') body[SEND.ikon] = null;
+    if (guruState === 'ok') {
+      body[SEND.guru] = checkedIds().map(function (v) { return /^\d+$/.test(v) ? Number(v) : v; });
+    }
 
     setSaving(true);
     var wasEdit = !!editing;
-    // 1) unggah ikon baru (data URL -> berkas -> path), 2) simpan ekskul, 3) sinkronkan guru pembina
-    var siapIkon = Promise.resolve();
-    if (ikonState === 'new') {
-      siapIkon = fetch(ikonData).then(function (r) { return r.blob(); }).then(function (blob) {
-        return window.SikesaApi.upload(new File([blob], 'ikon.' + (blob.type === 'image/png' ? 'png' : blob.type === 'image/webp' ? 'webp' : 'jpg'), { type: blob.type }));
-      }).then(function (path) { body[SEND.ikon] = path; });
-    } else if (ikonState === 'clear') { body[SEND.ikon] = null; }
-
-    siapIkon.then(function () {
-      return wasEdit ? Api.put(itemUrl(editing.id), body) : Api.post(E.ekskul, body);
-    }).then(function (res) {
-      if (!pilihGuru) return;
-      var id = wasEdit ? editing.id : (res && res.data && res.data.id_ekskul);
-      if (id == null) return;
-      var ada = relasi[String(id)] || [];
-      var tambah = pilihGuru.filter(function (g) { return !ada.some(function (x) { return String(x.idGuru) === g; }); });
-      var hapus = ada.filter(function (x) { return pilihGuru.indexOf(String(x.idGuru)) === -1; });
-      var kerja = [];
-      tambah.forEach(function (g) { kerja.push(Api.post(E.guruEkskul || '/api/admin/guru-ekskul', { id_guru: Number(g), id_ekskul: Number(id) })); });
-      hapus.forEach(function (x) { kerja.push(Api.del((E.guruEkskul || '/api/admin/guru-ekskul') + '/' + encodeURIComponent(x.idRel))); });
-      return Promise.all(kerja);
-    }).then(function () {
+    var req = wasEdit ? Api.put(itemUrl(editing.id), body) : Api.post(E.ekskul, body);
+    req.then(function () {
       dlg.close();
       toast(wasEdit ? 'Ekstrakurikuler diperbarui' : 'Ekstrakurikuler ditambahkan');
       return load(true);
