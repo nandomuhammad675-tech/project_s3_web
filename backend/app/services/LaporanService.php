@@ -24,7 +24,7 @@ final class LaporanService
         if ($g['id_tahun_ajaran'] === null || (int) $p['id_tahun_ajaran'] !== (int) $g['id_tahun_ajaran']) {
             throw HttpException::forbidden('Guru hanya dapat melihat atau mengekspor laporan tahun ajaran aktif.');
         }
-        return $this->susun((int) $g['id_tahun_ajaran'], $p['semester'], (int) $g['id_kelas']);
+        return $this->saring($this->susun((int) $g['id_tahun_ajaran'], $p['semester'], (int) $g['id_kelas']), $p);
     }
 
     /** Admin: seluruh tahun ajaran; kelas opsional (harus milik tahun ajaran tsb). */
@@ -36,7 +36,44 @@ final class LaporanService
                 throw HttpException::unprocessable('Kelas tidak ditemukan pada tahun ajaran tersebut.', ['kelas' => 'Kelas tidak valid untuk tahun ajaran ini.']);
             }
         }
-        return $this->susun((int) $p['id_tahun_ajaran'], $p['semester'], $p['id_kelas']);
+        return $this->saring($this->susun((int) $p['id_tahun_ajaran'], $p['semester'], $p['id_kelas']), $p);
+    }
+
+    /**
+     * Saring per siswa (laporan per anak) dan/atau per mata pelajaran. Tanpa filter, data tidak berubah.
+     * Siswa yang dipilih: absensi dan nilai hanya miliknya; sheet kelas lain tanpa data tidak dibuat oleh exporter.
+     */
+    private function saring(array $laporan, array $p): array
+    {
+        $idSiswa = $p['id_siswa'] ?? null;
+        $idMapel = $p['id_mapel'] ?? null;
+        if ($idSiswa === null && $idMapel === null) {
+            return $laporan;
+        }
+        foreach ($laporan['kelas'] as &$k) {
+            if ($idSiswa !== null) {
+                $k['absensi'] = array_values(array_filter($k['absensi'], static fn(array $r): bool => (int) $r['id_siswa'] === (int) $idSiswa));
+            }
+            $k['nilai'] = array_values(array_filter(
+                $k['nilai'],
+                static fn(array $r): bool => ($idSiswa === null || (int) $r['id_siswa'] === (int) $idSiswa)
+                    && ($idMapel === null || (int) $r['id_mapel'] === (int) $idMapel)
+            ));
+        }
+        unset($k);
+        if ($idSiswa !== null) {
+            $laporan['kelas'] = array_values(array_filter($laporan['kelas'], static fn(array $k): bool => $k['absensi'] || $k['nilai']));
+            $nama = $laporan['kelas'][0]['absensi'][0]['nama_siswa'] ?? ($laporan['kelas'][0]['nilai'][0]['nama_siswa'] ?? null);
+            $laporan['meta']['siswa'] = $nama;
+        }
+        $maks = 0;
+        foreach ($laporan['kelas'] as $k) {
+            foreach ($k['nilai'] as $r) {
+                $maks = max($maks, $r['uh'] ? max(array_keys($r['uh'])) : 0);
+            }
+        }
+        $laporan['meta']['maks_uh'] = $maks;
+        return $laporan;
     }
 
     private function susun(int $idTahun, string $semester, ?int $idKelas): array
@@ -76,7 +113,7 @@ final class LaporanService
             $baris[$kunci] ??= [
                 'id_siswa' => $r['id_siswa'],
                 'nisn' => $r['nisn'], 'nama_siswa' => $r['nama_siswa'], 'nomor_absen' => $r['nomor_absen'],
-                'id_mapel' => $r['id_mapel'], 'nama_mapel' => $r['nama_mapel'], 'uh' => [], 'asts' => null, 'asas' => null,
+                'id_siswa' => $r['id_siswa'], 'id_mapel' => $r['id_mapel'], 'kode_mapel' => $r['kode_mapel'], 'nama_mapel' => $r['nama_mapel'], 'uh' => [], 'asts' => null, 'asas' => null,
             ];
             if ($r['jenis'] === 'UH') {
                 $baris[$kunci]['uh'][$r['nomor_uh']] = $r['nilai'];

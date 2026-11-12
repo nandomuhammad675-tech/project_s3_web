@@ -26,12 +26,21 @@ function sikesa_api(string $path, array $query = [])
     return $cache[$url] = (is_array($j) && !empty($j['success'])) ? ($j['data'] ?? null) : null;
 }
 
-/** Path 'uploads/..' -> URL backend; URL http(s) apa adanya; selain itu aset lokal website. */
+/**
+ * Gambar dari Admin: path 'assets/img/<jenis>/<nama>-<n>.<ext>' = berkas di folder public website (dipakai langsung bila ada);
+ * bila berkas tidak ada, ditayangkan dari DATABASE lewat backend (/api/media?path=...). URL http(s) apa adanya;
+ * path lama 'uploads/..' dilayani backend; selain itu aset lokal website.
+ */
 function sikesa_img(?string $p): string
 {
     $p = (string) $p;
     if ($p === '') { return asset('img/home.jpg'); }
     if (preg_match('#^https?://#i', $p)) { return $p; }
+    if (preg_match('#^assets/img/(event|galeri|mading|guru|ekstrakurikuler|program-pembiasaan)/[a-z0-9-]+\.(jpg|png|webp)$#', $p)) {
+        return is_file(__DIR__ . '/../public/' . $p)
+            ? base_url($p)
+            : sikesa_api_base() . '/api/media?path=' . rawurlencode($p);
+    }
     if (strpos($p, 'uploads/') === 0) { return sikesa_api_base() . '/' . $p; }
     return base_url($p);
 }
@@ -69,16 +78,24 @@ function sikesa_guru(array $data): array
     return $data;
 }
 
-/** Galeri mandiri. API tidak punya tanggal => 'tanggal' null (view menyembunyikan). */
+/** Galeri website = foto per event (diunggah di Event & Galeri) + galeri umum. API tidak punya tanggal => 'tanggal' null (view menyembunyikan). */
 function sikesa_galeri(array $fallback): array
 {
-    $d = sikesa_api('galeri', ['per_page' => 100]);
-    if ($d === null) { return $fallback; }
-    return array_map(static fn($g) => [
-        'judul' => (string) ($g['keterangan'] ?: 'Dokumentasi kegiatan'),
-        'tanggal' => null,
-        'foto' => $g['file_gambar'],
-    ], $d['items']);
+    $umum = sikesa_api('galeri', ['per_page' => 100]);
+    if ($umum === null) { return $fallback; }
+    $out = [];
+    $ev = sikesa_api('event', ['per_page' => 100]);
+    foreach ((array) ($ev['items'] ?? []) as $e) {
+        foreach ((array) ($e['galeri'] ?? []) as $g) {
+            if (empty($g['file_gambar'])) { continue; }
+            $ket = trim((string) ($g['keterangan'] ?? ''));
+            $out[] = ['judul' => $e['nama_event'] . ($ket !== '' ? ' - ' . $ket : ''), 'tanggal' => null, 'foto' => $g['file_gambar']];
+        }
+    }
+    foreach ((array) ($umum['items'] ?? []) as $g) {
+        $out[] = ['judul' => (string) ($g['keterangan'] ?: 'Dokumentasi kegiatan'), 'tanggal' => null, 'foto' => $g['file_gambar']];
+    }
+    return $out;
 }
 
 /** Respons berhalaman -> ['items' => [...], 'total' => n, 'page' => n, 'per_page' => n]; null bila gagal. */

@@ -22,22 +22,12 @@ final class LaporanController
 
     /**
      * GET /api/guru/laporan/excel?semester=&tahun_ajaran=&jenis=&mapel=&siswa= : unduh XLSX kelas sendiri.
-     * `mapel` (id mata pelajaran) dan `siswa` (id siswa) opsional: mempersempit rekap nilai.
-     * Rekap nilai memuat SEMUA siswa aktif x SEMUA mapel; yang belum ada nilainya dibiarkan kosong.
+     * `mapel` (id mata pelajaran) dan `siswa` (id siswa) opsional: bila diisi, rekap nilai hanya memuat itu.
      */
     public function excel(Request $req): void
     {
         $p = AkademikValidator::laporan($req);
         $laporan = (new LaporanService())->untukGuru($req->get('guru'), $p);
-
-        if ($p['jenis'] === 'nilai' || $p['jenis'] === 'semua') {
-            $laporan = self::lengkapiNilai(
-                $laporan,
-                (int) $p['id_tahun_ajaran'],
-                Pagination::angka($req, 'mapel'),
-                Pagination::angka($req, 'siswa')
-            );
-        }
 
         LaporanExporter::kirim(LaporanExporter::buat($laporan, $p['jenis']), LaporanExporter::namaFile($laporan['meta']));
     }
