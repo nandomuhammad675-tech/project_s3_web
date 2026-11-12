@@ -60,6 +60,47 @@ final class SheetHelper
             ->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
     }
 
+    /** Nama sheet Excel yang valid (maks 31 karakter, tanpa []:*?/\\) dan unik dalam workbook. */
+    public static function namaSheet(\PhpOffice\PhpSpreadsheet\Spreadsheet $wb, string $dasar): string
+    {
+        $nama = trim(str_replace(['\\', '/', '?', '*', '[', ']', ':', "'"], '-', $dasar));
+        $nama = mb_substr($nama === '' ? 'Sheet' : $nama, 0, 31);
+        $asli = $nama;
+        $n = 2;
+        while ($wb->sheetNameExists($nama)) {
+            $akhiran = '-' . $n++;
+            $nama = mb_substr($asli, 0, 31 - mb_strlen($akhiran)) . $akhiran;
+        }
+        return $nama;
+    }
+
+    /** Kode mapel untuk nama sheet: kode_mapel bila ada, selain itu singkatan dari nama (mis. "Matematika" => MAT). */
+    public static function kodeMapel(?string $kode, string $nama): string
+    {
+        $kode = trim((string) $kode);
+        if ($kode !== '') {
+            return strtoupper($kode);
+        }
+        $kata = preg_split('/\s+/', trim($nama)) ?: [];
+        if (count($kata) > 1) {
+            $s = '';
+            foreach ($kata as $k) {
+                $s .= mb_strtoupper(mb_substr($k, 0, 1));
+            }
+            return mb_substr($s, 0, 5);
+        }
+        return mb_strtoupper(mb_substr($nama, 0, 3));
+    }
+
+    /** Dua baris judul di atas tabel (judul tebal + keterangan). Header tabel ditulis oleh pemanggil di baris 4. */
+    public static function judulSheet(Worksheet $s, string $judul, string $keterangan): void
+    {
+        self::teks($s, 1, 1, $judul);
+        $s->getStyle('A1')->getFont()->setBold(true)->setSize(13);
+        self::teks($s, 1, 2, $keterangan);
+        $s->getStyle('A2')->getFont()->setItalic(true)->getColor()->setRGB('555555');
+    }
+
     /** "2035-01-03" => "03/01/2035"; null => "-". */
     public static function tanggal(?string $ymd): string
     {

@@ -2,7 +2,7 @@
     <div class="footer__inner">
         <div class="footer__brand">
             <div class="footer__logo">
-                <img src="<?= base_url('assets/bingkai.png') ?>" alt="Logo">
+                <img src="<?= base_url('website/public/assets/gambar/LOGO SDN KEDUNGSARI 1.png') ?>" alt="Logo">
                 <strong>SD NEGERI KEDUNGSARI 1</strong>
             </div>
             <p>Situs resmi SD Negeri Kedungsari 1 untuk informasi akademik dan kegiatan sekolah.</p>
