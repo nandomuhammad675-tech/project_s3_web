@@ -57,6 +57,7 @@ final class AuthService
         if ($kUser !== null) {
             RateLimiter::clear($kUser);
         }
+        $this->akunRepo->catatLogin($akun->idUser);
         return $this->tokenInternal($akun);
     }
 

@@ -26,7 +26,8 @@
       <svg class="ico" aria-hidden="true"><use href="#i-bell"/></svg>
       <span class="bell__dot" id="bell-dot" hidden></span>
     </button>
+    <div class="bell-panel" id="bell-panel" role="dialog" aria-label="Pemberitahuan" hidden></div>
 
-    <div class="avatar" id="avatar" title="Akun Anda" aria-label="Akun Anda">AD</div>
+    <a class="avatar" id="avatar" href="<?= e(url('profil')) ?>" title="Profil akun" aria-label="Profil akun">AD</a>
   </div>
 </header>

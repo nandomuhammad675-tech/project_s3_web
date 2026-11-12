@@ -25,8 +25,17 @@ $err = 'text-xs text-red-600 mt-1';
             <div id="dsAlert" hidden class="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm mb-5"></div>
             <form id="formDisiplin" class="space-y-6" novalidate>
                 <div>
-                    <label class="<?= $lbl ?>" for="inputSiswaDisiplin">Siswa *</label>
-                    <select id="inputSiswaDisiplin" class="<?= $inp ?> appearance-none cursor-pointer"><option value="">Pilih siswa</option></select>
+                    <label class="<?= $lbl ?>" for="dsCari">Siswa *</label>
+                    <input type="hidden" id="inputSiswaDisiplin" value="">
+                    <div id="dsTerpilih" hidden class="flex items-center justify-between border border-[#455a2d]/30 bg-[#f7f6f0] rounded-xl px-3.5 py-3 text-sm font-bold text-[#455a2d]">
+                        <span id="dsTerpilihNama"></span>
+                        <button type="button" id="dsGanti" class="text-xs text-gray-500 hover:text-gray-800 font-semibold">Ganti</button>
+                    </div>
+                    <div id="dsPencarian" class="relative">
+                        <i class="ph ph-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        <input type="search" id="dsCari" autocomplete="off" placeholder="Ketik nama siswa untuk mencari..." class="<?= $inp ?> pl-10">
+                        <div id="dsHasil" hidden class="absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-56 overflow-y-auto z-20"></div>
+                    </div>
                     <p class="<?= $err ?>" data-err="id_siswa" hidden></p>
                 </div>
                 <div>

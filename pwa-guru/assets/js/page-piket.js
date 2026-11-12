@@ -15,7 +15,8 @@
         return '<div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100 flex flex-col w-full">' +
           '<div class="flex items-center justify-between pb-3 mb-3 border-b border-gray-100">' +
           '<div class="flex items-center gap-2 text-[#1f2937] font-bold text-[13px] uppercase tracking-wider"><i class="ph ph-broom text-[#455a2d] text-sm bg-[#f7f6f0] p-1.5 rounded-md"></i> ' + NAMA[h] + '</div>' +
-          '<button type="button" data-ubah="' + h + '" class="bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600 px-3.5 py-1.5 rounded-lg text-[11px] font-bold transition">Ubah</button></div>' +
+          '<div class="flex gap-1.5"><button type="button" data-ubah="' + h + '" class="bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600 px-3.5 py-1.5 rounded-lg text-[11px] font-bold transition">Ubah</button>' +
+          '<button type="button" data-hapus-hari="' + h + '" class="bg-red-50 hover:bg-red-100 border border-red-100 text-red-600 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition" title="Hapus piket" aria-label="Hapus piket ' + NAMA[h] + '"><i class="ph ph-trash"></i></button></div></div>' +
           '<div class="space-y-2 mb-3.5">' + p.siswa.map(function (x) {
             return '<div class="flex items-center gap-2.5"><div class="w-6 h-6 rounded-full bg-[#f7f6f0] flex items-center justify-center text-[9px] font-bold text-[#455a2d] shrink-0">' + U.esc(U.inisial(x.nama_siswa)) + '</div>' +
               '<p class="text-[13px] font-semibold text-gray-700">' + U.esc(x.nama_siswa) + '</p></div>';
@@ -103,7 +104,14 @@
   });
 
   $('gridPiket').addEventListener('click', function (e) {
-    var t = e.target.closest('[data-tambah]'), u = e.target.closest('[data-ubah]');
+    var t = e.target.closest('[data-tambah]'), u = e.target.closest('[data-ubah]'), d = e.target.closest('[data-hapus-hari]');
+    if (d) {
+      var hh = d.getAttribute('data-hapus-hari'), pp = P.perHari(st.items)[hh];
+      if (!pp || !window.confirm('Hapus piket hari ' + NAMA[hh] + '?')) return;
+      d.disabled = true;
+      P.hapus(pp.id_piket).then(function () { U.toast('Piket dihapus.'); return muat(); }, function (err) { d.disabled = false; U.toast(U.pesanGalat(err), 'error'); });
+      return;
+    }
     if (t) return buka(t.getAttribute('data-tambah'), null);
     if (u) { var h = u.getAttribute('data-ubah'); return buka(h, P.perHari(st.items)[h]); }
   });

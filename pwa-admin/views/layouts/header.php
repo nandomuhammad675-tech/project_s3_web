@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= e($pageTitle) ?> | SI-KESA Admin</title>
-  <meta name="theme-color" content="#455a1f">
+  <meta name="theme-color" content="#455a2d">
   <link rel="manifest" href="<?= e(url('manifest.json')) ?>">
   <link rel="icon" href="<?= e(url('assets/icons/icon-192.png')) ?>">
   <link rel="apple-touch-icon" href="<?= e(url('assets/icons/icon-192.png')) ?>">

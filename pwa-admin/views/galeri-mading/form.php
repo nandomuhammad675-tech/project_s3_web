@@ -43,7 +43,7 @@
 
     <label class="check" for="md-tampil">
       <input type="checkbox" id="md-tampil" checked>
-      <span>Tampilkan di website</span>
+      <span>Karya ditampilkan di website <small style="color:var(--ink-3)">(matikan untuk menyimpan sebagai draf)</small></span>
     </label>
 
     <div class="notice notice--warn" id="md-form-msg" role="alert" hidden></div>

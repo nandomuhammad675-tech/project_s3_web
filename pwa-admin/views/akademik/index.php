@@ -41,7 +41,7 @@ $sel = function (string $id, string $label, string $wrapId = '') use ($ico) {
       </div>
       <button type="button" class="btn btn--soft" id="ak-reset"><?= $ico('refresh', 'ico--sm') ?> Reset</button>
     </div>
-    <button type="button" class="btn btn--outline" id="ak-export" disabled><?= $ico('download', 'ico--sm') ?> Ekspor Tampilan</button>
+    <button type="button" class="btn btn--outline" id="ak-export" disabled><?= $ico('download', 'ico--sm') ?> Ekspor Excel</button>
   </div>
 
   <div class="notice notice--warn ak-warn" id="ak-warn" role="alert" hidden></div>

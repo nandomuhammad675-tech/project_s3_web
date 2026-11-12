@@ -1,5 +1,6 @@
 -- =====================================================================
 -- SI-KESA — Sistem Informasi SDN Kedungsari Satu
+-- Skema database v10 (= v9 + tabel media_file + kolom akun_pengguna.terakhir_login_pada; migrasi: migrasi_v9_ke_v10.sql)
 -- Skema database v9  |  selaras dengan URS v2.7, SRS v2.7, BRD v2.7, TDD v1.7
 -- Database: `si_kesa`   |   DBMS target: MySQL 8.0.16+ (CHECK aktif).
 -- Skema v9 BELUM dijalankan pada DBMS apa pun; uji ulang pada MySQL 8.0.16+
@@ -172,6 +173,7 @@ CREATE TABLE `akun_pengguna` (
   `role` enum('admin','guru') NOT NULL,
   `status_akun` enum('aktif','nonaktif') NOT NULL DEFAULT 'aktif',
   `kata_sandi_diubah_pada` timestamp NULL DEFAULT NULL COMMENT 'token dengan iat sebelum waktu ini ditolak',
+  `terakhir_login_pada` timestamp NULL DEFAULT NULL COMMENT 'waktu login berhasil terakhir (kolom Terakhir aktif pada Kelola Akun)',
   `dibuat_pada` timestamp NOT NULL DEFAULT current_timestamp(),
   `diubah_pada` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id_user`),
@@ -600,6 +602,25 @@ CREATE TABLE `catatan_kedisiplinan` (
   CONSTRAINT `fk_disiplin_guru` FOREIGN KEY (`id_guru`) REFERENCES `data_guru` (`id_guru`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `fk_disiplin_kelas` FOREIGN KEY (`id_kelas`) REFERENCES `kelas` (`id_kelas`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `fk_disiplin_tahun` FOREIGN KEY (`id_tahun_ajaran`) REFERENCES `tahun_ajaran` (`id_tahun_ajaran`) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+-- media_file : SEMUA gambar (foto Guru, banner/galeri event, mading, program pembiasaan, ikon ekstrakurikuler)
+-- disimpan di database. Salinan berkasnya ditulis ke website/public/assets/img/<jenis>/<nama>-<n>.<ext>
+-- (nama mengikuti nama event). Kolom gambar tabel lain berisi path yang sama (kunci: media_file.path).
+-- Cadangan: GET /api/media?path=... menayangkan gambar dari tabel ini bila berkas website tidak ada.
+-- Backend membuat tabel ini otomatis bila belum ada. max_allowed_packet MySQL minimal 8M (XAMPP lama: 1M).
+-- --------------------------------------------------------
+CREATE TABLE `media_file` (
+  `id_media` int(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `path` varchar(190) NOT NULL,
+  `jenis` varchar(30) NOT NULL,
+  `mime` varchar(30) NOT NULL,
+  `ukuran` int(10) UNSIGNED NOT NULL,
+  `data` mediumblob NOT NULL,
+  `dibuat_pada` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id_media`),
+  UNIQUE KEY `uq_media_path` (`path`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------

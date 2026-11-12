@@ -40,7 +40,7 @@ $icon = fn(string $n) => '<svg class="ico" aria-hidden="true"><use href="#i-' . 
 <div class="sidebar-backdrop" data-sidebar-close hidden></div>
 <aside class="sidebar" id="sidebar" aria-label="Menu utama">
   <div class="sidebar__brand">
-    <img class="sidebar__logo" src="<?= e(url('assets/icons/icon-192.png')) ?>" alt="" width="40" height="40">
+    <img class="sidebar__logo" src="<?= e(url('assets/img/logo-sekolah.png')) ?>" alt="Logo SD Negeri Kedungsari 1" height="40" style="height:40px;width:auto">
     <div>
       <div class="sidebar__app"><?= e($config['appName']) ?></div>
       <div class="sidebar__school"><?= e($config['schoolName']) ?></div>
@@ -84,4 +84,5 @@ $icon = fn(string $n) => '<svg class="ico" aria-hidden="true"><use href="#i-' . 
     </div>
   <?php endforeach; ?>
   </nav>
+  <div style="padding:12px"><button type="button" class="nav-item" data-pwa-install hidden><span class="nav-item__text">Pasang Aplikasi</span></button></div>
 </aside>

@@ -37,26 +37,17 @@ $err = 'text-xs text-red-600 mt-1';
                     </div>
                 </div>
                 <div>
-                    <label class="<?= $lbl ?>" for="jdMapel">Mata Pelajaran <span class="text-red-500">*</span></label>
-                    <select id="jdMapel" class="<?= $sel ?>"></select>
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="<?= $lbl ?> mb-0">Mata Pelajaran &amp; Jam <span class="text-red-500">*</span></span>
+                        <span class="text-xs text-gray-400" id="jdHint">Tambahkan beberapa mapel sekaligus</span>
+                    </div>
+                    <div id="jdBaris" class="space-y-3"></div>
                     <p class="<?= $err ?>" data-err="id_mapel" hidden></p>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="<?= $lbl ?>" for="jdMulai">Jam Mulai <span class="text-red-500">*</span></label>
-                        <input id="jdMulai" type="time" value="07:00" class="<?= $inp ?> font-bold">
-                        <p class="<?= $err ?>" data-err="jam_mulai" hidden></p>
-                    </div>
-                    <div>
-                        <label class="<?= $lbl ?>" for="jdSelesai">Jam Selesai <span class="text-red-500">*</span></label>
-                        <input id="jdSelesai" type="time" value="07:35" class="<?= $inp ?> font-bold">
-                        <p class="<?= $err ?>" data-err="jam_selesai" hidden></p>
-                    </div>
-                </div>
-                <div>
-                    <label class="<?= $lbl ?>" for="jdKet">Keterangan</label>
-                    <input id="jdKet" type="text" maxlength="100" placeholder="Opsional" class="<?= $inp ?>">
-                    <p class="<?= $err ?>" data-err="keterangan" hidden></p>
+                    <p class="<?= $err ?>" data-err="jam_mulai" hidden></p>
+                    <p class="<?= $err ?>" data-err="jam_selesai" hidden></p>
+                    <button type="button" id="jdTambahBaris" class="mt-3 text-[#455a2d] font-bold text-sm flex items-center gap-1.5 hover:underline">
+                        <i class="ph ph-plus-circle text-lg"></i> Tambah mata pelajaran
+                    </button>
                 </div>
                 <hr class="border-gray-100">
                 <div class="flex items-center justify-end gap-3 pb-2">

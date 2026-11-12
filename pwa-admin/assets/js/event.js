@@ -49,6 +49,7 @@
   function errText(err) { return err && err.message ? err.message : 'Terjadi gangguan, coba lagi'; }
   function itemUrl(id) { return E.event + '/' + encodeURIComponent(id); }
   function safeSrc(s) {
+    if (/^(uploads|aset|media|assets)\//.test(String(s || '')) && window.SikesaApi) return window.SikesaApi.fileUrl(String(s));
     s = String(s || '');
     return /^(https?:\/\/|\/|data:image\/(png|jpe?g|webp);base64,)/i.test(s) ? s : '';
   }
@@ -189,6 +190,7 @@
       var st = '<span class="badge ' + (r.tampil ? 'badge--terbit' : 'badge--draf') + '">' + (r.tampil ? 'Terbit' : 'Draf') + '</span>';
       return '<tr><td>' + esc(r.nama) + '</td><td>' + kat + '</td><td>' + tgl + '</td><td>' + st + '</td>' +
         '<td><div class="row-actions">' +
+        '<button type="button" class="icon-act" data-act="foto" data-id="' + esc(r.id) + '" aria-label="Foto galeri ' + esc(r.nama) + '" title="Foto galeri">' + icon('image', 'ico--sm') + '</button>' +
         '<button type="button" class="icon-act" data-act="edit" data-id="' + esc(r.id) + '" aria-label="Ubah ' + esc(r.nama) + '" title="Ubah">' + icon('pencil', 'ico--sm') + '</button>' +
         '<button type="button" class="icon-act icon-act--danger" data-act="del" data-id="' + esc(r.id) + '" aria-label="Hapus ' + esc(r.nama) + '" title="Hapus">' + icon('trash', 'ico--sm') + '</button>' +
         '</div></td></tr>';
@@ -237,7 +239,9 @@
     if (!b) return;
     var item = byId(b.getAttribute('data-id'));
     if (!item) return;
-    if (b.getAttribute('data-act') === 'edit') openForm(item); else openDelete(item);
+    var aksi = b.getAttribute('data-act');
+    if (aksi === 'foto') document.dispatchEvent(new CustomEvent('sikesa:galeri-buka', { detail: { idEvent: Number(item.id), nama: item.nama } }));
+    else if (aksi === 'edit') openForm(item); else openDelete(item);
   });
 
   /* ---------- formulir ---------- */

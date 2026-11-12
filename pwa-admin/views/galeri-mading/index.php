@@ -34,7 +34,7 @@ $ico = fn(string $n, string $cls = '') => '<svg class="ico ' . $cls . '" aria-hi
           <th scope="col" aria-sort="none"><button type="button" class="th-sort" data-sort="judul">Judul <span class="th-sort__arrow" aria-hidden="true"></span></button></th>
           <th scope="col">Kategori</th>
           <th scope="col" aria-sort="none"><button type="button" class="th-sort" data-sort="penulis">Penulis <span class="th-sort__arrow" aria-hidden="true"></span></button></th>
-          <th scope="col" aria-sort="none"><button type="button" class="th-sort" data-sort="tanggal">Tanggal <span class="th-sort__arrow" aria-hidden="true"></span></button></th>
+          <th scope="col" aria-sort="none"><button type="button" class="th-sort" data-sort="status">Status <span class="th-sort__arrow" aria-hidden="true"></span></button></th>
           <th scope="col">Aksi</th>
         </tr>
       </thead>

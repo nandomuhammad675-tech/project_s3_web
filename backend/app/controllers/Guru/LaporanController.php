@@ -27,20 +27,6 @@ final class LaporanController
         $p = AkademikValidator::laporan($req);
         $laporan = (new LaporanService())->untukGuru($req->get('guru'), $p);
 
-        $idMapel = Pagination::angka($req, 'mapel');
-        $idSiswa = Pagination::angka($req, 'siswa');
-        if ($idMapel !== null || $idSiswa !== null) {
-            foreach ($laporan['kelas'] as &$k) {
-                $k['nilai'] = array_values(array_filter(
-                    $k['nilai'],
-                    static fn(array $r): bool =>
-                        ($idMapel === null || (int) ($r['id_mapel'] ?? 0) === $idMapel)
-                        && ($idSiswa === null || (int) ($r['id_siswa'] ?? 0) === $idSiswa)
-                ));
-            }
-            unset($k);
-        }
-
         LaporanExporter::kirim(LaporanExporter::buat($laporan, $p['jenis']), LaporanExporter::namaFile($laporan['meta']));
     }
 }

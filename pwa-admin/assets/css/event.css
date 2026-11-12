@@ -4,7 +4,7 @@
   position: relative; min-height: 152px; display: flex; align-items: flex-end; overflow: hidden;
   border-radius: var(--radius); color: #fff; background: var(--olive-700); box-shadow: var(--shadow);
 }
-.ev-card--olive { background: linear-gradient(135deg, #6b8330, #34431a); }
+.ev-card--olive { background: linear-gradient(135deg, #6d8652, #35471f); }
 .ev-card--amber { background: linear-gradient(135deg, #d98f22, #7a4a0a); }
 .ev-card--blue  { background: linear-gradient(135deg, #4a7a96, #1d3a4c); }
 .ev-card--green { background: linear-gradient(135deg, #3f8f5f, #1b4a30); }
@@ -36,3 +36,10 @@
 
 @media (max-width: 900px) { .ev-featured { grid-template-columns: 1fr 1fr; } .ev-card:first-child { grid-column: 1 / -1; } }
 @media (max-width: 560px) { .ev-featured { grid-template-columns: 1fr; } .field-row { grid-template-columns: 1fr; } }
+/* Manajer foto galeri */
+.gl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:14px;max-height:340px;overflow:auto}
+.gl-item{position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fafaf5}
+.gl-item img{display:block;width:100%;height:110px;object-fit:cover}
+.gl-item small{display:block;padding:6px 8px;font-size:.75rem;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gl-item button{position:absolute;top:6px;right:6px;width:30px;height:30px;border:0;border-radius:50%;background:rgba(190,40,30,.92);color:#fff;cursor:pointer;font-size:16px;line-height:1}
+.gl-item button:disabled{opacity:.5}

@@ -5,7 +5,7 @@
     --green:#5b7553;--green-dark:#46603f;--green-soft:#a9b79a;
     --sage:#eeecdc;--cream:#f6ecdc;--paper:#fbfaf4;--card-blue:#eef2f8;
     --orange:#f08a1c;--orange-dark:#c96d08;--ink:#2f3a2c;--muted:#5f6a5a;--radius:14px;
-    --card-grey:#e6e8e1;--shadow-card:0 6px 0 rgba(91,117,83,.35);--nav-h:64px;
+    --card-grey:#e6e8e1;--shadow-card:0 6px 0 rgba(91,117,83,.35);--nav-h:80px;
 }
 
 *{box-sizing:border-box;margin:0;padding:0}

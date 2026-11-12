@@ -11,15 +11,15 @@
   if (!Api || !window.SikesaAuth || !window.SikesaAuth.token()) return;
 
   /* Nama kolom dari server. Ubah di sini bila kontrak API berbeda. */
-  var TA_K = { id: ['id_tahun_ajaran', 'id'], nama: ['nama_tahun', 'nama'], sem: ['semester_berjalan', 'semester'], aktif: ['status'] };
-  var KELAS_K = { id: ['id_kelas', 'id'], ta: ['id_tahun_ajaran'], nama: ['nama_kelas', 'nama'], tingkat: ['tingkat'] };
+  var TA_K = { id: ['id_tahun_ajaran', 'id'], nama: ['nama_tahun', 'nama'], sem: ['semester_aktif', 'semester_berjalan', 'semester'], aktif: ['status_aktif', 'status'] };
+  var KELAS_K = { id: ['id_kelas', 'id'], ta: ['id_tahun_ajaran'], nama: ['nama_kelas', 'nama'], tingkat: ['tingkat_kelas', 'tingkat'] };
   var PV = { absensi: ['absensi', 'rekap_absensi'], nilai: ['nilai', 'rekap_nilai'], header: ['header', 'kepala', 'kepala_laporan'] };
   var ROW = {
     kelas: ['nama_kelas', 'kelas'], nisn: ['nisn'], nama: ['nama_siswa', 'nama'],
     hadir: ['hadir', 'total_hadir'], sakit: ['sakit', 'total_sakit'], izin: ['izin', 'total_izin'], alpa: ['alpa', 'total_alpa'],
     mapel: ['nama_mapel', 'mapel'], asts: ['asts'], asas: ['asas'], uh: ['uh', 'nilai_uh']
   };
-  var PARAM = { ta: 'id_tahun_ajaran', semester: 'semester', kelas: 'id_kelas' };
+  var PARAM = { ta: 'tahun_ajaran', semester: 'semester', kelas: 'kelas' };
   var BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
   var PER_PAGE = 15;
 
@@ -171,6 +171,16 @@
   }
   function normPv(res) {
     var d = res && res.data !== undefined && !Array.isArray(res.data) ? res.data : (res || {});
+    // Backend: { meta, kelas: [{ nama_kelas, absensi: [...], nilai: [...] }] } -> ratakan per baris
+    if (d && Array.isArray(d.kelas)) {
+      var fa = [], fn = [];
+      d.kelas.forEach(function (k) {
+        (k.absensi || []).forEach(function (r) { fa.push(Object.assign({ nama_kelas: k.nama_kelas }, r)); });
+        (k.nilai || []).forEach(function (r) { fn.push(Object.assign({ nama_kelas: k.nama_kelas }, r)); });
+      });
+      var m = d.meta || {};
+      d = { absensi: fa, nilai: fn, header: { nama_sekolah: m.sekolah, tahun_ajaran: m.tahun_ajaran, semester: m.semester, kelas: m.kelas, tanggal_ekspor: m.tanggal_ekspor } };
+    }
     var abs = pick(d, PV.absensi, []), nil = pick(d, PV.nilai, []);
     pv.absensi = (Array.isArray(abs) ? abs : []).map(function (r) {
       return { kelas: txt(pick(r, ROW.kelas, '')), nisn: txt(pick(r, ROW.nisn, '')), nama: txt(pick(r, ROW.nama, '')),
@@ -298,7 +308,7 @@
 
     var my = ++seq;
     setBusy('dl');
-    fetch(buildUrl(E.laporan + '/excel', params()), {
+    fetch(buildUrl(E.laporan + '/excel', Object.assign(params(), { jenis: 'semua' })), {
       method: 'GET',
       headers: { Accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/json', Authorization: 'Bearer ' + (localStorage.getItem(Api.TOKEN_KEY) || '') },
       credentials: 'same-origin'

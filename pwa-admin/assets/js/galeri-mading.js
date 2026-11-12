@@ -11,15 +11,14 @@
   /* Nama kolom dari/ke server. Ubah di sini bila kontrak API berbeda. */
   var KEYS = {
     id: ['id_mading', 'id'],
-    judul: ['judul'],
+    judul: ['judul_karya', 'judul'],
     kategori: ['kategori'],
     deskripsi: ['deskripsi'],
     penulis: ['nama_penulis', 'penulis'],
-    gambar: ['gambar', 'gambar_url'],
-    tampil: ['status_tampil'],
-    tanggal: ['tanggal', 'created_at', 'dibuat_pada']
+    gambar: ['file_gambar', 'gambar', 'gambar_url'],
+    tampil: ['status_tampil']
   };
-  var SEND = { judul: 'judul', kategori: 'kategori', deskripsi: 'deskripsi', penulis: 'nama_penulis', gambar: 'gambar', tampil: 'status_tampil' };
+  var SEND = { judul: 'judul_karya', kategori: 'kategori', deskripsi: 'deskripsi', penulis: 'nama_penulis', gambar: 'file_gambar', tampil: 'status_tampil' };
   var BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
   var PER_PAGE = 10, JUDUL_MAX = 100, KAT_MAX = 50, PENULIS_MAX = 100, MAX_BYTES = 2 * 1024 * 1024, MAX_SIDE = 1280;
   var PILL_KNOWN = { artikel: 'green', puisi: 'blue', cerpen: 'amber', gambar: 'purple', karya: 'amber' };
@@ -48,6 +47,7 @@
   function errText(err) { return err && err.message ? err.message : 'Terjadi gangguan, coba lagi'; }
   function itemUrl(id) { return E.mading + '/' + encodeURIComponent(id); }
   function safeSrc(s) {
+    if (/^(uploads|aset|media|assets)\//.test(String(s || '')) && window.SikesaApi) return window.SikesaApi.fileUrl(String(s));
     s = String(s || '');
     return /^(https?:\/\/|\/|data:image\/(png|jpe?g|webp);base64,)/i.test(s) ? s : '';
   }
@@ -72,8 +72,7 @@
       deskripsi: String(pick(r, KEYS.deskripsi, '') || '').trim(),
       penulis: String(pick(r, KEYS.penulis, '') || '').trim(),
       gambar: safeSrc(pick(r, KEYS.gambar, '')),
-      tampil: tampil === true || Number(tampil) === 1,
-      tanggal: String(pick(r, KEYS.tanggal, '') || '').slice(0, 10)
+      tampil: tampil === true || Number(tampil) === 1
     };
   }
   function byId(id) {
@@ -83,7 +82,7 @@
 
   var elBody = $('md-body'), elState = $('md-state'), elFooter = $('md-footer'), elCount = $('md-count'),
       elPager = $('md-pager'), elSearch = $('md-search'), elKat = $('md-kategori'), elTable = $('md-table');
-  var all = [], query = '', kategori = '', sort = { key: 'tanggal', dir: 'desc' }, page = 1, loadState = 'loading';
+  var all = [], query = '', kategori = '', sort = { key: 'status', dir: 'desc' }, page = 1, loadState = 'loading';
 
   /* ---------- muat data ---------- */
   function fetchAll(url) {
@@ -140,7 +139,7 @@
     });
     var m = sort.dir === 'desc' ? -1 : 1;
     return rows.slice().sort(function (a, b) {
-      if (sort.key === 'tanggal') return m * (a.tanggal || '').localeCompare(b.tanggal || '');
+      if (sort.key === 'status') return m * ((a.tampil ? 1 : 0) - (b.tampil ? 1 : 0));
       return m * String(a[sort.key]).localeCompare(String(b[sort.key]), 'id', { sensitivity: 'base' });
     });
   }
@@ -187,9 +186,9 @@
       var thumb = '<span class="mad-thumb">' + (r.gambar ? '<img src="' + esc(r.gambar) + '" alt="" loading="lazy">' : icon('image')) + '</span>';
       var kat = r.kategori ? '<span class="pill pill--' + pillClass(r.kategori) + '">' + esc(r.kategori) + '</span>' : '<span class="is-muted">-</span>';
       var pen = r.penulis ? esc(r.penulis) : '<span class="is-muted">-</span>';
-      var tgl = r.tanggal ? esc(fmtDate(r.tanggal)) : '<span class="is-muted">-</span>';
+      var tgl = r.tampil ? '<span class="badge badge--aktif">Ditampilkan</span>' : '<span class="badge badge--draf">Draf</span>';
       return '<tr><td>' + thumb + '</td>' +
-        '<td>' + esc(r.judul) + (r.tampil ? '' : '<span class="mad-draft">Draf, tidak tampil di website</span>') + '</td>' +
+        '<td>' + esc(r.judul) + '' + '</td>' +
         '<td>' + kat + '</td><td>' + pen + '</td><td>' + tgl + '</td>' +
         '<td><div class="row-actions">' +
         '<button type="button" class="icon-act" data-act="edit" data-id="' + esc(r.id) + '" aria-label="Ubah ' + esc(r.judul) + '" title="Ubah">' + icon('pencil', 'ico--sm') + '</button>' +
@@ -214,7 +213,7 @@
   });
   elKat.addEventListener('change', function () { kategori = elKat.value; page = 1; render(); });
   function resetView() {
-    query = ''; kategori = ''; sort = { key: 'tanggal', dir: 'desc' }; page = 1;
+    query = ''; kategori = ''; sort = { key: 'status', dir: 'desc' }; page = 1;
     elSearch.value = ''; elKat.value = ''; render();
   }
   $('md-reset').addEventListener('click', resetView);

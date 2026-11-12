@@ -1,5 +1,5 @@
 /* SI-KESA PWA Admin | Konten Website: Pengaturan (dokumen 01 bagian 3.7)
- * Dua isian: URL Formulir PPDB dan URL Video Profil.
+ * Dua tautan, masing-masing punya tombol Simpan dan Hapus sendiri.
  * Validasi: harus diawali http:// atau https://. Kosong diperbolehkan (website publik menyesuaikan).
  * Alamat YouTube (watch / youtu.be / shorts) diubah otomatis ke bentuk embed.
  * Tampil "Terakhir diubah oleh [nama] pada [waktu]". Tidak ada unggah video. */
@@ -34,12 +34,6 @@
   function icon(n, cls) { return '<svg class="ico ' + (cls || '') + '" aria-hidden="true"><use href="#i-' + n + '"/></svg>'; }
   function toast(t, type) { if (window.SikesaUI) window.SikesaUI.toast(t, type); }
   function errText(err) { return err && err.message ? err.message : 'Terjadi gangguan, coba lagi'; }
-
-  var form = $('form-pengaturan'), elState = $('set-state');
-  var F = { ppdb: $('set-ppdb'), video: $('set-video') };
-  var errBox = { ppdb: $('set-ppdb-err'), video: $('set-video-err') };
-  var elConv = $('set-video-conv'), elMsg = $('set-msg'), elMeta = $('set-meta'), elMetaText = $('set-meta-text'), btnSave = $('set-save');
-  var saving = false;
 
   /* ---------- util URL ---------- */
   function isHttpUrl(s) {
@@ -81,21 +75,25 @@
     return Number(d) + ' ' + BULAN[mo - 1] + ' ' + y + ', ' + hh + '.' + mm + ' WIB';
   }
 
-  /* ---------- helper tampilan ---------- */
-  function fieldError(key, text) {
-    errBox[key].textContent = text || ''; errBox[key].hidden = !text;
-    F[key].classList.toggle('is-invalid', !!text);
-    F[key].setAttribute('aria-invalid', text ? 'true' : 'false');
+  var KEY = ['ppdb', 'video'];
+  var N = { ppdb: 'PPDB', video: 'video profil' };
+  var el = {};
+  KEY.forEach(function (k) {
+    el[k] = { form: $('form-' + k), input: $('set-' + k), err: $('set-' + k + '-err'), conv: $('set-' + k + '-conv'),
+              save: $('set-' + k + '-save'), hapus: $('set-' + k + '-hapus'), status: $('set-' + k + '-status') };
+  });
+  var elState = $('set-state'), elMsg = $('set-msg'), elMetaText = $('set-meta-text');
+  var tersimpan = { ppdb: '', video: '' }, saving = false;
+
+  function readSettings(res) {
+    var d = res && res.data !== undefined ? res.data : res;
+    if (Array.isArray(d)) { var o = {}; d.forEach(function (r) { if (r && r.kunci) o[r.kunci] = r.nilai; }); return o; }
+    return d && typeof d === 'object' ? d : {};
   }
-  function clearMessages() {
-    fieldError('ppdb', ''); fieldError('video', '');
-    elMsg.hidden = true; elMsg.textContent = '';
-  }
-  function setSaving(on) { saving = on; btnSave.disabled = on; btnSave.textContent = on ? 'Menyimpan...' : 'Simpan Pengaturan'; }
-  function showState(html) { elState.innerHTML = html; elState.hidden = !html; }
-  function setFormEnabled(on) {
-    F.ppdb.disabled = !on; F.video.disabled = !on;
-    btnSave.disabled = !on; form.hidden = false;
+  function fieldError(k, text) {
+    el[k].err.textContent = text || ''; el[k].err.hidden = !text;
+    el[k].input.classList.toggle('is-invalid', !!text);
+    el[k].input.setAttribute('aria-invalid', text ? 'true' : 'false');
   }
   function showMeta(oleh, pada) {
     var w = fmtWaktu(pada);
@@ -104,93 +102,90 @@
     else if (w) elMetaText.textContent = 'Terakhir diubah pada ' + w;
     else elMetaText.textContent = 'Belum pernah diubah.';
   }
-
-  /* ---------- muat data ---------- */
-  function readSettings(res) {
-    var d = res && res.data !== undefined ? res.data : res;
-    // Bentuk daftar kunci-nilai: [{ kunci, nilai }]
-    if (Array.isArray(d)) {
-      var o = {};
-      d.forEach(function (r) { if (r && r.kunci) o[r.kunci] = r.nilai; });
-      return o;
-    }
-    return d && typeof d === 'object' ? d : {};
+  function tampilkan(k) {
+    var ada = !!tersimpan[k];
+    el[k].input.value = tersimpan[k];
+    el[k].status.textContent = ada ? 'Tautan aktif dan tampil di website.' : 'Belum ada tautan (tidak tampil di website).';
+    el[k].hapus.disabled = !ada || saving;
+    el[k].save.disabled = saving;
+    el[k].conv.hidden = true;
   }
-
-  function load() {
-    form.hidden = false; showState('');
-    F.ppdb.disabled = true; F.video.disabled = true; btnSave.disabled = true;
-    elMetaText.innerHTML = '<span class="skeleton"></span>';
-    return Api.get(E.pengaturan).then(function (res) {
-      var d = readSettings(res);
-      F.ppdb.value = String(pick(d, KEYS.ppdb, '') || '');
-      F.video.value = String(pick(d, KEYS.video, '') || '');
-      showMeta(String(pick(d, KEYS.oleh, '') || '').trim(), pick(d, KEYS.pada, ''));
-      setFormEnabled(true);
-    }).catch(function (err) {
-      if (err && err.status === 401) return;
-      form.hidden = true;
-      showState('<strong>Pengaturan gagal dimuat</strong>' + esc(errText(err)) +
-        '<br><button type="button" class="btn btn--outline" data-act="retry">' + icon('refresh', 'ico--sm') + ' Coba lagi</button>');
+  function setBusy(on) {
+    saving = on;
+    KEY.forEach(function (k) {
+      el[k].input.disabled = on; el[k].save.disabled = on; el[k].hapus.disabled = on || !tersimpan[k];
     });
   }
-  elState.addEventListener('click', function (ev) { if (ev.target.closest('[data-act="retry"]')) load(); });
-
-  /* ---------- ubah otomatis alamat YouTube ---------- */
-  function convertVideo(announce) {
-    var v = F.video.value.trim();
-    var e = toEmbed(v);
-    if (v && e !== v) {
-      F.video.value = e;
-      elConv.textContent = 'Alamat YouTube diubah otomatis ke bentuk embed.';
-      elConv.hidden = false;
-    } else if (!announce) {
-      elConv.hidden = true;
-    }
-    return F.video.value.trim();
+  function apply(res) {
+    var d = readSettings(res);
+    tersimpan.ppdb = String(pick(d, KEYS.ppdb, '') || '');
+    tersimpan.video = String(pick(d, KEYS.video, '') || '');
+    KEY.forEach(tampilkan);
+    showMeta(String(pick(d, KEYS.oleh, '') || ''), pick(d, KEYS.pada, ''));
   }
-  F.video.addEventListener('blur', function () { convertVideo(true); });
-  F.video.addEventListener('input', function () { elConv.hidden = true; fieldError('video', ''); });
-  F.ppdb.addEventListener('input', function () { fieldError('ppdb', ''); });
-  F.ppdb.addEventListener('blur', function () { F.ppdb.value = F.ppdb.value.trim(); });
+  function showError(t) { elMsg.textContent = t; elMsg.hidden = !t; }
 
-  /* ---------- simpan ---------- */
-  function validate(key, value, label) {
-    if (!value) return true; // kosong diperbolehkan
-    if (value.length > URL_MAX) { fieldError(key, label + ' terlalu panjang (maksimal ' + URL_MAX + ' karakter)'); return false; }
-    if (!isHttpUrl(value)) { fieldError(key, 'Gunakan URL yang diawali http:// atau https://'); return false; }
-    return true;
-  }
-
-  /* Validasi di layar hanya pelengkap; server yang menentukan. */
-  form.addEventListener('submit', function (ev) {
-    ev.preventDefault();
-    if (saving) return;
-    clearMessages();
-
-    var ppdb = F.ppdb.value.trim();
-    var video = convertVideo(true);
-    var okPpdb = validate('ppdb', ppdb, 'URL PPDB');
-    var okVideo = validate('video', video, 'URL video');
-    if (!okPpdb) { F.ppdb.focus(); return; }
-    if (!okVideo) { F.video.focus(); return; }
-
-    var body = {};
-    body[SEND.ppdb] = ppdb || null;
-    body[SEND.video] = video || null;
-
-    setSaving(true);
-    Api.put(E.pengaturan, body).then(function (res) {
-      toast('Pengaturan tersimpan');
-      var d = readSettings(res);
-      var oleh = String(pick(d, KEYS.oleh, '') || '').trim();
-      if (oleh || pick(d, KEYS.pada, '')) showMeta(oleh, pick(d, KEYS.pada, ''));
-      else return load(); // server tidak mengirim ulang data: muat ulang untuk mengambil "terakhir diubah"
-    }).catch(function (err) {
+  function muat() {
+    elState.hidden = true;
+    return Api.get(E.pengaturan).then(function (res) {
+      KEY.forEach(function (k) { el[k].input.disabled = false; });
+      apply(res);
+    }, function (err) {
       if (err && err.status === 401) return;
-      elMsg.textContent = errText(err); elMsg.hidden = false;
-    }).then(function () { setSaving(false); });
+      elState.hidden = false;
+      elState.innerHTML = '<p>' + esc(errText(err)) + '</p><button type="button" class="btn btn--outline" id="set-retry">Coba lagi</button>';
+      var r = $('set-retry'); if (r) r.addEventListener('click', muat);
+    });
+  }
+
+  function kirim(k, nilai, sukses) {
+    var body = {}; body[SEND[k]] = nilai;
+    showError(''); setBusy(true);
+    Api.put(E.pengaturan, body).then(function (res) {
+      setBusy(false);
+      // sinkronkan hanya tautan yang diubah; tautan lain tetap seperti tersimpan
+      var d = readSettings(res);
+      var baru = pick(d, k === 'ppdb' ? KEYS.ppdb : KEYS.video, nilai);
+      tersimpan[k] = String(baru || '');
+      KEY.forEach(tampilkan);
+      showMeta(String(pick(d, KEYS.oleh, '') || ''), pick(d, KEYS.pada, ''));
+      toast(sukses);
+    }, function (err) {
+      setBusy(false); KEY.forEach(tampilkan);
+      if (err && err.status === 401) return;
+      if (err && err.status === 422 && err.errors && err.errors[SEND[k]]) fieldError(k, String(err.errors[SEND[k]]));
+      else showError(errText(err));
+    });
+  }
+
+  KEY.forEach(function (k) {
+    el[k].input.addEventListener('input', function () {
+      fieldError(k, '');
+      if (k === 'video') {
+        var v = el.video.input.value.trim(), c = toEmbed(v);
+        el.video.conv.hidden = !(v && c !== v);
+        if (!el.video.conv.hidden) el.video.conv.textContent = 'Akan disimpan sebagai: ' + c;
+      }
+    });
+    el[k].form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (saving) return;
+      var v = el[k].input.value.trim();
+      if (!v) { fieldError(k, 'Isi tautan, atau gunakan tombol Hapus Tautan untuk mengosongkan.'); return; }
+      if (v.length > URL_MAX) { fieldError(k, 'Tautan terlalu panjang (maks ' + URL_MAX + ' karakter).'); return; }
+      if (!isHttpUrl(v)) { fieldError(k, 'Tautan harus diawali http:// atau https://.'); return; }
+      if (k === 'video') v = toEmbed(v);
+      kirim(k, v, 'Tautan ' + N[k] + ' disimpan');
+    });
+    el[k].hapus.addEventListener('click', function () {
+      if (saving || !tersimpan[k]) return;
+      var pesan = k === 'ppdb'
+        ? 'Hapus tautan PPDB? Gunakan ini bila pendaftaran sudah ditutup. Tombol PPDB di website tidak lagi menampilkan tautan.'
+        : 'Hapus tautan video profil? Video tidak lagi tampil di website.';
+      if (!window.confirm(pesan)) return;
+      kirim(k, null, 'Tautan ' + N[k] + ' dihapus');
+    });
   });
 
-  load();
+  muat();
 })();
