@@ -7,8 +7,8 @@
   <title><?= e($pageTitle) ?> | SI-KESA Admin</title>
   <meta name="theme-color" content="#455a2d">
   <link rel="manifest" href="<?= e(url('manifest.json')) ?>">
-  <link rel="icon" href="<?= e(url('assets/icons/icon-192.png')) ?>">
-  <link rel="apple-touch-icon" href="<?= e(url('assets/icons/icon-192.png')) ?>">
+  <link rel="icon" type="image/png" href="<?= e(url('assets/img/logo_sekolah.png')) ?>">
+<link rel="apple-touch-icon" href="<?= e(url('assets/icons/icon-192.png')) ?>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
