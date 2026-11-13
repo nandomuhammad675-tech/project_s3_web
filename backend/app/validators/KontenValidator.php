@@ -11,8 +11,8 @@ final class KontenValidator
     public const KATEGORI_EVENT = ['kegiatan', 'event', 'prestasi', 'kolaborasi'];
 
     /**
-     * Gambar: path hasil POST /api/admin/upload ("uploads/<32 hex>.jpg|png|webp") atau URL https.
-     * Database hanya menyimpan path/URL (TDD §9).
+     * Gambar: path hasil POST /api/admin/upload ("assets/img/<jenis>/<nama>-<n>.jpg|png|webp"; isi gambar ada di database dan
+     * salinannya di folder website public/). Tautan/URL gambar tidak diterima.
      */
     public static function gambar(Validasi $v, string $k, string $label, bool $wajib): ?string
     {
@@ -20,8 +20,8 @@ final class KontenValidator
         if ($s === null) {
             return null;
         }
-        if (!preg_match('#^(uploads/[a-f0-9]{32}\.(jpg|png|webp)|https://[^\s<>"\']+)$#', $s)) {
-            $v->error($k, $label . ' harus berupa path hasil unggah (uploads/...) atau URL https.');
+        if (!preg_match(\App\Helpers\FileHelper::POLA_PATH, $s)) {
+            $v->error($k, $label . ' harus berupa gambar yang diunggah.');
             return null;
         }
         return $s;

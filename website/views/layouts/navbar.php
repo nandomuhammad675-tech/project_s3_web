@@ -14,7 +14,7 @@ $menu = [
 ?>
 <nav class="navbar" id="navbar">
     <a href="<?= base_url('/') ?>" class="navbar__brand">
-        <img src="<?= base_url('assets/bingkai.png') ?>" alt="Logo SD Negeri Kedungsari 1">
+        <img src="<?= base_url('icon/logo_sekolah.png') ?>" alt="Logo SD Negeri Kedungsari 1">
         <span>SD NEGERI KEDUNGSARI 1</span>
     </a>
 

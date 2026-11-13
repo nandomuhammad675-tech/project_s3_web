@@ -26,6 +26,21 @@ final class AkunPenggunaRepository
         return $this->hidrasi($st->fetch());
     }
 
+    /** Login Admin/Guru: username dahulu; bila tidak ada, cocokkan NIP Guru (data_guru.nip, unik). */
+    public function cariByUsernameAtauNip(string $identitas): ?AkunPengguna
+    {
+        $akun = $this->cariByUsername($identitas);
+        if ($akun !== null || $identitas === '') {
+            return $akun;
+        }
+        $st = $this->db->prepare(
+            'SELECT a.id_user FROM akun_pengguna a JOIN data_guru g ON g.id_user = a.id_user WHERE g.nip = ? LIMIT 1'
+        );
+        $st->execute([$identitas]);
+        $row = $st->fetch();
+        return $row ? $this->cariById((int) $row['id_user']) : null;
+    }
+
     public function cariById(int $id): ?AkunPengguna
     {
         $st = $this->db->prepare('SELECT ' . self::KOLOM . ' FROM akun_pengguna WHERE id_user = ? LIMIT 1');
@@ -46,7 +61,7 @@ final class AkunPenggunaRepository
     public function daftar(int $limit, int $offset): array
     {
         $st = $this->db->prepare(
-            'SELECT id_user, username, role, status_akun, dibuat_pada FROM akun_pengguna ORDER BY id_user LIMIT ? OFFSET ?'
+            'SELECT ' . $this->proyeksi() . ' FROM akun_pengguna a LEFT JOIN data_guru g ON g.id_user = a.id_user ORDER BY a.id_user LIMIT ? OFFSET ?'
         );
         $st->bindValue(1, $limit, PDO::PARAM_INT);
         $st->bindValue(2, $offset, PDO::PARAM_INT);
@@ -61,10 +76,43 @@ final class AkunPenggunaRepository
 
     public function ringkas(int $id): ?array
     {
-        $st = $this->db->prepare('SELECT id_user, username, role, status_akun, dibuat_pada FROM akun_pengguna WHERE id_user = ?');
+        $st = $this->db->prepare('SELECT ' . $this->proyeksi() . ' FROM akun_pengguna a LEFT JOIN data_guru g ON g.id_user = a.id_user WHERE a.id_user = ?');
         $st->execute([$id]);
         $r = $st->fetch();
         return $r === false ? null : $r;
+    }
+
+    /** Kolom terakhir_login_pada ada? (skema v10). Dicek sekali agar basis data v9 lama tetap berjalan. */
+    private function adaKolomLogin(): bool
+    {
+        static $ada = null;
+        if ($ada === null) {
+            $st = $this->db->query("SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'akun_pengguna' AND COLUMN_NAME = 'terakhir_login_pada'");
+            $ada = (int) $st->fetchColumn() > 0;
+        }
+        return $ada;
+    }
+
+    /** Kolom untuk daftar akun: nama (nama Guru bila akun Guru) dan terakhir_aktif (waktu login terakhir). */
+    private function proyeksi(): string
+    {
+        // Sesi basis data memakai UTC (lihat Database.php); waktu dikirim ber-zona (+00:00) agar klien
+        // mengubahnya ke WIB dengan benar (sama seperti diubah_pada pada Pengaturan).
+        $utc = static fn(string $kolom): string => "DATE_FORMAT($kolom, '%Y-%m-%dT%H:%i:%s+00:00')";
+        return 'a.id_user, a.username, a.role, a.status_akun, ' . $utc('a.dibuat_pada') . ' AS dibuat_pada, g.nama_guru AS nama, '
+            . ($this->adaKolomLogin() ? $utc('a.terakhir_login_pada') : 'NULL') . ' AS terakhir_aktif';
+    }
+
+    /** Catat waktu login berhasil (untuk kolom "Terakhir aktif" pada Kelola Akun). Kegagalan dicatat tidak menggagalkan login. */
+    public function catatLogin(int $idUser): void
+    {
+        try {
+            if ($this->adaKolomLogin()) {
+                $this->db->prepare('UPDATE akun_pengguna SET terakhir_login_pada = NOW() WHERE id_user = ?')->execute([$idUser]);
+            }
+        } catch (\Throwable $e) {
+            // abaikan
+        }
     }
 
     public function buat(string $username, string $hash, string $role): int
