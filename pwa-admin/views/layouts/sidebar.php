@@ -2,6 +2,9 @@
 /**
  * Sidebar. WAJIB: tidak ada menu Jadwal dan Piket di PWA Admin.
  * Menyembunyikan menu hanya kenyamanan; server tetap yang menolak akses.
+ *
+ * @var array  $config      Dibuat di pwa-admin/index.php
+ * @var string $activeRoute Rute yang sedang dibuka, dibuat di pwa-admin/index.php
  */
 $nav = [
     ['label' => 'Setup Awal', 'items' => [
@@ -40,7 +43,7 @@ $icon = fn(string $n) => '<svg class="ico" aria-hidden="true"><use href="#i-' . 
 <div class="sidebar-backdrop" data-sidebar-close hidden></div>
 <aside class="sidebar" id="sidebar" aria-label="Menu utama">
   <div class="sidebar__brand">
-    <img class="sidebar__logo" src="<?= e(url('assets/img/logo-sekolah.png')) ?>" alt="Logo SD Negeri Kedungsari 1" height="40" style="height:40px;width:auto">
+    <img class="sidebar__logo" src="<?= e(url('assets/img/logo_sekolah.png')) ?>" alt="Logo SD Negeri Kedungsari 1" height="40" style="height:40px;width:auto">
     <div>
       <div class="sidebar__app"><?= e($config['appName']) ?></div>
       <div class="sidebar__school"><?= e($config['schoolName']) ?></div>

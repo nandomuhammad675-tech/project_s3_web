@@ -21,7 +21,7 @@ final class LaporanExporter
         }
 
         $wb = new Spreadsheet();
-        self::informasi($wb, $laporan['meta']);
+        self::informasi($wb, $laporan['meta'], $jenis);
         if ($jenis === 'absensi' || $jenis === 'semua') {
             AbsensiExporter::tambah($wb, $laporan);
         }
@@ -56,7 +56,7 @@ final class LaporanExporter
         $wb->disconnectWorksheets();
     }
 
-    private static function informasi(Spreadsheet $wb, array $meta): void
+        private static function informasi(Spreadsheet $wb, array $meta, string $jenis): void
     {
         $s = $wb->getActiveSheet();
         $s->setTitle('Informasi');
@@ -72,6 +72,15 @@ final class LaporanExporter
             ['Periode data absensi', SheetHelper::periode($meta)],
             ['Tanggal ekspor', $meta['tanggal_ekspor']],
         ];
+        // Periode mengikuti jenis laporan: nilai = nama semester, absensi = rentang tanggal data absensi.
+        if ($jenis === 'nilai' || $jenis === 'semua') {
+            $baris[] = ['Periode penilaian', 'Semester ' . ucfirst($meta['semester']) . ' ' . $meta['tahun_ajaran']];
+        }
+        if ($jenis === 'absensi' || $jenis === 'semua') {
+            $baris[] = ['Periode data absensi', SheetHelper::periode($meta)];
+        }
+        $baris[] = ['Tanggal ekspor', $meta['tanggal_ekspor']];
+
         foreach ($baris as $i => [$k, $v]) {
             SheetHelper::teks($s, 1, 3 + $i, $k);
             SheetHelper::teks($s, 2, 3 + $i, $v);

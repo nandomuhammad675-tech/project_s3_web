@@ -10,7 +10,7 @@ define('SIKESA_API_LOADED', true);
 
 function sikesa_api_base(): string
 {
-    $u = getenv('SIKESA_API_URL') ?: 'http://localhost/si-kesa/backend/public';
+    $u = getenv('SIKESA_API_URL') ?: 'http://localhost/project_s3_web/backend/public';
     return rtrim($u, '/');
 }
 

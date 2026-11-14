@@ -2,6 +2,8 @@
 /**
  * SI-KESA PWA Admin | halaman login (desain yang sama dengan PWA Guru).
  * Dirender mandiri oleh index.php (tanpa kerangka sidebar). Variabel $config dari index.php.
+ *
+ * @var array $config Dibuat di pwa-admin/index.php
  */
 function esc($t): string { return e((string) $t); }
 function aset(string $path): string {
@@ -25,7 +27,7 @@ $config = [
     ],
 ];
 $ROLE_TITLE = 'Admin';
-$LOGO     = esc(aset('img/logo-sekolah.png'));
+$LOGO     = esc(aset('img/logo_sekolah.png'));
 $VIDEO    = esc(aset('vidio/VIDEO BG.mp4'));
 $MANIFEST = esc(url('manifest.json'));
 $PWAJS    = esc(url('assets/js/pwa-install.js'));
@@ -95,8 +97,7 @@ form{text-align:left}
 .input input:focus{outline:none;border-color:var(--gold);background:#fff}
 .eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:38px;height:38px;border:0;border-radius:50%;
     background:transparent;color:#5d6656;cursor:pointer;display:grid;place-items:center}
-.eye:hover{background:rgba(0,0,0,.07)}
-.eye svg{width:20px;height:20px}
+   input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:none}
 
 .alert{padding:10px 14px;margin-bottom:14px;border-radius:10px;background:var(--danger);color:#7a1717;font-size:.82rem;font-weight:600}
 
