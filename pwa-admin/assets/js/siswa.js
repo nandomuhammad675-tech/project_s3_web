@@ -273,10 +273,12 @@
     else openDelete(item);
   });
 
-  /* Impor dari Excel: dokumen 01 belum mendefinisikan endpoint impor. */
+  /* Impor dari Excel: dialog + pembacaan berkas ada di siswa-impor.js */
   $('btn-impor').addEventListener('click', function () {
-    toast('Impor dari Excel belum tersedia. Tambahkan siswa satu per satu dulu.');
+    if (window.SikesaImporSiswa) window.SikesaImporSiswa.buka();
+    else toast('Modul impor belum termuat. Muat ulang halaman.', 'error');
   });
+  document.addEventListener('sikesa:siswa-diimpor', function () { load(true); });
 
   /* ---------- formulir tambah / ubah ---------- */
   var dlg = $('dlg-siswa'), form = $('form-siswa');

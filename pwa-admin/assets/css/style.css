@@ -1,11 +1,11 @@
 /* SI-KESA PWA Admin | dasar, tombol, kartu, dasbor */
 :root {
-  --olive-900: #34431a;
-  --olive-800: #455a1f;
-  --olive-700: #566c27;
-  --olive-600: #6b8330;
-  --amber-500: #eba43c;
-  --amber-600: #d98f22;
+  --olive-900: #35471f;
+  --olive-800: #455a2d;
+  --olive-700: #587040;
+  --olive-600: #6d8652;
+  --amber-500: #eba048;
+  --amber-600: #d98c2e;
   --amber-100: #fdf1da;
   --amber-50:  #f8efdc;
   --green-600: #16a34a;
@@ -253,3 +253,13 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .crumb__sep { color: var(--ink-3); }
 .crumb__current { font-weight: 600; color: var(--ink); overflow: hidden; text-overflow: ellipsis; }
 @media (max-width: 560px) { .crumb__parent, .crumb__sep { display: none; } }
+/* Lonceng: panel pemberitahuan */
+.topbar__right{position:relative}
+.bell__dot{background:#dc2626!important}
+.bell-panel{position:absolute;right:56px;top:calc(100% + 8px);width:320px;max-height:380px;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 32px rgba(40,50,20,.18);z-index:60}
+.bell-panel__head{padding:12px 16px;font-weight:700;border-bottom:1px solid var(--line-2)}
+.bell-panel__empty{padding:16px;color:var(--ink-3);font-size:.9rem}
+.bell-panel__list{list-style:none;margin:0;padding:0}
+.bell-panel__list li{display:flex;flex-direction:column;gap:2px;padding:10px 16px;border-bottom:1px solid var(--line-2);font-size:.88rem}
+.bell-panel__list li span{color:#a32d20}
+a.avatar{text-decoration:none;color:inherit;display:inline-flex;align-items:center;justify-content:center}

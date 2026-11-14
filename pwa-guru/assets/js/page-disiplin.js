@@ -41,12 +41,37 @@
   }
   function alertForm(t) { var a = $('dsAlert'); a.hidden = !t; a.textContent = t || ''; }
 
+  /* ---------- pencarian siswa (ketik dulu, hasil muncul) ---------- */
+  function pilihSiswa(id, nama, kunci) {
+    $('inputSiswaDisiplin').value = id == null ? '' : String(id);
+    $('dsTerpilih').hidden = id == null;
+    $('dsPencarian').hidden = id != null;
+    $('dsTerpilihNama').textContent = nama || '';
+    $('dsGanti').hidden = !!kunci;       // saat memperbaiki, siswa tidak dapat diganti
+  }
+  function hasilCari() {
+    var q = $('dsCari').value.trim().toLowerCase(), box = $('dsHasil');
+    if (!q) { box.hidden = true; return; }
+    var cocok = st.siswa.filter(function (s) { return s.nama_siswa.toLowerCase().indexOf(q) > -1; }).slice(0, 20);
+    box.innerHTML = cocok.length ? cocok.map(function (s) {
+      return '<button type="button" data-pilih="' + s.id_siswa + '" class="w-full text-left px-4 py-2.5 text-sm hover:bg-[#f7f6f0] border-b border-gray-50 last:border-0">' + U.esc(s.nama_siswa) + '</button>';
+    }).join('') : '<p class="px-4 py-3 text-sm text-gray-400">Siswa tidak ditemukan.</p>';
+    box.hidden = false;
+  }
+  $('dsCari').addEventListener('input', hasilCari);
+  $('dsHasil').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-pilih]'); if (!b) return;
+    var id = Number(b.getAttribute('data-pilih'));
+    var s = st.siswa.filter(function (x) { return x.id_siswa === id; })[0];
+    if (s) { pilihSiswa(s.id_siswa, s.nama_siswa, false); $('dsHasil').hidden = true; }
+  });
+  $('dsGanti').addEventListener('click', function () { pilihSiswa(null, '', false); $('dsCari').focus(); });
+
   function buka(item) {
     st.edit = item || null;
     $('modalTitleDisiplin').textContent = (item ? 'Ubah' : 'Tambah') + ' Catatan Kedisiplinan';
-    var sel = $('inputSiswaDisiplin');
-    sel.value = item ? String(item.id_siswa) : '';
-    sel.disabled = !!item;       // siswa tidak dapat diganti saat memperbaiki
+    pilihSiswa(item ? item.id_siswa : null, item ? item.nama_siswa : '', !!item);
+    $('dsCari').value = ''; $('dsHasil').hidden = true;
     $('dsTanggal').value = item ? item.tanggal : U.isoDari(new Date());
     $('dsJenis').value = item ? item.jenis_pelanggaran : '';
     $('dsCatatan').value = item ? item.catatan : '';
@@ -95,7 +120,6 @@
       st.siswa = r.items || [];
       var opt = st.siswa.map(function (s) { return '<option value="' + s.id_siswa + '">' + U.esc(s.nama_siswa) + '</option>'; }).join('');
       $('fltSiswa').innerHTML = '<option value="">Semua Siswa</option>' + opt;
-      $('inputSiswaDisiplin').innerHTML = '<option value="">Pilih siswa</option>' + opt;
       return muat();
     });
   }).catch(function (err) { if (err && err.status !== 401) U.toast(U.pesanGalat(err), 'error'); });

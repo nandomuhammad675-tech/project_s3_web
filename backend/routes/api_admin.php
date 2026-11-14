@@ -76,6 +76,7 @@ return static function (Router $r): void {
     // Siswa
     $r->get('/api/admin/siswa',          [SiswaController::class, 'index'],   $admin);
     $r->post('/api/admin/siswa',         [SiswaController::class, 'store'],   $admin);
+    $r->post('/api/admin/siswa/impor',   [SiswaController::class, 'impor'],   $admin);
     $r->get('/api/admin/siswa/{id}',     [SiswaController::class, 'show'],    $admin);
     $r->put('/api/admin/siswa/{id}',     [SiswaController::class, 'update'],  $admin);
     $r->delete('/api/admin/siswa/{id}',  [SiswaController::class, 'destroy'], $admin);
@@ -135,6 +136,9 @@ return static function (Router $r): void {
 
     // --- Langkah 6b ---
     // Data akademik Guru: HANYA GET (read-only); tidak ada rute tulis
+    $r->get('/api/admin/akademik/absensi/excel',  [AkademikController::class, 'absensiExcel'],  $admin);
+    $r->get('/api/admin/akademik/nilai/excel',    [AkademikController::class, 'nilaiExcel'],    $admin);
+    $r->get('/api/admin/akademik/disiplin/excel', [AkademikController::class, 'disiplinExcel'], $admin);
     $r->get('/api/admin/akademik/absensi',   [AkademikController::class, 'absensi'],  $admin);
     $r->get('/api/admin/akademik/nilai',     [AkademikController::class, 'nilai'],    $admin);
     $r->get('/api/admin/akademik/disiplin',  [AkademikController::class, 'disiplin'], $admin);

@@ -1,0 +1,24 @@
+/* SI-KESA PWA Admin | Program Pembiasaan */
+.pb-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.pb-card {
+  display: flex; align-items: center; gap: 16px; padding: 18px 20px; min-height: 80px;
+  background: #fff; border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow);
+}
+.pb-card--skeleton { display: block; }
+.pb-card__no { flex: none; min-width: 40px; font-size: 26px; font-weight: 700; line-height: 1; color: #dfe6c4; letter-spacing: -.02em; }
+.pb-card__body { flex: 1; min-width: 0; }
+.pb-card__hari { font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--olive-600); }
+.pb-card__nama { margin: 2px 0; font-size: 16px; font-weight: 700; color: var(--ink); }
+.pb-card__desk { font-size: 12.5px; color: var(--ink-2); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.pb-card__ikon { flex: none; width: 36px; height: 36px; display: grid; place-items: center; overflow: hidden; border-radius: 9px; background: #eef0e2; color: var(--olive-700); }
+.pb-card__ikon img { width: 100%; height: 100%; object-fit: cover; }
+.pb-card .icon-act { flex: none; }
+
+.pb-hari { display: inline-block; padding: 6px 12px; background: var(--bg); border: 1px solid var(--line); border-radius: 9px; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+
+/* Aman bila css halaman lain tidak dimuat */
+.input--area { height: auto; padding: 10px 12px; resize: vertical; line-height: 1.5; }
+.input--file { height: auto; padding: 8px 10px; font-size: 13px; }
+.dialog--wide { width: min(520px, calc(100vw - 32px)); }
+
+@media (max-width: 800px) { .pb-grid { grid-template-columns: 1fr; } }

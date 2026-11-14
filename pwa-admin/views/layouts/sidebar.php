@@ -5,9 +5,9 @@
  */
 $nav = [
     ['label' => 'Setup Awal', 'items' => [
-        ['key' => 'dashboard',      'label' => 'Dasbor',                 'icon' => 'home',         'href' => 'dashboard'],
+        ['key' => 'dashboard',      'label' => 'Dasbor',                  'icon' => 'home',         'href' => 'dashboard'],
         ['key' => 'kenaikan-kelas', 'label' => 'Tahun Ajaran & Kenaikan', 'icon' => 'calendar-cog', 'href' => 'kenaikan-kelas'],
-        ['key' => 'data-master',    'label' => 'Data Master',            'icon' => 'database', 'children' => [
+        ['key' => 'data-master',    'label' => 'Data Master',             'icon' => 'database', 'children' => [
             ['key' => 'mata-pelajaran',  'label' => 'Mata Pelajaran'],
             ['key' => 'tahun-ajaran',    'label' => 'Tahun Ajaran'],
             ['key' => 'guru',            'label' => 'Guru'],
@@ -25,11 +25,7 @@ $nav = [
             ['key' => 'program-pembiasaan', 'label' => 'Program Pembiasaan'],
             ['key' => 'pengaturan',         'label' => 'Pengaturan'],
         ]],
-        ['key' => 'akademik', 'label' => 'Data Akademik', 'icon' => 'eye', 'badge' => 'Hanya lihat', 'children' => [
-            ['key' => 'absensi',  'label' => 'Absensi'],
-            ['key' => 'nilai',    'label' => 'Nilai'],
-            ['key' => 'disiplin', 'label' => 'Kedisiplinan'],
-        ]],
+        ['key' => 'akademik', 'label' => 'Data Akademik', 'icon' => 'eye', 'badge' => 'Hanya lihat', 'href' => 'akademik'],
         ['key' => 'laporan', 'label' => 'Laporan Excel', 'icon' => 'file', 'href' => 'laporan'],
     ]],
     ['label' => 'Akun & Pengaturan', 'items' => [
@@ -44,7 +40,7 @@ $icon = fn(string $n) => '<svg class="ico" aria-hidden="true"><use href="#i-' . 
 <div class="sidebar-backdrop" data-sidebar-close hidden></div>
 <aside class="sidebar" id="sidebar" aria-label="Menu utama">
   <div class="sidebar__brand">
-    <img class="sidebar__logo" src="<?= e(url('assets/icons/icon-192.png')) ?>" alt="" width="40" height="40">
+    <img class="sidebar__logo" src="<?= e(url('assets/img/logo-sekolah.png')) ?>" alt="Logo SD Negeri Kedungsari 1" height="40" style="height:40px;width:auto">
     <div>
       <div class="sidebar__app"><?= e($config['appName']) ?></div>
       <div class="sidebar__school"><?= e($config['schoolName']) ?></div>
@@ -81,6 +77,7 @@ $icon = fn(string $n) => '<svg class="ico" aria-hidden="true"><use href="#i-' . 
         <?php else: $active = $activeRoute === $item['key']; ?>
           <a class="nav-item<?= $active ? ' is-active' : '' ?>" href="<?= e(url($item['href'])) ?>" <?= $active ? 'aria-current="page"' : '' ?>>
             <?= $icon($item['icon']) ?><span class="nav-item__text"><?= e($item['label']) ?></span>
+            <?php if (!empty($item['badge'])): ?><span class="nav-badge"><?= e($item['badge']) ?></span><?php endif; ?>
           </a>
         <?php endif; ?>
       <?php endforeach; ?>

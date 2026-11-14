@@ -50,11 +50,11 @@
   }
 
   $('lpPratinjau').addEventListener('click', function () {
-    jalankan(this, function () { return L.preview({ semester: st.semester, tahunAjaran: st.tahunAjaran }).then(tampil); });
+    jalankan(this, function () { return L.preview({ semester: st.semester, tahunAjaran: st.tahunAjaran, idSiswa: $('lpSiswa').value, idMapel: $('lpMapel').value }).then(tampil); });
   });
   $('lpUnduh').addEventListener('click', function () {
     jalankan(this, function () {
-      return L.unduhDanSimpan({ semester: st.semester, tahunAjaran: st.tahunAjaran, jenis: $('lpJenis').value }).then(function (nama) { pesan('Berkas ' + nama + ' diunduh.', 'ok'); });
+      return L.unduhDanSimpan({ semester: st.semester, tahunAjaran: st.tahunAjaran, jenis: $('lpJenis').value, idSiswa: $('lpSiswa').value, idMapel: $('lpMapel').value }).then(function (nama) { pesan('Berkas ' + nama + ' diunduh.', 'ok'); });
     });
   });
 
@@ -65,5 +65,13 @@
     if (ta) { st.tahunAjaran = ta.id_tahun_ajaran; st.semester = ta.semester_aktif || 'ganjil'; $('lpTahun').textContent = ta.nama_tahun + ' \u00b7 Tahun aktif'; toggle(); }
     else $('lpTahun').textContent = 'Belum ada tahun ajaran aktif';
     $('lpKelas').textContent = me.kelas ? 'Kelas ' + me.kelas.nama_kelas : '-';
+    if (me.kelas) {
+      S.referensi.siswa().then(function (r) {
+        $('lpSiswa').innerHTML = '<option value="">Semua siswa (satu kelas)</option>' + (r.items || []).map(function (x) { return '<option value="' + x.id_siswa + '">' + U.esc(x.nama_siswa) + '</option>'; }).join('');
+      }).catch(function () {});
+      S.referensi.mapel().then(function (m) {
+        $('lpMapel').innerHTML = '<option value="">Semua mata pelajaran</option>' + (m || []).map(function (x) { return '<option value="' + x.id_mapel + '">' + U.esc(x.nama_mapel) + '</option>'; }).join('');
+      }).catch(function () {});
+    }
   }).catch(function () { /* ditampilkan app.js */ });
 })();

@@ -2,7 +2,7 @@
  * - Berkas statis (assets/): cache dulu, perbarui di latar belakang.
  * - Halaman: jaringan dulu; offline => halaman cadangan.
  * - /api/* TIDAK PERNAH di-cache. */
-const VERSION = 'sikesa-guru-v1';
+const VERSION = 'sikesa-guru-v2';
 
 self.addEventListener('install', (event) => { self.skipWaiting(); });
 

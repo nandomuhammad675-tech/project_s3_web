@@ -35,7 +35,7 @@ final class LaporanExporter
     /** Nama berkas aman untuk header: huruf, angka, minus, garis bawah saja. */
     public static function namaFile(array $meta): string
     {
-        $bagian = ['laporan', $meta['semester'], $meta['tahun_ajaran'], $meta['kelas'] === 'Semua kelas' ? null : $meta['kelas']];
+        $bagian = ['laporan', $meta['semester'], $meta['tahun_ajaran'], $meta['kelas'] === 'Semua kelas' ? null : $meta['kelas'], isset($meta['siswa']) ? $meta['siswa'] : null];
         $nama = implode('-', array_filter($bagian, static fn($b) => $b !== null));
         return preg_replace('/[^A-Za-z0-9_-]+/', '-', $nama) . '.xlsx';
     }
@@ -68,6 +68,7 @@ final class LaporanExporter
             ['Tahun Ajaran', $meta['tahun_ajaran']],
             ['Semester', ucfirst($meta['semester'])],
             ['Kelas', $meta['kelas']],
+            ['Siswa', $meta['siswa'] ?? 'Semua siswa'],
             ['Periode data absensi', SheetHelper::periode($meta)],
             ['Tanggal ekspor', $meta['tanggal_ekspor']],
         ];

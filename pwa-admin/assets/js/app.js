@@ -110,13 +110,41 @@
     });
   }
 
-  /* Lonceng: lompat ke peringatan di dasbor */
+  /* Lonceng: guru/kelas yang belum mengisi absensi hari ini (GET /api/admin/dasbor/absensi) */
   var bell = document.getElementById('btn-bell');
+  var dot = document.getElementById('bell-dot');
+  var panel = document.getElementById('bell-panel');
+  var belum = [];
+  function esc(t) { return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function renderBell(libur) {
+    if (!panel) return;
+    var h = '<div class="bell-panel__head">Pemberitahuan</div>';
+    if (libur) h += '<div class="bell-panel__empty">Hari ini libur, tidak ada absensi.</div>';
+    else if (!belum.length) h += '<div class="bell-panel__empty">Semua kelas sudah mengisi absensi hari ini.</div>';
+    else {
+      h += '<ul class="bell-panel__list">' + belum.slice(0, 12).map(function (k) {
+        return '<li><b>' + esc(k.nama_guru_wali || 'Wali kelas belum ditetapkan') + '</b><span>Kelas ' + esc(k.nama_kelas) + ' belum mengisi absensi</span></li>';
+      }).join('') + '</ul>';
+      if (belum.length > 12) h += '<div class="bell-panel__empty">+ ' + (belum.length - 12) + ' kelas lainnya</div>';
+    }
+    panel.innerHTML = h;
+  }
+  function muatBell() {
+    if (!bell || !window.SikesaApi || (window.SIKESA && window.SIKESA.route === 'login')) return;
+    window.SikesaApi.get('/api/admin/dasbor/absensi', { per_page: 100 }).then(function (res) {
+      var d = (res && res.data) || {};
+      var items = d.items || [];
+      belum = items.filter(function (k) { return k.status === 'belum'; });
+      var libur = items.length > 0 && items.every(function (k) { return k.status === 'libur'; });
+      if (dot) dot.hidden = !belum.length;
+      bell.setAttribute('aria-label', belum.length ? belum.length + ' kelas belum absensi' : 'Pemberitahuan');
+      renderBell(libur);
+    }, function () { /* tanpa notifikasi bila server tidak terjangkau */ });
+  }
   if (bell) {
-    bell.addEventListener('click', function () {
-      var a = document.getElementById('alerts');
-      if (a && a.children.length) a.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      else window.SikesaUI.toast('Tidak ada pemberitahuan baru');
-    });
+    bell.addEventListener('click', function (e) { e.stopPropagation(); if (panel) panel.hidden = !panel.hidden; });
+    document.addEventListener('click', function (e) { if (panel && !panel.hidden && !e.target.closest('#bell-panel')) panel.hidden = true; });
+    muatBell();
+    setInterval(muatBell, 5 * 60 * 1000);
   }
 })();
