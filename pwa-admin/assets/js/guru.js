@@ -68,7 +68,7 @@
       nama: String(pick(r, KEYS.nama, '') || '').trim(),
       nip: String(pick(r, KEYS.nip, '') || '').trim(),
       jabatan: String(pick(r, KEYS.jabatan, '') || '').trim(),
-      foto: (function (v) { v = String(v || ''); return /^uploads\//.test(v) && window.SikesaApi ? window.SikesaApi.fileUrl(v) : v; })(pick(r, KEYS.foto, '')),
+      foto: (function (v) { v = String(v || ''); return /^(uploads|aset|media|assets)\//.test(v) && window.SikesaApi ? window.SikesaApi.fileUrl(v) : v; })(pick(r, KEYS.foto, '')),
       email: String(pick(r, KEYS.email, '') || '').trim(),
       telepon: String(pick(r, KEYS.telepon, '') || '').trim(),
       username: String(pick(r, KEYS.username, '') || '').trim(),
@@ -431,14 +431,9 @@
 
     setSaving(true);
     var wasEdit = !!editing;
-    // Foto baru: data URL -> berkas -> unggah ke server -> path disimpan pada foto_profil
-    var siapFoto = Promise.resolve();
-    if (fotoState === 'new') {
-      siapFoto = fetch(fotoData).then(function (r) { return r.blob(); }).then(function (blob) {
-        return window.SikesaApi.upload(new File([blob], 'foto.' + (blob.type === 'image/png' ? 'png' : blob.type === 'image/webp' ? 'webp' : 'jpg'), { type: blob.type }));
-      }).then(function (path) { body[SEND.foto] = path; });
-    }
-    siapFoto.then(function () {
+    // Foto baru dikirim sebagai data URL; apiClient mengunggahnya ke aset/guru/<nama>/ lalu mengganti dengan path.
+    if (fotoState === 'new') body[SEND.foto] = fotoData;
+    Promise.resolve().then(function () {
       return wasEdit ? Api.put(itemUrl(editing.id), body) : Api.post(E.guru, body);
     }).then(function () {
       dlg.close();

@@ -43,6 +43,55 @@ final class SiswaService
     }
 
     /**
+     * Impor massal siswa (dari berkas Excel yang dibaca klien). Tiap baris divalidasi seperti buat(); baris
+     * yang valid disimpan (status baru), yang gagal dilaporkan per baris. Maksimal 500 baris per permintaan.
+     * @param array<int, mixed> $rows
+     * @return array{total:int, berhasil:int, gagal:int, hasil:array<int, array<string, mixed>>}
+     */
+    public function impor(array $rows): array
+    {
+        if ($rows === []) {
+            throw HttpException::unprocessable('Tidak ada baris data untuk diimpor.');
+        }
+        if (count($rows) > 500) {
+            throw HttpException::unprocessable('Maksimal 500 baris per impor. Pecah berkas menjadi beberapa bagian.');
+        }
+
+        $hasil = [];
+        $ok = 0;
+        $dalamBerkas = [];
+        foreach (array_values($rows) as $i => $baris) {
+            $no = $i + 1;
+            if (!is_array($baris)) {
+                $hasil[] = ['baris' => $no, 'status' => 'gagal', 'pesan' => 'Format baris tidak valid.'];
+                continue;
+            }
+            $nisn = isset($baris['nisn_resmi']) ? trim((string) $baris['nisn_resmi']) : '';
+            if ($nisn !== '' && isset($dalamBerkas[$nisn])) {
+                $hasil[] = ['baris' => $no, 'status' => 'gagal', 'pesan' => 'NISN ganda dalam berkas (sama dengan baris ' . $dalamBerkas[$nisn] . ').'];
+                continue;
+            }
+            try {
+                $in = [
+                    'nama_siswa' => $baris['nama_siswa'] ?? null,
+                    'nisn_resmi' => $nisn,
+                    'nama_wali'  => ($baris['nama_wali'] ?? '') === '' ? null : $baris['nama_wali'],
+                    'no_hp_wali' => ($baris['no_hp_wali'] ?? '') === '' ? null : $baris['no_hp_wali'],
+                ];
+                $this->buat($in);
+                $dalamBerkas[$nisn] = $no;
+                $ok++;
+                $hasil[] = ['baris' => $no, 'status' => 'berhasil', 'pesan' => 'Tersimpan.'];
+            } catch (HttpException $e) {
+                $detail = $e->errors ? ' ' . implode(' ', array_map('strval', $e->errors)) : '';
+                $pesan = $e->status === 409 ? 'NISN sudah terdaftar.' : trim($e->getMessage() . $detail);
+                $hasil[] = ['baris' => $no, 'status' => 'gagal', 'pesan' => $pesan];
+            }
+        }
+        return ['total' => count($rows), 'berhasil' => $ok, 'gagal' => count($rows) - $ok, 'hasil' => $hasil];
+    }
+
+    /**
      * Ubah parsial. Satu-satunya perubahan status manual yang diizinkan: baru atau aktif menjadi "pindah"
      * (TDD §5.5). Status lain berubah otomatis oleh penempatan dan kenaikan kelas.
      */

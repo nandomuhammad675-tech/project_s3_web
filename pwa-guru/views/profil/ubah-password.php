@@ -1,5 +1,5 @@
 <?php
-$active_menu = 'profil';
+$active_menu = 'akun';
 $page_title = 'Ganti Password';
 $page_scripts = ['page-profil.js'];
 

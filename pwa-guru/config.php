@@ -63,7 +63,8 @@ function sk_routes(): array
         'piket'     => 'piket/index.php',
         'disiplin'  => 'disiplin/index.php',
         'laporan'   => 'laporan/index.php',
-        'profil'    => 'profil/ubah-password.php',
+        'profil'    => 'profil/profil.php',
+        'password'  => 'profil/ubah-password.php',
         'login'     => 'auth/login.php',
     ];
 }

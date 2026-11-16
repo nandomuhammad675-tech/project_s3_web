@@ -87,7 +87,7 @@
     var role = txt(pick(r, KEYS.role, '')).toLowerCase();
     return {
       id: pick(r, KEYS.id, null), username: txt(pick(r, KEYS.username, '')), role: role,
-      nama: txt(pick(r, KEYS.nama, '')), aktif: isOn(pick(r, KEYS.aktif, 1)),
+      nama: txt(pick(r, KEYS.nama, '')) || (String(pick(r, KEYS.role, '')) === 'admin' ? 'Administrator' : txt(pick(r, KEYS.username, ''))), aktif: isOn(pick(r, KEYS.aktif, 1)),
       terakhir: pick(r, KEYS.terakhir, ''), self: isOn(pick(r, KEYS.self, 0)) && pick(r, KEYS.self, null) !== null
     };
   }
@@ -294,7 +294,7 @@
     if (pass.length < PASS_MIN) { fieldError('ac-rs-pass', 'Password minimal 8 karakter'); $('ac-rs-pass').focus(); return; }
     var body = {}; body[SEND.resetPass] = pass;
     setRsBusy(true);
-    Api.put(itemUrl(rsItem.id) + '/reset-password', body).then(function () {
+    Api.put(itemUrl(rsItem.id) + '/password', body).then(function () {
       dRs.close(); hidePass('ac-rs-pass');
       toast('Password diganti. Sesi lama akun ini berakhir.');
     }).catch(function (err) {
@@ -324,7 +324,7 @@
   dSt.addEventListener('cancel', function (ev) { if (stBusy) ev.preventDefault(); });
   bOk.addEventListener('click', function () {
     if (stBusy || !stItem) return;
-    var body = {}; body[SEND.status] = stNext ? 1 : 0;
+    var body = {}; body[SEND.status] = stNext ? 'aktif' : 'nonaktif';
     setStBusy(true);
     Api.put(itemUrl(stItem.id) + '/status', body).then(function () {
       dSt.close(); toast(stNext ? 'Akun diaktifkan' : 'Akun dinonaktifkan'); return load(true);
@@ -353,7 +353,7 @@
 
     var body = {}; body[SEND.pwLama] = oldP; body[SEND.pwBaru] = newP;
     setPwBusy(true);
-    Api.post(E.ubahPassword, body).then(function (res) {
+    Api.put(E.ubahPassword, body).then(function (res) {
       // Server memberi token baru: ganti token lokal agar tidak terlempar ke login.
       var d = (res && res.data) || res || {};
       var token = d.token || d.access_token;

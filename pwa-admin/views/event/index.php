@@ -6,7 +6,10 @@ $ico = fn(string $n, string $cls = '') => '<svg class="ico ' . $cls . '" aria-hi
     <h1>Event &amp; Galeri</h1>
     <p>Publikasikan kegiatan dan dokumentasi sekolah.</p>
   </div>
-  <button type="button" class="btn btn--amber" id="btn-tambah"><?= $ico('plus', 'ico--sm') ?> Tambah Event</button>
+  <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <button type="button" class="btn btn--outline" id="btn-galeri-umum"><?= $ico('image', 'ico--sm') ?> Galeri Umum</button>
+    <button type="button" class="btn btn--amber" id="btn-tambah"><?= $ico('plus', 'ico--sm') ?> Tambah Event</button>
+  </div>
 </div>
 
 <section class="ev-featured" id="ev-featured" aria-label="Event terbaru" hidden></section>
@@ -61,3 +64,6 @@ $ico = fn(string $n, string $cls = '') => '<svg class="ico ' . $cls . '" aria-hi
 
 <?php require __DIR__ . '/form.php'; ?>
 <?php $delId = 'dlg-hapus'; require __DIR__ . '/../partials/modal-confirm-delete.php'; ?>
+
+<?php require __DIR__ . '/galeri.php'; ?>
+<script>document.getElementById('btn-galeri-umum').addEventListener('click', function () { document.dispatchEvent(new CustomEvent('sikesa:galeri-buka', { detail: { idEvent: null, nama: '' } })); });</script>

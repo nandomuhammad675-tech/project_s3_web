@@ -3,6 +3,8 @@
  * Dasbor Admin (Beranda).
  * Markup kerangka saja; isi diisi oleh assets/js/dashboard.js.
  * Setiap blok punya tiga keadaan: memuat, kosong, gagal (dengan tombol coba lagi).
+ *
+ * @var array $config Dibuat di pwa-admin/index.php
  */
 $ico = fn(string $n, string $cls = '') => '<svg class="ico ' . $cls . '" aria-hidden="true"><use href="#i-' . $n . '"/></svg>';
 ?>

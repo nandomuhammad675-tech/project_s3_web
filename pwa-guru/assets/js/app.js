@@ -131,6 +131,28 @@
       '<p class="text-sm text-gray-500 max-w-md">Akun Anda belum menjadi wali kelas pada tahun ajaran aktif, sehingga menu ini belum dapat dipakai. Hubungi Admin sekolah.</p></div>';
   }
 
+  /* ---------- lonceng: notifikasi merah bila absensi hari ini belum diisi ---------- */
+  function muatBell() {
+    var btn = doc.getElementById('bellBtn'), dot = doc.getElementById('bellDot'), isi = doc.getElementById('bellIsi'), panel = doc.getElementById('bellPanel');
+    if (!btn) return;
+    btn.addEventListener('click', function (e) { e.stopPropagation(); panel.hidden = !panel.hidden; });
+    doc.addEventListener('click', function (e) { if (!panel.hidden && !e.target.closest('#bellPanel')) panel.hidden = true; });
+    meJanji.then(function (me) {
+      if (!me || !me.kelas) { isi.textContent = 'Belum ada pemberitahuan.'; return; }
+      return api.get('/api/guru/dasbor/absensi').then(function (d) {
+        var st = d && d.status;
+        if (st === 'belum') {
+          dot.hidden = false;
+          isi.innerHTML = '<p class="font-semibold text-red-600 mb-1">Absensi hari ini belum diisi</p><p class="mb-3">Kelas ' + esc(me.kelas.nama_kelas) + ' belum tercatat hari ini.</p><a href="' + esc(cfg.base) + '/index.php?hal=absensi" class="inline-block bg-[#eba048] text-white px-4 py-2 rounded-lg text-xs font-bold">Isi Absensi</a>';
+        } else {
+          dot.hidden = true;
+          isi.textContent = st === 'libur' ? 'Hari ini libur.' : 'Absensi hari ini sudah diisi. Tidak ada pemberitahuan baru.';
+        }
+      });
+    }).catch(function () { isi.textContent = 'Pemberitahuan belum bisa dimuat.'; });
+  }
+  muatBell();
+
   /* ---------- keluar ---------- */
   doc.addEventListener('click', function (ev) {
     var b = ev.target.closest && ev.target.closest('[data-action="logout"]');

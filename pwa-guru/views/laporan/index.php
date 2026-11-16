@@ -38,7 +38,7 @@ require_once __DIR__ . '/../layouts/sidebar.php';
                     </div>
                     <div>
                         <h3 class="text-[15px] font-bold text-[#1f2937] leading-none mb-1">Laporan Akademik</h3>
-                        <p class="text-xs text-gray-500">File Excel berisi rekap absensi dan rekap nilai per semester.</p>
+                        <p class="text-xs text-gray-500">File Excel berisi rekap absensi dan rekap nilai per semester. Nilai dipisah per mata pelajaran (satu sheet per mapel) dengan kolom UH, ASTS, dan ASAS.</p>
                     </div>
                 </div>
 
@@ -73,6 +73,20 @@ require_once __DIR__ . '/../layouts/sidebar.php';
                     </div>
                 </div>
 
+                <div class="mb-4 grid grid-cols-1 gap-3">
+                    <div>
+                        <label class="text-xs font-bold text-[#1f2937] mb-1 block" for="lpSiswa">Siswa</label>
+                        <select id="lpSiswa" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-[13px] text-[#1f2937] bg-white focus:outline-none focus:border-[#eba048]">
+                            <option value="">Semua siswa (satu kelas)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold text-[#1f2937] mb-1 block" for="lpMapel">Mata pelajaran (untuk nilai)</label>
+                        <select id="lpMapel" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-[13px] text-[#1f2937] bg-white focus:outline-none focus:border-[#eba048]">
+                            <option value="">Semua mata pelajaran</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="mb-4">
                     <label class="text-xs font-bold text-[#1f2937] mb-1 block" for="lpJenis">Isi file Excel</label>
                     <select id="lpJenis" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-[13px] text-[#1f2937] bg-white focus:outline-none focus:border-[#eba048]">

@@ -50,7 +50,7 @@
   /* Hanya terima gambar dari server (alamat atau data URL gambar). */
   function safeSrc(s) {
     s = String(s || '');
-    if (/^uploads\//.test(s) && window.SikesaApi && window.SikesaApi.fileUrl) return window.SikesaApi.fileUrl(s);
+    if (/^(uploads|aset|media|assets)\//.test(s) && window.SikesaApi && window.SikesaApi.fileUrl) return window.SikesaApi.fileUrl(s);
     return /^(https?:\/\/|\/|data:image\/(png|jpe?g|webp);base64,)/i.test(s) ? s : '';
   }
 
@@ -417,14 +417,10 @@
 
     setSaving(true);
     var wasEdit = !!editing;
-    // 1) unggah ikon baru (data URL -> berkas -> path), 2) simpan ekskul, 3) sinkronkan guru pembina
+    // Ikon baru dikirim sebagai data URL; apiClient mengunggahnya ke aset/ekstrakurikuler/<nama>/ lalu mengganti dengan path.
+    if (ikonState === 'new') body[SEND.ikon] = ikonData;
+    else if (ikonState === 'clear') { body[SEND.ikon] = null; }
     var siapIkon = Promise.resolve();
-    if (ikonState === 'new') {
-      siapIkon = fetch(ikonData).then(function (r) { return r.blob(); }).then(function (blob) {
-        return window.SikesaApi.upload(new File([blob], 'ikon.' + (blob.type === 'image/png' ? 'png' : blob.type === 'image/webp' ? 'webp' : 'jpg'), { type: blob.type }));
-      }).then(function (path) { body[SEND.ikon] = path; });
-    } else if (ikonState === 'clear') { body[SEND.ikon] = null; }
-
     siapIkon.then(function () {
       return wasEdit ? Api.put(itemUrl(editing.id), body) : Api.post(E.ekskul, body);
     }).then(function (res) {

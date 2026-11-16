@@ -1,6 +1,6 @@
 /* SI-KESA PWA Admin | Data Akademik, HANYA LIHAT (dokumen 01 bagian 3.8)
  * Tiga tab: Absensi, Nilai, Kedisiplinan. Tidak ada tombol tambah, ubah, atau hapus.
- * Filter dikirim ke server (server yang menentukan). Ekspor Tampilan = CSV dari baris yang sedang tampil. */
+ * Filter dikirim ke server (server yang menentukan). Ekspor = XLSX dari server (sheet per kelas / per mapel). */
 (function () {
   'use strict';
 
@@ -14,10 +14,10 @@
     status: ['status'], mapel: ['nama_mapel', 'mapel'], jenis: ['jenis'], nomorUh: ['nomor_uh'], nilai: ['nilai'],
     pelanggaran: ['jenis_pelanggaran'], catatan: ['catatan'], oleh: ['dicatat_oleh', 'nama_guru', 'guru']
   };
-  var TA_K = { id: ['id_tahun_ajaran', 'id'], nama: ['nama_tahun', 'nama'], sem: ['semester_berjalan', 'semester'], aktif: ['status'] };
-  var KELAS_K = { id: ['id_kelas', 'id'], ta: ['id_tahun_ajaran'], nama: ['nama_kelas', 'nama'], tingkat: ['tingkat'] };
+  var TA_K = { id: ['id_tahun_ajaran', 'id'], nama: ['nama_tahun', 'nama'], sem: ['semester_aktif', 'semester_berjalan', 'semester'], aktif: ['status_aktif', 'status'] };
+  var KELAS_K = { id: ['id_kelas', 'id'], ta: ['id_tahun_ajaran'], nama: ['nama_kelas', 'nama'], tingkat: ['tingkat_kelas', 'tingkat'] };
   var MAPEL_K = { id: ['id_mapel', 'id'], nama: ['nama_mapel', 'nama'] };
-  var PARAM = { ta: 'id_tahun_ajaran', semester: 'semester', kelas: 'id_kelas', mapel: 'id_mapel', tanggal: 'tanggal', dari: 'tanggal_dari', sampai: 'tanggal_sampai', siswa: 'siswa' };
+  var PARAM = { ta: 'id_tahun_ajaran', semester: 'semester', kelas: 'id_kelas', mapel: 'id_mapel', tanggal: 'tanggal', dari: 'dari', sampai: 'sampai', siswa: 'siswa' };
   var BULAN = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
   var PER_PAGE = 20;
 
@@ -88,7 +88,7 @@
       ]
     },
     disiplin: {
-      path: E.akademik + '/kedisiplinan', semester: false, rentang: true, empty: 'Belum ada catatan kedisiplinan untuk filter ini.',
+      path: E.akademik + '/disiplin', semester: false, rentang: true, empty: 'Belum ada catatan kedisiplinan untuk filter ini.',
       cols: [
         { h: 'Tanggal', html: function (r) { return dash(fmtDate(r.tanggal)); }, text: function (r) { return fmtDate(r.tanggal); } },
         { h: 'Kelas', html: function (r) { return dash(r.kelas); }, text: function (r) { return r.kelas; } },
@@ -219,9 +219,10 @@
     if (t.semester) q[PARAM.semester] = st.semester;
     if (st.kelas) q[PARAM.kelas] = st.kelas;
     if (t.mapel && st.mapel) q[PARAM.mapel] = st.mapel;
-    if (t.tanggal && st.tgl) q[PARAM.tanggal] = st.tgl;
+    if (t.tanggal && st.tgl) { q.dari = st.tgl; q.sampai = st.tgl; }
     if (t.rentang) { if (st.dari) q[PARAM.dari] = st.dari; if (st.sampai) q[PARAM.sampai] = st.sampai; }
-    if (st.q) q[PARAM.siswa] = st.q;
+    // Backend belum menyaring nama/NISN: bila ada kata kunci, ambil sampai 200 baris lalu saring di layar.
+    if (st.q) { q.per_page = 200; q.page = 1; }
     return q;
   }
   function warn(text) { el.warn.textContent = text || ''; el.warn.hidden = !text; }
@@ -237,9 +238,10 @@
     Api.get(t.path, query()).then(function (res) {
       if (my !== seq) return;
       var rows = toList(res).map(norm), meta = res && res.meta;
+      if (st.q) meta = null;
       if (meta && Number(meta.last_page)) {
         clientAll = null;
-        cur = { rows: rows, total: Number(meta.total) || rows.length, pages: Number(meta.last_page) || 1, from: ((Number(meta.current_page) || st.page) - 1) * (Number(meta.per_page) || PER_PAGE) };
+        cur = { rows: rows, total: Number(meta.total) || rows.length, pages: Number(meta.last_page) || 1, from: ((Number(meta.current_page || meta.page) || st.page) - 1) * (Number(meta.per_page) || PER_PAGE) };
       } else { // server tidak membagi halaman: bagi di layar, dan saring siswa di layar
         clientAll = rows;
         applyClient();
@@ -325,25 +327,22 @@
     if (b.getAttribute('data-act') === 'retry-init') init();
   });
 
-  /* ---------- Ekspor Tampilan (CSV dari baris yang sedang tampil) ---------- */
-  function csvCell(s) {
-    s = String(s == null ? '' : s);
-    if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; // cegah rumus terbaca di Excel
-    return '"' + s.replace(/"/g, '""') + '"';
-  }
+  /* ---------- Ekspor Excel (XLSX dari server) ----------
+   * Server membuat berkas sesuai filter yang sedang aktif: Absensi dan Kedisiplinan = satu sheet per kelas;
+   * Nilai = satu sheet per mata pelajaran per kelas (UH 1..n, ASTS, ASAS sebagai kepala kolom). Kelas tidak pernah digabung. */
+  var exporting = false;
   el.exp.addEventListener('click', function () {
-    if (!cur.rows.length) return;
-    var t = TABS[st.tab];
-    var lines = [t.cols.map(function (c) { return csvCell(c.h); }).join(',')];
-    cur.rows.forEach(function (r) { lines.push(t.cols.map(function (c) { return csvCell(c.text(r)); }).join(',')); });
-    var ta = lists.ta.filter(function (x) { return x.id === st.ta; })[0];
-    var name = 'data-akademik-' + st.tab + (ta ? '-' + ta.nama.replace(/[^\d]+/g, '-') : '') + '.csv';
-    var blob = new Blob(['\ufeff' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob); a.download = name;
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
-    toast('Tampilan diekspor');
+    if (exporting || !cur.rows.length) return;
+    var q = query(); delete q.page; delete q.per_page;
+    exporting = true; el.exp.disabled = true;
+    var label = el.exp.innerHTML; el.exp.textContent = 'Menyiapkan Excel...';
+    Api.download(E.akademik + '/' + st.tab + '/excel', q).then(function (f) {
+      Api.saveBlob(f.blob, f.name.replace(/[^\w.\-]+/g, '-'));
+      toast('Excel berhasil dibuat: ' + f.name);
+    }, function (err) {
+      if (err && err.status === 401) return;
+      toast((err && err.message) || 'Ekspor gagal', 'error');
+    }).then(function () { exporting = false; el.exp.innerHTML = label; el.exp.disabled = !cur.rows.length; });
   });
 
   /* ---------- mulai ---------- */

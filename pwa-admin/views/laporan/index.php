@@ -47,6 +47,11 @@ $ico = fn(string $n, string $cls = '') => '<svg class="ico ' . $cls . '" aria-hi
       </div>
       <div class="field__hint" id="lap-kelas-hint" hidden>Pilih satu tahun ajaran untuk memilih kelas tertentu.</div>
 
+      <div class="notice" style="background:#f4f6ea;border:1px solid #dfe5c8;margin-bottom:12px">
+        <b>Isi file Excel:</b> satu sheet <b>Informasi</b>, lalu <b>Rekap Absensi</b> satu sheet per kelas (ABS-4A, ...) dan
+        <b>Rekap Nilai</b> satu sheet per mata pelajaran per kelas (MTK-4A, ...) dengan kolom UH 1, UH 2, ..., ASTS, ASAS.
+        Kelas dan mata pelajaran tidak pernah digabung dalam satu sheet.
+      </div>
       <div class="notice notice--warn" id="lap-msg" role="alert" hidden></div>
 
       <div class="lap-actions">

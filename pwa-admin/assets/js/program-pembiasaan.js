@@ -44,6 +44,7 @@
   function errText(err) { return err && err.message ? err.message : 'Terjadi gangguan, coba lagi'; }
   function itemUrl(id) { return E.programPembiasaan + '/' + encodeURIComponent(id); }
   function safeSrc(s) {
+    if (/^(uploads|aset|media|assets)\//.test(String(s || '')) && window.SikesaApi) return window.SikesaApi.fileUrl(String(s));
     s = String(s || '');
     return /^(https?:\/\/|\/|data:image\/(png|jpe?g|webp);base64,)/i.test(s) ? s : '';
   }

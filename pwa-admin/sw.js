@@ -2,7 +2,7 @@
  * - File statis (css/js/ikon): cache dulu, perbarui di latar belakang.
  * - Halaman: jaringan dulu. Jika offline, tampilkan cadangan.
  * - /api/* TIDAK PERNAH di-cache (data selalu dari server). */
-const VERSION = 'sikesa-admin-v6';
+const VERSION = 'sikesa-admin-v7';
 const SHELL = [
   'assets/css/style.css',
   'assets/css/sidebar.css',

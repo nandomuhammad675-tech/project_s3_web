@@ -8,7 +8,7 @@ $active_menu = $active_menu ?? 'beranda';
     <!-- Bagian Logo -->
     <div class="p-6 flex items-center gap-3">
         <!-- FOTO LOGO SEKOLAH -->
-        <img src="<?= sk_e($sk['base']) ?>/assets/icons/logosekolah.png" alt="Logo SI-KESA" class="w-12 h-12 object-contain shrink-0">
+        <img src="<?= sk_e($sk['base']) ?>/assets/img/logo-sekolah.png" alt="Logo SI-KESA" class="w-12 h-12 object-contain shrink-0">
         <div>
             <h1 class="font-bold text-lg leading-tight">SI-KESA</h1>
             <p class="text-[10px] text-gray-300">SDN Kedungsari 1</p>

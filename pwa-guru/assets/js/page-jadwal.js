@@ -62,10 +62,12 @@
     $('modalJudul').textContent = item ? 'Ubah Jadwal' : 'Tambah Jadwal';
     $('jdSemester').value = item ? item.semester : st.semester;
     $('jdHari').value = item ? item.hari : (hariAwal || 'senin');
-    $('jdMapel').value = item ? String(item.id_mapel) : (st.mapel[0] ? String(st.mapel[0].id_mapel) : '');
-    $('jdMulai').value = item ? item.jam_mulai.slice(0, 5) : '07:00';
-    $('jdSelesai').value = item ? item.jam_selesai.slice(0, 5) : '07:35';
-    $('jdKet').value = item && item.keterangan ? item.keterangan : '';
+    $('jdBaris').innerHTML = '';
+    if (item) { tambahBaris({ id_mapel: item.id_mapel, mulai: item.jam_mulai.slice(0, 5), selesai: item.jam_selesai.slice(0, 5), ket: item.keterangan || '' }); }
+    else { tambahBaris(); }
+    $('jdTambahBaris').hidden = !!item;
+    $('jdHint').hidden = !!item;
+    $('jdSemester').disabled = !!item;
     galat(null); alertForm('');
     var m = $('modalJadwal'), o = $('modalOverlay'), c = $('modalContent');
     m.classList.remove('hidden');
@@ -81,25 +83,85 @@
   $('modalJadwal').addEventListener('click', function (e) { if (e.target.closest('[data-tutup]')) tutup(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('modalJadwal').classList.contains('hidden')) tutup(); });
 
+  /* ---------- baris mapel + jam ---------- */
+  function ke(menit) { var m = Math.max(0, Math.min(23 * 60 + 59, menit)); return U.dua(Math.floor(m / 60)) + ':' + U.dua(m % 60); }
+  function dariJam(j) { var p = String(j || '').split(':'); return (+p[0] || 0) * 60 + (+p[1] || 0); }
+
+  function tambahBaris(nilai) {
+    var wadah = $('jdBaris');
+    var terakhir = wadah.lastElementChild;
+    var mulai = nilai ? nilai.mulai : (terakhir ? terakhir.querySelector('[data-f=selesai]').value : '07:00');
+    var selesai = nilai ? nilai.selesai : ke(dariJam(mulai) + 35);
+    var opsi = st.mapel.map(function (m) { return '<option value="' + m.id_mapel + '"' + (nilai && nilai.id_mapel === m.id_mapel ? ' selected' : '') + '>' + U.esc(m.nama_mapel) + '</option>'; }).join('');
+    var d = document.createElement('div');
+    d.className = 'border border-gray-200 rounded-xl p-3 bg-gray-50/60';
+    d.innerHTML =
+      '<div class="flex items-center gap-2 mb-2">' +
+        '<select data-f="mapel" aria-label="Mata pelajaran" class="flex-1 border border-gray-200 rounded-lg p-2.5 text-sm font-medium bg-white focus:outline-none focus:border-[#eba048]">' + opsi + '</select>' +
+        '<button type="button" data-hapus-baris class="w-9 h-9 rounded-lg text-red-500 hover:bg-red-50 flex items-center justify-center shrink-0" aria-label="Hapus baris"><i class="ph ph-trash text-lg"></i></button>' +
+      '</div>' +
+      '<div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2">' +
+        '<input type="time" step="300" data-f="mulai" value="' + mulai + '" aria-label="Jam mulai" class="border border-gray-200 rounded-lg p-2.5 text-sm font-bold bg-white focus:outline-none focus:border-[#eba048]">' +
+        '<span class="text-gray-400 text-sm">sampai</span>' +
+        '<input type="time" step="300" data-f="selesai" value="' + selesai + '" aria-label="Jam selesai" class="border border-gray-200 rounded-lg p-2.5 text-sm font-bold bg-white focus:outline-none focus:border-[#eba048]">' +
+      '</div>' +
+      '<input type="text" data-f="ket" maxlength="100" value="' + U.esc(nilai ? nilai.ket : '') + '" placeholder="Keterangan (opsional)" class="mt-2 w-full border border-gray-200 rounded-lg p-2 text-xs bg-white focus:outline-none focus:border-[#eba048]">';
+    wadah.appendChild(d);
+    var mu = d.querySelector('[data-f=mulai]'), se = d.querySelector('[data-f=selesai]');
+    mu.addEventListener('change', function () { if (!se.dataset.manual) se.value = ke(dariJam(mu.value) + 35); });
+    se.addEventListener('change', function () { se.dataset.manual = '1'; });
+    pasangTombolHapus();
+  }
+  function pasangTombolHapus() {
+    var semua = $('jdBaris').children;
+    for (var i = 0; i < semua.length; i++) semua[i].querySelector('[data-hapus-baris]').hidden = semua.length === 1;
+  }
+  $('jdTambahBaris').addEventListener('click', function () { tambahBaris(); });
+  $('jdBaris').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-hapus-baris]'); if (!b) return;
+    b.closest('.border').remove(); pasangTombolHapus();
+  });
+
+  function bacaBaris() {
+    return Array.prototype.map.call($('jdBaris').children, function (d) {
+      return {
+        id_mapel: Number(d.querySelector('[data-f=mapel]').value) || null,
+        jam_mulai: d.querySelector('[data-f=mulai]').value,
+        jam_selesai: d.querySelector('[data-f=selesai]').value,
+        keterangan: d.querySelector('[data-f=ket]').value.trim() || null
+      };
+    });
+  }
+
   $('formJadwal').addEventListener('submit', function (e) {
     e.preventDefault();
-    var d = {
-      semester: $('jdSemester').value, hari: $('jdHari').value, id_mapel: Number($('jdMapel').value) || null,
-      jam_mulai: $('jdMulai').value, jam_selesai: $('jdSelesai').value, keterangan: $('jdKet').value.trim() || null
-    };
     galat(null); alertForm('');
-    var edit = st.edit;
-    var btn = $('jdSimpan'); btn.disabled = true;
-    (edit ? J.ubah(edit.id_jadwal, d) : J.buat(d)).then(function () {
-      U.toast(edit ? 'Jadwal diperbarui.' : 'Jadwal ditambahkan.');
-      tutup();
-      st.semester = d.semester;
+    var semester = st.edit ? st.edit.semester : $('jdSemester').value, hari = $('jdHari').value;
+    var baris = bacaBaris();
+    for (var i = 0; i < baris.length; i++) {
+      var b = baris[i];
+      if (!b.id_mapel || !b.jam_mulai || !b.jam_selesai) { alertForm('Lengkapi mata pelajaran dan jam pada baris ' + (i + 1) + '.'); return; }
+      if (b.jam_selesai <= b.jam_mulai) { alertForm('Baris ' + (i + 1) + ': jam selesai harus setelah jam mulai.'); return; }
+      for (var j = 0; j < i; j++) { if (b.jam_mulai < baris[j].jam_selesai && baris[j].jam_mulai < b.jam_selesai) { alertForm('Jam baris ' + (i + 1) + ' bertabrakan dengan baris ' + (j + 1) + '.'); return; } }
+    }
+    var edit = st.edit, btn = $('jdSimpan'); btn.disabled = true;
+    var ok = 0, gagal = [];
+    var rantai = Promise.resolve();
+    baris.forEach(function (b, idx) {
+      rantai = rantai.then(function () {
+        var data = { semester: semester, hari: hari, id_mapel: b.id_mapel, jam_mulai: b.jam_mulai, jam_selesai: b.jam_selesai, keterangan: b.keterangan };
+        return (edit ? J.ubah(edit.id_jadwal, data) : J.buat(data)).then(function () { ok++; }, function (err) {
+          if (err && err.status === 401) throw err;
+          gagal.push('Baris ' + (idx + 1) + ': ' + U.pesanGalat(err));
+        });
+      });
+    });
+    rantai.then(function () {
+      if (gagal.length) { alertForm((ok ? ok + ' tersimpan. ' : '') + gagal.join(' ')); }
+      else { U.toast(edit ? 'Jadwal diperbarui.' : ok + ' jadwal ditambahkan.'); tutup(); }
+      st.semester = semester;
       return muat();
-    }, function (err) {
-      var peta = (err && err.errors) || {};
-      galat(peta);
-      alertForm(Object.keys(peta).length && err.status === 422 ? '' : U.pesanGalat(err));
-    }).then(function () { btn.disabled = false; });
+    }, function (err) { alertForm(U.pesanGalat(err)); }).then(function () { btn.disabled = false; });
   });
 
   /* ---------- peristiwa ---------- */
@@ -123,7 +185,6 @@
     if (me.tahun_ajaran && me.tahun_ajaran.semester_aktif) st.semester = me.tahun_ajaran.semester_aktif;
     return S.referensi.mapel().then(function (m) {
       st.mapel = m || [];
-      $('jdMapel').innerHTML = st.mapel.map(function (x) { return '<option value="' + x.id_mapel + '">' + U.esc(x.nama_mapel) + '</option>'; }).join('');
       return muat();
     });
   }).catch(function (err) { if (err && err.status !== 401) U.toast(U.pesanGalat(err), 'error'); });

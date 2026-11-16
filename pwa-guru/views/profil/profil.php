@@ -3,15 +3,7 @@
 $active_menu = 'profil';
 $page_title  = 'Profil Saya';
 
-// Data Dummy Guru
-$guru = [
-    'nama'    => 'Rina Wulandari, S.Pd.',
-    'nip'     => '19880412 201503 2 004',
-    'email'   => 'rina.wulandari@sdnkedungsari1.sch.id',
-    'telepon' => '081234567890',
-    'peran'   => 'Wali Kelas 4A',
-    'status'  => 'Guru Aktif'
-];
+$page_scripts = ['page-akun.js'];
 
 // Panggil Layout Header & Sidebar (Sesuaikan path jika perlu)
 require_once __DIR__ . '/../layouts/header.php';
@@ -37,17 +29,15 @@ require_once __DIR__ . '/../layouts/sidebar.php';
             
             <!-- 1. KARTU HEADER PROFIL -->
             <div class="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center gap-5">
-                <div class="w-16 h-16 rounded-full bg-[#455a2d] text-white font-bold text-xl flex items-center justify-center shrink-0">
-                    RW
+                <div id="akInisial" class="w-16 h-16 rounded-full bg-[#455a2d] text-white font-bold text-xl flex items-center justify-center shrink-0">
+                    --
                 </div>
                 <div>
                     <div class="flex items-center gap-2 mb-1">
-                        <h3 class="text-lg font-bold text-[#1f2937]"><?= htmlspecialchars($guru['nama']) ?></h3>
-                        <span class="bg-[#f7f6f0] text-[#455a2d] text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-[#455a2d]/20">
-                            <?= htmlspecialchars($guru['status']) ?>
-                        </span>
+                        <h3 id="akNama" class="text-lg font-bold text-[#1f2937]">Memuat...</h3>
+                        <span class="bg-[#f7f6f0] text-[#455a2d] text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-[#455a2d]/20">Guru Aktif</span>
                     </div>
-                    <p class="text-xs text-gray-500 font-medium"><?= htmlspecialchars($guru['peran']) ?> &middot; NIP. <?= htmlspecialchars($guru['nip']) ?></p>
+                    <p id="akPeran" class="text-xs text-gray-500 font-medium">&nbsp;</p>
                 </div>
             </div>
 
@@ -59,35 +49,18 @@ require_once __DIR__ . '/../layouts/sidebar.php';
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-[11px] font-bold text-gray-400 tracking-wider uppercase mb-1.5 block">NAMA LENGKAP</label>
-                        <input type="text" value="<?= htmlspecialchars($guru['nama']) ?>" class="w-full h-11 border border-gray-100 rounded-xl px-3.5 text-sm font-bold text-gray-800 bg-[#f8f9fa] focus:outline-none focus:border-[#eba048] transition">
-                    </div>
-
-                    <div>
-                        <label class="text-[11px] font-bold text-gray-400 tracking-wider uppercase mb-1.5 block">NIP</label>
-                        <input type="text" value="<?= htmlspecialchars($guru['nip']) ?>" class="w-full h-11 border border-gray-100 rounded-xl px-3.5 text-sm font-bold text-gray-400 bg-gray-50 cursor-not-allowed" readonly>
-                    </div>
-
-                    <div>
-                        <label class="text-[11px] font-bold text-gray-400 tracking-wider uppercase mb-1.5 block">EMAIL</label>
-                        <input type="email" value="<?= htmlspecialchars($guru['email']) ?>" class="w-full h-11 border border-gray-100 rounded-xl px-3.5 text-sm font-bold text-gray-800 bg-[#f8f9fa] focus:outline-none focus:border-[#eba048] transition">
-                    </div>
-
-                    <div>
-                        <label class="text-[11px] font-bold text-gray-400 tracking-wider uppercase mb-1.5 block">NOMOR TELEPON / WA</label>
-                        <input type="text" value="<?= htmlspecialchars($guru['telepon']) ?>" class="w-full h-11 border border-gray-100 rounded-xl px-3.5 text-sm font-bold text-gray-800 bg-[#f8f9fa] focus:outline-none focus:border-[#eba048] transition">
-                    </div>
+                    <div><label class="text-[11px] font-bold text-gray-400 tracking-wider uppercase mb-1.5 block" for="akNamaIn">NAMA LENGKAP</label><input id="akNamaIn" type="text" readonly class="w-full h-11 border border-gray-100 rounded-xl px-3.5 text-sm font-bold text-gray-800 bg-gray-50 cursor-default"></div>
+                    <div><label class="text-[11px] font-bold text-gray-400 tracking-wider uppercase mb-1.5 block" for="akUser">USERNAME</label><input id="akUser" type="text" readonly class="w-full h-11 border border-gray-100 rounded-xl px-3.5 text-sm font-bold text-gray-800 bg-gray-50 cursor-default"></div>
+                    <div><label class="text-[11px] font-bold text-gray-400 tracking-wider uppercase mb-1.5 block" for="akKelas">WALI KELAS</label><input id="akKelas" type="text" readonly class="w-full h-11 border border-gray-100 rounded-xl px-3.5 text-sm font-bold text-gray-800 bg-gray-50 cursor-default"></div>
+                    <div><label class="text-[11px] font-bold text-gray-400 tracking-wider uppercase mb-1.5 block" for="akTa">TAHUN AJARAN / SEMESTER</label><input id="akTa" type="text" readonly class="w-full h-11 border border-gray-100 rounded-xl px-3.5 text-sm font-bold text-gray-800 bg-gray-50 cursor-default"></div>
                 </div>
+                <p class="text-[11px] text-gray-400 mt-3">NIP, email, dan nomor telepon dikelola oleh Admin sekolah.</p>
 
-                <!-- Tombol Aksi: Ganti Password & Simpan Profil -->
+                <!-- Tombol Aksi: Ganti Password -->
                 <div class="flex items-center justify-end gap-3 mt-6">
-                    <a href="ubah-password.php" class="px-5 py-2.5 rounded-xl border border-[#455a2d] text-[#455a2d] font-bold text-xs hover:bg-[#f7f6f0] transition flex items-center gap-1.5">
+                    <a href="<?= sk_url('password') ?>" class="px-5 py-2.5 rounded-xl border border-[#455a2d] text-[#455a2d] font-bold text-xs hover:bg-[#f7f6f0] transition flex items-center gap-1.5">
                         <i class="ph ph-lock-key text-base"></i> Ganti Password
                     </a>
-                    <button type="button" class="bg-[#eba048] hover:bg-orange-500 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1.5">
-                        <i class="ph ph-floppy-disk text-base"></i> Simpan Profil
-                    </button>
                 </div>
             </div>
 

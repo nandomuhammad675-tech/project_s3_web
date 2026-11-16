@@ -9,7 +9,8 @@ $page_title = $page_title ?? 'Beranda';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#455a2d">
-    <title><?= sk_e($page_title) ?> - SI-KESA</title>
+    <title><?= sk_e($page_title) ?> | SI-KESA Guru</title>
+    <link rel="icon" href="<?= sk_e($sk['base']) ?>/assets/img/logo-sekolah.png">
     <link rel="apple-touch-icon" href="<?= sk_e($sk['base']) ?>/assets/icons/icon-192.png">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
