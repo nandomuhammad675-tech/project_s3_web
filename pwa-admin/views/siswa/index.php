@@ -67,4 +67,9 @@ $ico = fn(string $n, string $cls = '') => '<svg class="ico ' . $cls . '" aria-hi
 </section>
 
 <?php require __DIR__ . '/form.php'; ?>
+<<<<<<< HEAD
+=======
+<?php require __DIR__ . '/impor.php'; ?>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" crossorigin="anonymous" defer></script>
+>>>>>>> 9625e4f5c440ecbe2fb8dc94838f6de0297bb2b3
 <?php $delId = 'dlg-hapus'; require __DIR__ . '/../partials/modal-confirm-delete.php'; ?>

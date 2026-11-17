@@ -1,0 +1,14 @@
+# SI-KESA PWA Guru
+Options -Indexes
+DirectoryIndex index.php
+
+# Service worker dan manifest harus selalu segar
+<Files "sw.js">
+  Header set Cache-Control "no-cache"
+</Files>
+<Files "manifest.json">
+  Header set Content-Type "application/manifest+json"
+</Files>
+<FilesMatch "^(config\.local\.php)$">
+  Require all denied
+</FilesMatch>

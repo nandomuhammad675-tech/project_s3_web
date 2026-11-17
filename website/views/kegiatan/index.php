@@ -1,143 +1,34 @@
 <?php
+require_once __DIR__ . '/../../lib/bootstrap.php';
+require_once __DIR__ . '/../../lib/api.php';
 /**
- * Halaman Berita & Artikel - SD Negeri Kedungsari 1
- * SATU FILE. Letakkan di: website/views/kegiatan/index.php
- * (dibuka lewat '?page=kegiatan', sesuai peta di page_url())
+ * Kegiatan & Prestasi. Daftar: /?page=kegiatan[&kategori=prestasi][&hal=2]. Detail: /?page=kegiatan&slug=e12
+ * Data: GET /api/public/event (hanya status_tampil = 1, terbaru di atas; urutan & halaman dari server).
  */
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+if (isset($_GET['slug'])) { require __DIR__ . '/detail.php'; return; }
 
-// ===== Fungsi bantu (dilewati jika framework Anda sudah punya) =====
-if (!function_exists('base_url')) {
-    function base_url(string $path = ''): string {
-        static $base = null;
-        if ($base === null) {
-            $base = '';
-            $root = rtrim(str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT'] ?? '') ?: ''), '/');
-            foreach ([__DIR__ . '/../../public', __DIR__ . '/public', __DIR__, __DIR__ . '/..'] as $dir) {
-                $assets = realpath($dir . '/assets');
-                if ($assets) {
-                    $pub = str_replace('\\', '/', dirname($assets));
-                    if ($root !== '' && stripos($pub, $root) === 0) {
-                        $base = substr($pub, strlen($root)) . '/';
-                        break;
-                    }
-                }
-            }
-            if ($base === '') {
-                $base = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/') . '/';
-            }
-        }
-        return $base . ltrim($path, '/');
-    }
-}
-if (!function_exists('esc')) {
-    function esc($text): string {
-        return htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8');
-    }
-}
-if (!function_exists('page_url')) {
-    function page_url(string $key): string {
-        static $map = [
-            'home'    => '',
-            'profil'  => '?page=guru',
-            'berita'  => '?page=kegiatan',
-            'ekstra'  => '?page=ekstrakurikuler',
-            'galeri'  => '?page=galeri',
-            'kontak'  => '?page=kontak',
-            'ppdb'    => '?page=ppdb',
-        ];
-        return base_url($map[$key] ?? $key);
-    }
-}
+$kategoriAll = sikesa_kategori();
+$kategori    = (string) ($_GET['kategori'] ?? '');
+if (!isset($kategoriAll[$kategori])) { $kategori = ''; }
+$perHalaman  = 6;
+$hal         = max(1, (int) ($_GET['hal'] ?? 1));
 
-$current = 'berita';
+$data  = sikesa_event($kategori ?: null, $hal, $perHalaman);       // null = API gagal
+$items = $data['items'] ?? [];
+$total = (int) ($data['total'] ?? 0);
+$totalHal = max(1, (int) ceil($total / $perHalaman));
+if ($data !== null && $hal > $totalHal) { $hal = $totalHal; $data = sikesa_event($kategori ?: null, $hal, $perHalaman); $items = $data['items'] ?? []; }
 
-// ===== Format tanggal Indonesia =====
-function tanggal_id(string $ymd): string {
-    static $bulan = [1 => 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-                     'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-    $t = strtotime($ymd);
-    return date('j', $t) . ' ' . $bulan[(int) date('n', $t)] . ' ' . date('Y', $t);
-}
+$urlHal = static fn(int $h): string => page_url('berita', array_filter(['kategori' => $kategori, 'hal' => $h > 1 ? $h : null]));
 
-// ===== DATA BERITA =====
-// Tambah / ubah berita di sini (nanti bisa diganti dengan data dari database).
-// 'tanggal' memakai format YYYY-MM-DD. 'foto' relatif terhadap folder public.
-$beritaList = [
-    [
-        'slug'    => 'kelas-digital-nanga-pinoh',
-        'judul'   => 'Guru di Nanga Pinoh, Kabupaten Melawi Menyelenggarakan Pembelajaran Kelas secara Digital yang Menyenangkan untuk Siswa SD Kelas 1',
-        'ringkas' => 'Veronica Dewi Sartika, S. Pd. SD merupakan guru kelas 1 SD yang bertugas di Kabupaten Melawi, Kalimantan Barat.',
-        'tanggal' => '2026-09-18',
-        'foto'    => 'assets/img/berita/berita-1.jpg',
-    ],
-    [
-        'slug'    => 'sd-makassar-disegel',
-        'judul'   => 'Kompleks SD di Makassar disegel dan seribu murid \'dirumahkan\' – Mengapa perlindungan hak pendidikan anak \'lemah\'?',
-        'ringkas' => 'Sekitar seribu murid Sekolah Dasar (SD) di Makassar, Sulawesi Selatan, disebut belajar dari rumah karena kompleks sekolah mereka disegel. Kompleks sekolah tersebut menjadi pusat sengketa lahan.',
-        'tanggal' => '2024-07-24',
-        'foto'    => 'assets/img/berita/berita-2.jpg',
-    ],
-    [
-        'slug'    => 'anak-sd-berkunjung-balai-kota',
-        'judul'   => 'Keseruan Anak SD Berkunjung ke Balai Kota Jakarta',
-        'ringkas' => 'Sebanyak 50 murid Sekolah Dasar (SD) dari wilayah Jakarta Pusat berkunjung ke Balai Kota DKI Jakarta, Jalan Medan Merdeka Selatan, Gambir, Rabu (23/7). Dalam kunjungannya anak-anak diajak berkeliling dan berdialog langsung dengan Gubernur DKI Jakarta, Pramono Anung.',
-        'tanggal' => '2025-07-23',
-        'foto'    => 'assets/img/berita/berita-3.jpg',
-    ],
-    [
-        'slug'    => 'empat-siswa-disetrum-kepsek',
-        'judul'   => 'Empat siswa SD di Malang yang disetrum kepsek untuk \'terapi\'',
-        'ringkas' => 'Polisi melakukan penyelidikan atas dugaan penyetruman terhadap empat siswa sekolah dasar oleh kepala sekolah, kendati orang tua siswa dan sekolah menyebut persoalannya sudah \'diselesaikan secara kekeluargaan\'.',
-        'tanggal' => '2017-05-03',
-        'foto'    => 'assets/img/berita/berita-4.jpg',
-    ],
-    [
-        'slug'    => 'keracunan-mbg-blora',
-        'judul'   => '19 Siswa SD Diduga Keracunan MBG, Dinkes Blora Buka Suara',
-        'ringkas' => 'BLORA, Beritajateng.id – Dinas Kesehatan (Dinkes) Kabupaten Blora buka suara mengenai dugaan keracunan makanan dalam program Makan Bergizi Gratis (MBG) di SDN Sendangrejo, Kecamatan Ngawen, pada Senin, 20 Juli 2026.',
-        'tanggal' => '2026-07-20',
-        'foto'    => 'assets/img/berita/berita-5.jpg',
-    ],
-    [
-        'slug'    => 'sekolah-siaga-bencana',
-        'judul'   => 'Dinsos Abdya Lakukan Penyuluhan Sekolah Siaga Bencana kepada Murid SD',
-        'ringkas' => 'BLANGPIDIE – Dinas Sosial (Dinsos) Aceh Barat Daya (Abdya) menerjunkan Penyuluh Sosial dan Pekerja Sosial untuk memberikan penyuluhan Sekolah Siaga Bencana (SSB) kepada pelajar tingkat sekolah dasar (SD) di wilayah kabupaten setempat.',
-        'tanggal' => '2026-08-29',
-        'foto'    => 'assets/img/berita/berita-6.jpg',
-    ],
-];
-
-// Urutkan dari yang terbaru
-usort($beritaList, fn($a, $b) => strcmp($b['tanggal'], $a['tanggal']));
-
-// ===== Halaman berita (paginasi) =====
-// ?hal=2 -> halaman ke-2 | ?hal=semua -> tampilkan seluruh berita
-$perHalaman = 6;
-$totalBerita = count($beritaList);
-$totalHalaman = max(1, (int) ceil($totalBerita / $perHalaman));
-$semua = (($_GET['hal'] ?? '') === 'semua');
-
-if ($semua) {
-    $halaman = 1;
-    $tampil  = $beritaList;
-} else {
-    $halaman = max(1, min($totalHalaman, (int) ($_GET['hal'] ?? 1)));
-    $tampil  = array_slice($beritaList, ($halaman - 1) * $perHalaman, $perHalaman);
-}
-
-// Alamat tautan halaman ini + detail berita
-function berita_url(array $params = []): string {
-    return page_url('berita') . ($params ? '&' . http_build_query($params) : '');
-}
-function detail_url(string $slug): string {
-    // Ubah di sini jika halaman detail berita Anda memakai route lain
-    return page_url('berita') . '&slug=' . rawurlencode($slug);
-}
-
-$title = 'Berita & Artikel - SD Negeri Kedungsari 1';
+layout_start([
+    'title'       => ($kategori ? $kategoriAll[$kategori] . ' - ' : '') . 'Kegiatan & Prestasi - SD Negeri Kedungsari 1',
+    'current'     => 'berita',
+    'description' => 'Kegiatan, event, prestasi, dan kolaborasi terbaru SD Negeri Kedungsari 1',
+    'css'         => [],
+]);
 ?>
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -301,71 +192,44 @@ $menuLain = [
         </ul>
     </nav>
 
+=======
+>>>>>>> 9625e4f5c440ecbe2fb8dc94838f6de0297bb2b3
 <main>
+    <?php ui_hero('Kegiatan & Prestasi', 'Informasi terbaru dan kabar terkini seputar kegiatan<br>SD NEGERI KEDUNGSARI 1'); ?>
 
-    <!-- ================= HERO ================= -->
-    <section class="hero page-hero" style="--bg:url('<?= base_url('assets/home.jpg') ?>')">
-        <div class="page-hero__content">
-            <h1>Berita &amp; Artikel</h1>
-            <p>Informasi terbaru dan kabar terkini seputar kegiatan<br>SD NEGERI KEDUNGSARI 1.</p>
-        </div>
-    </section>
-
-    <!-- ================= DAFTAR BERITA ================= -->
     <section class="section section--leaf" id="berita">
-        <h2 class="title">Berita &amp; Artikel</h2>
+        <h2 class="title">Kegiatan &amp; Prestasi</h2>
 
-        <?php if (!$tampil): ?>
-            <p class="berita-kosong">Belum ada berita yang dipublikasikan.</p>
-        <?php else: ?>
-            <div class="berita-grid">
-                <?php foreach ($tampil as $b): ?>
-                    <article class="berita-card">
-                        <a class="berita-card__link" href="<?= esc(detail_url($b['slug'])) ?>">
-                            <img class="berita-card__img"
-                                 src="<?= base_url($b['foto']) ?>"
-                                 alt="<?= esc($b['judul']) ?>" loading="lazy">
-                            <div class="berita-card__body">
+        <nav class="filter" aria-label="Saring menurut kategori">
+            <a class="pill<?= $kategori === '' ? ' pill--solid' : '' ?>" href="<?= esc(page_url('berita', [], 'berita')) ?>"<?= $kategori === '' ? ' aria-current="true"' : '' ?>>Semua</a>
+            <?php foreach ($kategoriAll as $k => $label): ?>
+                <a class="pill<?= $kategori === $k ? ' pill--solid' : '' ?>" href="<?= esc(page_url('berita', ['kategori' => $k], 'berita')) ?>"<?= $kategori === $k ? ' aria-current="true"' : '' ?>><?= esc($label) ?></a>
+            <?php endforeach; ?>
+        </nav>
+
+        <?php if ($data === null): ui_gagal('Daftar kegiatan', $urlHal($hal) . '#berita');
+        elseif (!$items): ui_kosong($kategori ? 'Belum ada ' . strtolower($kategoriAll[$kategori]) . ' yang dipublikasikan.' : 'Belum ada kegiatan yang dipublikasikan.');
+        else: ?>
+            <div class="grid grid--2 grid--center">
+                <?php foreach ($items as $b): ?>
+                    <article class="kartu kartu--post">
+                        <a class="kartu__link" href="<?= esc(page_url('berita', ['slug' => $b['slug']])) ?>">
+                            <img class="kartu__img" src="<?= esc(sikesa_img($b['foto'])) ?>" alt="" loading="lazy" width="600" height="400">
+                            <div class="kartu__body">
+                                <?php if ($b['kategori'] !== ''): ?><span class="badge"><?= esc($kategoriAll[$b['kategori']] ?? ucfirst($b['kategori'])) ?></span><?php endif; ?>
                                 <h3><?= esc($b['judul']) ?></h3>
-                                <p><?= esc(mb_strimwidth($b['ringkas'], 0, 190, '…', 'UTF-8')) ?></p>
-                                <time datetime="<?= esc($b['tanggal']) ?>"><?= esc(tanggal_id($b['tanggal'])) ?></time>
+                                <?php if ($b['ringkas'] !== ''): ?><p><?= esc($b['ringkas']) ?></p><?php endif; ?>
+                                <?php if ($b['tanggal'] !== ''): ?><time datetime="<?= esc($b['tanggal']) ?>"><?= esc(tanggal_id($b['tanggal'])) ?></time><?php endif; ?>
                             </div>
                         </a>
                     </article>
                 <?php endforeach; ?>
             </div>
-
-            <!-- ===== Paginasi ===== -->
-            <nav class="pager" aria-label="Halaman berita">
-                <?php if ($totalHalaman > 1 && !$semua): ?>
-                    <div class="pager__dots">
-                        <?php for ($i = 1; $i <= $totalHalaman; $i++): ?>
-                            <a href="<?= esc(berita_url(['hal' => $i])) ?>#berita"
-                               class="<?= $i === $halaman ? 'is-on' : '' ?>"
-                               aria-label="Halaman <?= $i ?>"
-                               <?= $i === $halaman ? 'aria-current="page"' : '' ?>></a>
-                        <?php endfor; ?>
-                    </div>
-                <?php endif; ?>
-
-                <div class="pager__nav">
-                    <a class="pill <?= ($semua || $halaman <= 1) ? 'is-disabled' : '' ?>"
-                       href="<?= esc(berita_url(['hal' => max(1, $halaman - 1)])) ?>#berita">Sebelumnya</a>
-
-                    <?php if ($semua): ?>
-                        <a class="pill pill--solid" href="<?= esc(berita_url()) ?>#berita">Tampilkan Per Halaman</a>
-                    <?php else: ?>
-                        <a class="pill pill--solid" href="<?= esc(berita_url(['hal' => 'semua'])) ?>#berita">Lihat Semua Berita</a>
-                    <?php endif; ?>
-
-                    <a class="pill <?= ($semua || $halaman >= $totalHalaman) ? 'is-disabled' : '' ?>"
-                       href="<?= esc(berita_url(['hal' => min($totalHalaman, $halaman + 1)])) ?>#berita">Selanjutnya</a>
-                </div>
-            </nav>
+            <?php ui_pager($hal, $totalHal, $urlHal, 'Halaman kegiatan', 'berita'); ?>
         <?php endif; ?>
     </section>
-
 </main>
+<<<<<<< HEAD
 
 <footer class="footer">
     <div class="footer__inner">
@@ -426,3 +290,6 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+=======
+<?php layout_end(); ?>
+>>>>>>> 9625e4f5c440ecbe2fb8dc94838f6de0297bb2b3

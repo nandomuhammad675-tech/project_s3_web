@@ -2,13 +2,21 @@
  * - File statis (css/js/ikon): cache dulu, perbarui di latar belakang.
  * - Halaman: jaringan dulu. Jika offline, tampilkan cadangan.
  * - /api/* TIDAK PERNAH di-cache (data selalu dari server). */
+<<<<<<< HEAD
 const VERSION = 'sikesa-admin-v5';
+=======
+const VERSION = 'sikesa-admin-v7';
+>>>>>>> 9625e4f5c440ecbe2fb8dc94838f6de0297bb2b3
 const SHELL = [
   'assets/css/style.css',
   'assets/css/sidebar.css',
   'assets/css/table.css',
   'assets/css/form.css',
   'assets/css/master.css',
+<<<<<<< HEAD
+=======
+  'assets/js/pwa-install.js',
+>>>>>>> 9625e4f5c440ecbe2fb8dc94838f6de0297bb2b3
   'assets/js/apiClient.js',
   'assets/js/auth.js',
   'assets/js/app.js',

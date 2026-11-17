@@ -57,11 +57,11 @@
       id: pick(r, ['id', 'id_tahun_ajaran']),
       nama: pick(r, ['nama_tahun', 'nama', 'tahun_ajaran', 'tahun'], '-'),
       semester: String(pick(r, ['semester_berjalan', 'semester_aktif', 'semester'], '')).toLowerCase(),
-      aktif: flag(pick(r, ['status', 'status_aktif', 'is_aktif', 'aktif'], null)) === true
+      aktif: flag(pick(r, ['status_aktif', 'status', 'is_aktif', 'aktif'], null)) === true
     };
   }
   function normKelas(r) {
-    var waliNama = pick(r, ['nama_wali', 'wali_kelas', 'nama_guru', 'wali'], null);
+    var waliNama = pick(r, ['nama_guru_wali', 'nama_wali', 'wali_kelas', 'nama_guru', 'wali'], null);
     if (waliNama && typeof waliNama === 'object') waliNama = waliNama.nama_guru || waliNama.nama || null;
     var aktif = flag(pick(r, ['wali_aktif', 'status_akun_wali', 'akun_wali_aktif'], null));
     return {
@@ -75,7 +75,7 @@
   function normAbsensi(r) {
     var raw = String(pick(r, ['status', 'status_absensi'], 'belum')).toLowerCase();
     var st = raw.indexOf('sudah') > -1 ? 'sudah' : raw.indexOf('libur') > -1 ? 'libur' : 'belum';
-    var wali = pick(r, ['wali_kelas', 'nama_wali', 'nama_guru'], null);
+    var wali = pick(r, ['nama_guru_wali', 'wali_kelas', 'nama_wali', 'nama_guru'], null);
     var aktif = flag(pick(r, ['wali_aktif', 'status_akun_wali'], null));
     return {
       kelas: pick(r, ['nama_kelas', 'kelas', 'nama'], '-'),
@@ -133,7 +133,12 @@
       var ta = toList(r[0].value).map(normTahun);
       var mapelList = toList(r[1].value);
       var guruList = toList(r[2].value);
-      var kelasAll = toList(r[3].value).map(normKelas);
+      var statusGuru = {};
+      guruList.forEach(function (g) { statusGuru[String(g.id_guru)] = g.status_akun === 'aktif'; });
+      var kelasAll = toList(r[3].value).map(function (k) {
+        if (k.id_guru_wali != null && k.wali_aktif === undefined) k.wali_aktif = !!statusGuru[String(k.id_guru_wali)];
+        return normKelas(k);
+      });
 
       var aktif = ta.find(function (t) { return t.aktif; }) || null;
       var kelasAktif = aktif

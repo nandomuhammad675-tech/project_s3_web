@@ -1,5 +1,6 @@
 <div class="toast-stack" id="toast-stack" aria-live="polite" aria-atomic="true"></div>
 
+<script src="<?= e(url('assets/js/pwa-install.js')) ?>"></script>
 <script src="<?= e(url('assets/js/apiClient.js')) ?>"></script>
 <script src="<?= e(url('assets/js/auth.js')) ?>"></script>
 <script src="<?= e(url('assets/js/app.js')) ?>"></script>

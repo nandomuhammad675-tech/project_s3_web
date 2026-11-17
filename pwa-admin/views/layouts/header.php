@@ -5,10 +5,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= e($pageTitle) ?> | SI-KESA Admin</title>
+<<<<<<< HEAD
   <meta name="theme-color" content="#455a1f">
   <link rel="manifest" href="<?= e(url('manifest.json')) ?>">
   <link rel="icon" href="<?= e(url('assets/icons/icon-192.png')) ?>">
   <link rel="apple-touch-icon" href="<?= e(url('assets/icons/icon-192.png')) ?>">
+=======
+  <meta name="theme-color" content="#455a2d">
+  <link rel="manifest" href="<?= e(url('manifest.json')) ?>">
+  <link rel="icon" type="image/png" href="<?= e(url('assets/img/logo_sekolah.png')) ?>">
+<link rel="apple-touch-icon" href="<?= e(url('assets/icons/icon-192.png')) ?>">
+>>>>>>> 9625e4f5c440ecbe2fb8dc94838f6de0297bb2b3
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
@@ -54,5 +61,9 @@
     <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
     <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></symbol>
     <symbol id="i-book-open" viewBox="0 0 24 24"><path d="M12 7c-1.5-1.6-4-2.5-8-2.5V18c4 0 6.5.9 8 2.5 1.5-1.6 4-2.5 8-2.5V4.5C16 4.5 13.5 5.4 12 7zM12 7v13.5"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="1.5"/><path d="m21 15-5-5L5 21"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v12M7 11l5 5 5-5M4 20h16"/></symbol>
+    <symbol id="i-ban" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/></symbol>
   </defs>
 </svg>

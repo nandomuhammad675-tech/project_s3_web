@@ -303,7 +303,7 @@
   aOk.addEventListener('click', function () {
     if (aBusy || !aTarget) return;
     aBusy = true; aOk.disabled = true; aOk.textContent = 'Memproses...'; aMsg.hidden = true;
-    Api.post(itemUrl(aTarget.id) + '/aktifkan', {}).then(function () {
+    Api.put(itemUrl(aTarget.id) + '/aktifkan', {}).then(function () {
       aDlg.close();
       toast('Tahun ajaran ' + aTarget.nama + ' aktif');
       return load(true);

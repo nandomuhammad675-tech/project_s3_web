@@ -5,7 +5,7 @@
 2. `composer install` di folder `backend`.
 3. Salin `.env.example` menjadi `.env`, isi `JWT_SECRET` (acak, minimal 32 karakter). `DB_*` bawaan XAMPP sudah cocok.
 4. Buat database `si_kesa` di phpMyAdmin lalu impor `../database/si_kesa_v9.sql`.
-5. Uji: `http://localhost/si-kesa/backend/public/api/public/ping`
+5. Uji: `http://localhost/si-kesa/backend/public/api/public/pengaturan` (atau `bash tests/smoke_langkah1.sh`)
 
 ## Lapisan (TDD §2)
 `controllers → services → repositories → database`; `models` = bentuk data entitas utama;

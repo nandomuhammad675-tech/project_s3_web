@@ -1,73 +1,17 @@
 <?php
+require_once __DIR__ . '/../../lib/bootstrap.php';
 /**
  * Halaman Home - SD Negeri Kedungsari 1
  * File tunggal (PHP biasa, tanpa CodeIgniter).
  * Tes: taruh di website/public/home.php, buka http://localhost/project_s3_web/website/public/home.php
  * Pakai sebagai halaman utama: salin seluruh isinya ke website/views/home/index.php
  */
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
-// Fungsi bantu (dilewati jika framework Anda sudah punya)
-if (!function_exists('base_url')) {
-    function base_url(string $path = ''): string {
-        static $base = null;
-        if ($base === null) {
-            $base = '';
-            // Cari folder yang berisi "assets" (website/public), lalu hitung URL-nya dari document root
-            $root = rtrim(str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT'] ?? '') ?: ''), '/');
-            foreach ([__DIR__ . '/../../public', __DIR__ . '/public', __DIR__, __DIR__ . '/..'] as $dir) {
-                $assets = realpath($dir . '/assets');
-                if ($assets) {
-                    $pub = str_replace('\\', '/', dirname($assets));
-                    if ($root !== '' && stripos($pub, $root) === 0) {
-                        $base = substr($pub, strlen($root)) . '/';
-                        break;
-                    }
-                }
-            }
-            // Cadangan jika tidak ketemu
-            if ($base === '') {
-                $base = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/') . '/';
-            }
-        }
-        return $base . ltrim($path, '/');
-    }
-}
-if (!function_exists('esc')) {
-    function esc($text): string {
-        return htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8');
-    }
-}
-
-// ===== ALAMAT HALAMAN (ubah di sini jika route proyek Anda berbeda) =====
-// Alamat dibaca oleh public/index.php: '?page=guru' membuka views/guru/index.php
-if (!function_exists('page_url')) {
-    function page_url(string $key): string {
-        static $map = [
-            'home'    => '',
-            'profil'  => '?page=guru',
-            'berita'  => '?page=kegiatan',
-            'ekstra'  => '?page=ekstrakurikuler',
-            'galeri'  => '?page=galeri',
-            'kontak'  => '?page=kontak',
-            'ppdb'    => '?page=ppdb',
-        ];
-        return base_url($map[$key] ?? $key);
-    }
-}
 
 $current = 'home';
 
 // ===== DATA =====
 $data = [
     'title' => 'SD Negeri Kedungsari 1',
-
-    'berita' => [
-        ['img' => 'assets/img/berita/berita-1.jpg', 'judul' => 'Lorong kelas'],
-        ['img' => 'assets/img/berita/berita-2.jpg', 'judul' => 'Halaman sekolah'],
-        ['img' => 'assets/img/berita/berita-3.jpg', 'judul' => 'Gedung sekolah'],
-    ],
 
     'kedisiplinan' => [
         ['img' => 'assets/img/kedisiplinan/upacara.jpg', 'nama' => 'Senin Disiplin',  'ket' => '(Upacara)'],
@@ -99,8 +43,38 @@ $data = [
 
     'youtubeId' => 'YOUTUBE_VIDEO_ID', // ganti dengan ID video sekolah
 ];
-extract($data);
+
+$visi = $data['visi'];
+$misi = $data['misi'];
+
+require_once __DIR__ . '/../../lib/api.php';
+
+// 3 kegiatan & prestasi terbaru (event status_tampil = 1; terbaru di atas). null = API tidak terjangkau
+$berita = sikesa_event(null, 1, 3);
+
+// Cuplikan program pembiasaan (null = API tidak terjangkau)
+$HARI    = ['senin' => 'Senin', 'selasa' => 'Selasa', 'rabu' => 'Rabu', 'kamis' => 'Kamis', 'jumat' => "Jum'at", 'sabtu' => 'Sabtu'];
+$program = sikesa_program();
+
+// Ekstrakurikuler (nama + deskripsi + ikon dari database) dan 3 foto galeri mandiri
+$ekstra = array_slice(sikesa_ekskul(require __DIR__ . '/../ekstrakurikuler/data.php'), 0, 6);
+$galeri = array_slice(sikesa_galeri(require __DIR__ . '/../galeri/data.php'), 0, 3);
+
+// Video profil: hanya tampil bila video_profil_url (pengaturan_sistem) berisi alamat YouTube yang valid
+$youtubeId = sikesa_youtube_id();
+
+// Kepala Sekolah: Guru berjabatan "Kepala Sekolah" di database
+$kepsek = sikesa_kepsek();
+
+layout_start([
+    'title'       => 'SD Negeri Kedungsari 1',
+    'current'     => 'home',
+    'description' => 'Website resmi SD Negeri Kedungsari 1 - Cerdas, Berkarakter, Berprestasi',
+    'css'         => 'home',
+    'js'          => 'home',
+]);
 ?>
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -297,15 +271,17 @@ $menuLain = [
         </ul>
     </nav>
 
+=======
+>>>>>>> 9625e4f5c440ecbe2fb8dc94838f6de0297bb2b3
 <main>
 
     <!-- ================= HERO ================= -->
-    <section class="hero" style="--bg:url('<?= base_url('assets/home.jpg') ?>')">
+    <section class="hero" style="--bg:url('<?= asset('img/home.jpg') ?>')">
         <div class="hero__content">
             <p class="hero__small">SELAMAT DATANG DI WEBSITE</p>
             <h1>SD NEGERI<br>KEDUNGSARI 1</h1>
             <p class="hero__tag">Cerdas &bull; Berkarakter &bull; Berprestasi</p>
-            <a href="<?= base_url('ppdb') ?>" class="btn-ppdb btn-ppdb--hero">Pendaftaran Siswa Baru</a>
+            <a href="<?= page_url('ppdb') ?>" class="btn-ppdb btn-ppdb--hero">Pendaftaran Siswa Baru</a>
         </div>
     </section>
 
@@ -315,7 +291,7 @@ $menuLain = [
 
         <div class="sambutan">
             <div class="sambutan__photo">
-                <img src="<?= base_url('assets/profil.jpg') ?>" alt="Lestari, S.Pd., M.Pd.">
+                <img src="<?= $kepsek ? esc(sikesa_img($kepsek['foto'])) : asset('img/guru-default.svg') ?>" alt="<?= $kepsek ? esc($kepsek['nama']) : 'Kepala Sekolah' ?>">
             </div>
 
             <div class="sambutan__card">
@@ -324,63 +300,106 @@ $menuLain = [
                 <p>Melalui kerja sama erat bersama para orang tua, kami berkomitmen memberikan generasi yang berakhlak mulia, berwawasan luas, serta siap menyongsong masa depan dengan percaya diri.</p>
 
                 <div class="sambutan__name">
-                    <strong>Lestari, S.Pd., M.Pd.</strong>
-                    <small>Kepala Sekolah SDN Kedungsari 1</small>
+                    <?php if ($kepsek): ?><strong><?= esc($kepsek['nama']) ?></strong><?php endif; ?>
+                    <small><?= esc(($kepsek['jabatan'] ?? '') ?: 'Kepala Sekolah') ?> SDN Kedungsari 1</small>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ================= ARTIKEL & BERITA ================= -->
+    <!-- ================= KEGIATAN & PRESTASI TERBARU ================= -->
     <section class="section section--tint" id="berita">
-        <h2 class="title">Artikel &amp; Berita</h2>
+        <h2 class="title">Kegiatan &amp; Prestasi Terbaru</h2>
         <p class="subtitle">Ikuti update terbaru seputar kegiatan dan informasi sekolah</p>
 
-        <div class="carousel">
-            <?php foreach ($berita as $b): ?>
-                <figure class="carousel__slide">
-                    <img src="<?= base_url($b['img']) ?>" alt="<?= esc($b['judul']) ?>">
-                </figure>
-            <?php endforeach; ?>
-        </div>
+        <?php if ($berita === null): ui_gagal('Kegiatan', page_url('home') . '#berita');
+        elseif (!$berita['items']): ui_kosong('Belum ada kegiatan yang dipublikasikan.');
+        else: $n = count($berita['items']); ?>
+            <div class="carousel" id="carousel" aria-roledescription="carousel" aria-label="Kegiatan terbaru">
+                <?php foreach ($berita['items'] as $i => $b): ?>
+                    <figure class="carousel__slide<?= $n === 1 ? ' is-active' : '' ?>">
+                        <a href="<?= esc(page_url('berita', ['slug' => $b['slug']])) ?>" aria-label="<?= esc($b['judul']) ?>">
+                            <img src="<?= esc(sikesa_img($b['foto'])) ?>" alt="<?= esc($b['judul']) ?>"<?= $i > 0 ? ' loading="lazy"' : '' ?>>
+                        </a>
+                        <figcaption><?= esc(mb_strimwidth($b['judul'], 0, 70, '…', 'UTF-8')) ?></figcaption>
+                    </figure>
+                <?php endforeach; ?>
+            </div>
 
-        <div class="carousel__dots">
-            <?php foreach ($berita as $i => $b): ?>
-                <button type="button" aria-label="Berita ke-<?= $i + 1 ?>"></button>
-            <?php endforeach; ?>
-        </div>
+            <?php if ($n > 1): ?>
+            <div class="carousel__dots">
+                <?php for ($i = 0; $i < $n; $i++): ?><button type="button" aria-label="Kegiatan ke-<?= $i + 1 ?>"></button><?php endfor; ?>
+            </div>
+            <?php endif; ?>
 
-        <div class="carousel__nav">
-            <button type="button" id="prevBtn" class="pill">Sebelumnya</button>
-            <a href="<?= base_url('berita') ?>" class="pill pill--solid">Lihat Semua Berita</a>
-            <button type="button" id="nextBtn" class="pill">Selanjutnya</button>
-        </div>
+            <div class="carousel__nav">
+                <?php if ($n > 1): ?><button type="button" id="prevBtn" class="pill">Sebelumnya</button><?php endif; ?>
+                <a href="<?= esc(page_url('berita')) ?>" class="pill pill--solid">Lihat Semua Kegiatan</a>
+                <?php if ($n > 1): ?><button type="button" id="nextBtn" class="pill">Selanjutnya</button><?php endif; ?>
+            </div>
+        <?php endif; ?>
     </section>
 
-    <!-- ================= KEDISIPLINAN ================= -->
-    <section class="section section--leaf" id="kedisiplinan">
-        <h2 class="title">Kedisiplinan</h2>
-        <div class="grid3">
-            <?php foreach ($kedisiplinan as $item): ?>
-                <article class="item">
-                    <img src="<?= base_url($item['img']) ?>" alt="<?= esc($item['nama'] . ' ' . $item['ket']) ?>" loading="lazy">
-                    <h3><?= esc($item['nama']) ?><br><span><?= esc($item['ket']) ?></span></h3>
-                </article>
-            <?php endforeach; ?>
-        </div>
+    <!-- ================= PROGRAM PEMBIASAAN ================= -->
+    <section class="section section--leaf" id="program">
+        <h2 class="title">Program Pembiasaan</h2>
+        <?php if ($program === null): ?>
+            <p class="kosong">Program pembiasaan gagal dimuat. <a href="<?= page_url('home') ?>#program"><u>Coba lagi</u></a></p>
+        <?php elseif (!$program): ?>
+            <p class="kosong">Belum ada data program pembiasaan.</p>
+        <?php else: ?>
+            <div class="grid3">
+                <?php foreach ($program as $p): ?>
+                    <article class="item">
+                        <?php if (!empty($p['ikon'])): ?>
+                            <img src="<?= esc(sikesa_img($p['ikon'])) ?>" alt="<?= esc($p['nama_program']) ?>" loading="lazy">
+                        <?php else: ?>
+                            <div class="item__hari" aria-hidden="true"><?= esc($HARI[$p['hari']] ?? $p['hari']) ?></div>
+                        <?php endif; ?>
+                        <h3><?= esc($p['nama_program']) ?><?php if (!empty($p['deskripsi'])): ?><br><span><?= esc($p['deskripsi']) ?></span><?php endif; ?></h3>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+            <div class="carousel__nav" style="margin-top:30px"><a href="<?= page_url('program') ?>" class="pill pill--solid">Lihat Program Pembiasaan</a></div>
+        <?php endif; ?>
     </section>
 
     <!-- ================= EKSTRAKURIKULER ================= -->
     <section class="section section--tint" id="ekstra">
         <h2 class="title">Ekstrakurikuler</h2>
-        <div class="grid3">
-            <?php foreach ($ekstra as $item): ?>
-                <article class="item">
-                    <img src="<?= base_url($item['img']) ?>" alt="<?= esc($item['nama'] . ' ' . $item['ket']) ?>" loading="lazy">
-                    <h3><?= esc($item['nama']) ?><br><span><?= esc($item['ket']) ?></span></h3>
-                </article>
-            <?php endforeach; ?>
-        </div>
+        <?php if (!$ekstra): ?>
+            <p class="kosong">Belum ada data ekstrakurikuler.</p>
+        <?php else: ?>
+            <div class="grid3">
+                <?php foreach ($ekstra as $item): ?>
+                    <article class="item">
+                        <a href="<?= page_url('ekstra') ?>&amp;slug=<?= rawurlencode($item['slug']) ?>">
+                            <img src="<?= esc(sikesa_img($item['foto'] ?? '')) ?>" alt="Ekstrakurikuler <?= esc($item['nama']) ?>" loading="lazy">
+                            <h3>Ekstra<br><span><?= esc($item['nama']) ?></span></h3>
+                        </a>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+            <div class="carousel__nav" style="margin-top:30px"><a href="<?= page_url('ekstra') ?>" class="pill pill--solid">Lihat Semua Ekstrakurikuler</a></div>
+        <?php endif; ?>
+    </section>
+
+    <!-- ================= GALERI ================= -->
+    <section class="section section--leaf" id="galeri">
+        <h2 class="title">Galeri</h2>
+        <?php if (!$galeri): ?>
+            <p class="kosong">Belum ada foto yang dipublikasikan.</p>
+        <?php else: ?>
+            <div class="grid3">
+                <?php foreach ($galeri as $g): ?>
+                    <article class="item">
+                        <img src="<?= esc(sikesa_img($g['foto'])) ?>" alt="<?= esc($g['judul']) ?>" loading="lazy">
+                        <h3><?= esc($g['judul']) ?></h3>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+            <div class="carousel__nav" style="margin-top:30px"><a href="<?= page_url('galeri') ?>" class="pill pill--solid">Lihat Semua Foto</a></div>
+        <?php endif; ?>
     </section>
 
     <!-- ================= VISI & MISI ================= -->
@@ -404,7 +423,8 @@ $menuLain = [
         </div>
     </section>
 
-    <!-- ================= VIDEO PROFIL ================= -->
+    <!-- ================= VIDEO PROFIL (disembunyikan bila video_profil_url kosong) ================= -->
+    <?php if ($youtubeId): ?>
     <section class="section section--leaf" id="video">
         <p class="kicker">PROFIL SEKOLAH</p>
         <h2 class="title title--plain">Video Profil Sekolah</h2>
@@ -417,8 +437,10 @@ $menuLain = [
             </button>
         </div>
     </section>
+    <?php endif; ?>
 
 </main>
+<<<<<<< HEAD
 
 <footer class="footer">
     <div class="footer__inner">
@@ -539,3 +561,6 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+=======
+<?php layout_end(); ?>
+>>>>>>> 9625e4f5c440ecbe2fb8dc94838f6de0297bb2b3

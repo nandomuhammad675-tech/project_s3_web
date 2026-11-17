@@ -1,0 +1,36 @@
+/* SI-KESA PWA Admin | Akun */
+.ac-tabs { display: flex; gap: 24px; margin-bottom: 16px; border-bottom: 1px solid var(--line); }
+.ac-tab { padding: 10px 2px; margin-bottom: -1px; background: none; border: 0; border-bottom: 2px solid transparent; font: inherit; font-size: 13.5px; font-weight: 500; color: var(--ink-2); cursor: pointer; }
+.ac-tab:hover { color: var(--ink); }
+.ac-tab[aria-selected="true"] { color: var(--olive-800); font-weight: 600; border-bottom-color: var(--amber-500); }
+
+.table--akun td:first-child { font-weight: 500; }
+.table--akun th:last-child, .table--akun td:last-child { width: 120px; }
+.ac-nama { font-weight: 600; color: var(--ink); }
+.ac-self { display: block; margin-top: 2px; font-size: 11px; font-weight: 400; color: var(--olive-600); }
+.ac-self button { padding: 0; background: none; border: 0; font: inherit; color: inherit; text-decoration: underline; cursor: pointer; }
+.ac-none { color: var(--ink-3); }
+
+.pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.pill--admin { background: #e6ebd2; color: var(--olive-800); }
+.pill--guru  { background: #fdf1da; color: #9a5b0c; }
+.icon-act--ok { color: #12803c; }
+.icon-act--ok:hover { background: #effaf2; border-color: #bfe6cb; }
+
+.ac-role-fixed { display: flex; align-items: center; gap: 10px; }
+.ac-role-fixed .field__hint { margin: 0; }
+
+.ac-pw { max-width: 480px; padding: 24px; }
+.ac-pw h2 { font-size: 16px; font-weight: 600; }
+.ac-pw__lead { margin: 4px 0 18px; font-size: 12.5px; color: var(--ink-2); }
+.ac-pw__actions { display: flex; justify-content: flex-end; margin-top: 4px; }
+
+.btn:disabled { opacity: .6; cursor: not-allowed; }
+.field__hint { margin-top: 4px; font-size: 12px; color: var(--ink-3); }
+.field__error { margin-top: 4px; font-size: 12px; color: #a32d20; }
+.input.is-invalid { border-color: #d9534f; }
+
+@media (max-width: 640px) {
+  .ac-pw { padding: 18px; }
+  .ac-pw__actions .btn { width: 100%; }
+}

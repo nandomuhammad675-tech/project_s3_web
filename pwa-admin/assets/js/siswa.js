@@ -12,16 +12,16 @@
   /* Nama kolom dari/ke server. Ubah di sini bila kontrak API berbeda. */
   var KEYS = {
     id: ['id_siswa', 'id'],
-    nisn: ['nisn'],
+    nisn: ['nisn_resmi', 'nisn'],
     nama: ['nama_siswa', 'nama'],
     status: ['status', 'status_siswa'],
-    kelas: ['kelas_tahun_aktif', 'nama_kelas', 'kelas'],
+    kelas: ['kelas_aktif', 'kelas_tahun_aktif', 'nama_kelas', 'kelas'],
     kelasAkhir: ['kelas_terakhir'],
     tahunAkhir: ['tahun_ajaran_terakhir', 'tahun_terakhir'],
     wali: ['nama_wali', 'wali'],
     hp: ['no_hp_wali', 'hp_wali']
   };
-  var SEND = { nisn: 'nisn', nama: 'nama_siswa', status: 'status', wali: 'nama_wali', hp: 'no_hp_wali' };
+  var SEND = { nisn: 'nisn_resmi', nama: 'nama_siswa', status: 'status_siswa', wali: 'nama_wali', hp: 'no_hp_wali' };
   var LABEL = { baru: 'Baru', aktif: 'Aktif', lulus: 'Lulus', pindah: 'Pindah' };
   var PER_PAGE = 10;
   var PENEMPATAN_URL = (CFG.base || '') + '/riwayat-kelas';
@@ -273,10 +273,12 @@
     else openDelete(item);
   });
 
-  /* Impor dari Excel: dokumen 01 belum mendefinisikan endpoint impor. */
+  /* Impor dari Excel: dialog + pembacaan berkas ada di siswa-impor.js */
   $('btn-impor').addEventListener('click', function () {
-    toast('Impor dari Excel belum tersedia. Tambahkan siswa satu per satu dulu.');
+    if (window.SikesaImporSiswa) window.SikesaImporSiswa.buka();
+    else toast('Modul impor belum termuat. Muat ulang halaman.', 'error');
   });
+  document.addEventListener('sikesa:siswa-diimpor', function () { load(true); });
 
   /* ---------- formulir tambah / ubah ---------- */
   var dlg = $('dlg-siswa'), form = $('form-siswa');

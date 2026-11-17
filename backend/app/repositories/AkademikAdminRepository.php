@@ -28,7 +28,7 @@ final class AkademikAdminRepository
             'alias' => 'n',
             'tanggal' => null,
             'select' => 'SELECT n.id_nilai, n.id_siswa, s.nisn_resmi AS nisn, s.nama_siswa, n.id_kelas, k.nama_kelas,
-                    n.id_mapel, m.nama_mapel, n.semester, n.jenis_penilaian AS jenis, n.nomor_uh, n.nilai_angka AS nilai, g.nama_guru',
+                    n.id_mapel, m.kode_mapel, m.nama_mapel, n.semester, n.jenis_penilaian AS jenis, n.nomor_uh, n.nilai_angka AS nilai, g.nama_guru',
             'from' => ' FROM data_nilai n
                     JOIN data_siswa s ON s.id_siswa = n.id_siswa
                     JOIN kelas k ON k.id_kelas = n.id_kelas
@@ -71,6 +71,12 @@ final class AkademikAdminRepository
         $st->bindValue($i, $offset, PDO::PARAM_INT);
         $st->execute();
         return array_map(fn(array $r): array => $this->rapikan($r), $st->fetchAll());
+    }
+
+    /** Semua baris sesuai filter (tanpa halaman) untuk ekspor Excel; dibatasi 50.000 baris. */
+    public function semua(string $jenis, array $f): array
+    {
+        return $this->daftar($jenis, $f, 50000, 0);
     }
 
     public function total(string $jenis, array $f): int

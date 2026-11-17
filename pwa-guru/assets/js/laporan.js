@@ -17,14 +17,14 @@
   function preview(p) {
     var e = periksa(p);
     if (e) return Promise.reject(e);
-    return api.get('/api/guru/laporan', { semester: p.semester, tahun_ajaran: p.tahunAjaran });
+    return api.get('/api/guru/laporan', { semester: p.semester, tahun_ajaran: p.tahunAjaran, siswa: p.idSiswa || undefined, mapel: p.idMapel || undefined });
   }
 
   /** Unduh XLSX => { blob, namaFile }. p: { semester, tahunAjaran, jenis?: 'absensi'|'nilai'|'semua' }. */
   function unduh(p) {
     var e = periksa(p);
     if (e) return Promise.reject(e);
-    return api.unduh('/api/guru/laporan/excel', { semester: p.semester, tahun_ajaran: p.tahunAjaran, jenis: p.jenis });
+    return api.unduh('/api/guru/laporan/excel', { semester: p.semester, tahun_ajaran: p.tahunAjaran, jenis: p.jenis, siswa: p.idSiswa || undefined, mapel: p.idMapel || undefined });
   }
 
   /** Unduh lalu langsung disimpan oleh browser. Mengembalikan nama berkas. */
