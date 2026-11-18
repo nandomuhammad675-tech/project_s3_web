@@ -97,15 +97,61 @@ form{text-align:left}
     background:var(--field);color:#222;font-size:.95rem;transition:border-color .15s,background .15s}
 .input input::placeholder{color:#8a8f84}
 .input input:focus{outline:none;border-color:var(--gold);background:#fff}
-.eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:38px;height:38px;border:0;border-radius:50%;
-    background:transparent;color:#5d6656;cursor:pointer;display:grid;place-items:center}
-.eye:hover{background:rgba(0,0,0,.07)}
-.eye svg{width:20px;height:20px}
+/* Ganti CSS .eye yang lama dengan ini */
+.eye {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 38px;
+    height: 38px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #5d6656;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: transform .22s cubic-bezier(.34, 1.56, .64, 1), background .2s, color .2s;
+}
+.eye:hover {
+    background: rgba(69, 90, 45, .1);
+    color: var(--green-dark);
+    transform: translateY(-50%) scale(1.12);
+}
+.eye:active {
+    transform: translateY(-50%) scale(.88);
+}
+.eye svg {
+    width: 20px;
+    height: 20px;
+    overflow: visible;
+}
+.eye .pupil {
+    transition: transform .25s cubic-bezier(.34, 1.56, .64, 1);
+    transform-origin: center;
+}
+.eye .slash {
+    stroke-dasharray: 24;
+    stroke-dashoffset: 0; /* Garis coret muncul saat password disembunyikan (aria-pressed="false") */
+    transition: stroke-dashoffset .28s ease;
+}
+
+/* Saat password ditampilkan (aria-pressed="true") */
+.eye[aria-pressed="true"] {
+    color: var(--green);
+}
+.eye[aria-pressed="true"] .slash {
+    stroke-dashoffset: 24; /* Garis coret menghilang secara mulus */
+}
+.eye[aria-pressed="true"] .pupil {
+    transform: scale(1.18); /* Pupil membesar sedikit saat "melihat" */
+}
 
 .alert{padding:10px 14px;margin-bottom:14px;border-radius:10px;background:var(--danger);color:#7a1717;font-size:.82rem;font-weight:600}
 
 .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:52px;margin-top:20px;border:0;border-radius:12px;
-    background:var(--gold);color:#2b2108;font-size:1rem;font-weight:700;cursor:pointer;transition:background .2s,transform .05s}
+    background:var(--gold);color:#ffffff;font-size:1rem;font-weight:700;cursor:pointer;transition:background .2s,transform .05s}
 .btn:hover{background:var(--gold-dark)}
 .btn:active{transform:scale(.99)}
 .btn[disabled]{opacity:.7;cursor:wait}
@@ -157,10 +203,10 @@ form{text-align:left}
             <div class="alert" id="alert" role="alert" hidden></div>
 
             <div class="field">
-                <label for="username">Username</label>
+                <label for="username">NIP/Username</label>
                 <div class="input">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 7-7h2a7 7 0 0 1 7 7v1"/></svg>
-                    <input type="text" id="username" name="username" required maxlength="50" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Masukkan username">
+                    <input type="text" id="username" name="username" required maxlength="50" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Masukkan NIP/Username">
                 </div>
             </div>
 
@@ -170,8 +216,12 @@ form{text-align:left}
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
                     <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="Masukkan kata sandi">
                     <button type="button" class="eye" id="eye" aria-label="Tampilkan kata sandi" aria-pressed="false">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
-                    </button>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/>
+        <circle class="pupil" cx="12" cy="12" r="3"/>
+        <line class="slash" x1="3" y1="3" x2="21" y2="21"/>
+    </svg>
+</button>
                 </div>
             </div>
 

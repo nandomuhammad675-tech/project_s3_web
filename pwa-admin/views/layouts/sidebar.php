@@ -28,12 +28,11 @@ $nav = [
             ['key' => 'program-pembiasaan', 'label' => 'Program Pembiasaan'],
             ['key' => 'pengaturan',         'label' => 'Pengaturan'],
         ]],
-        ['key' => 'akademik', 'label' => 'Data Akademik', 'icon' => 'eye', 'badge' => 'Hanya lihat', 'href' => 'akademik'],
+        ['key' => 'akademik', 'label' => 'Data Akademik', 'icon' => 'eye', 'href' => 'akademik'],
         ['key' => 'laporan', 'label' => 'Laporan Excel', 'icon' => 'file', 'href' => 'laporan'],
     ]],
     ['label' => 'Akun & Pengaturan', 'items' => [
         ['key' => 'akun',          'label' => 'Kelola Akun',         'icon' => 'user-cog', 'href' => 'akun'],
-        ['key' => 'ubah-password', 'label' => 'Ganti Password Saya', 'icon' => 'key',      'href' => 'ubah-password'],
         ['key' => '__logout',      'label' => 'Keluar',              'icon' => 'logout',   'action' => 'logout'],
     ]],
 ];
