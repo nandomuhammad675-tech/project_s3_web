@@ -624,20 +624,12 @@
     // Hanya dikirim bila tahun tujuan punya dua kelas tingkat 6.
     if (needMap6()) {
       payload.penempatan_tingkat_6 = S.kes.siswa5.map(function (s) {
-<<<<<<< HEAD
-        return { id_siswa: num(s.id), id_kelas: num(S.map6[s.id]) };
-=======
         return { id_siswa: num(s.id), id_kelas_tujuan: num(S.map6[s.id]) };
->>>>>>> 9625e4f5c440ecbe2fb8dc94838f6de0297bb2b3
       });
     }
     var baru = Object.keys(S.mapBaru).filter(function (k) { return S.mapBaru[k]; });
     if (baru.length) {
-<<<<<<< HEAD
-      payload.penempatan_siswa_baru = baru.map(function (k) { return { id_siswa: num(k), id_kelas: num(S.mapBaru[k]) }; });
-=======
       payload.penempatan_siswa_baru = baru.map(function (k) { return { id_siswa: num(k), id_kelas_tujuan: num(S.mapBaru[k]) }; });
->>>>>>> 9625e4f5c440ecbe2fb8dc94838f6de0297bb2b3
     }
     S.busy = true; S.problems = null; render();
     Api.post(EP.jalan, payload).then(function (res) {
@@ -661,11 +653,7 @@
   function activate() {
     if (S.busy) return;
     S.busy = true; S.actMsg = ''; render();
-<<<<<<< HEAD
-    Api.post(EP.aktifkan(S.target.id), {}).then(function () {
-=======
     Api.put(EP.aktifkan(S.target.id), {}).then(function () {
->>>>>>> 9625e4f5c440ecbe2fb8dc94838f6de0297bb2b3
       S.activated = true; toast('Tahun ajaran ' + S.target.nama + ' aktif');
     }).catch(function (err) {
       if (err && err.status === 401) return;
@@ -757,12 +745,8 @@
     var body = $('log-body'), st = $('log-state'), tbl = $('log-table'), btn = $('log-toggle');
     st.hidden = true; tbl.hidden = false;
     body.innerHTML = '<tr><td colspan="5"><span class="skeleton skeleton--row"></span></td></tr><tr><td colspan="5"><span class="skeleton skeleton--row"></span></td></tr>';
-<<<<<<< HEAD
-    Api.get(EP.log, { limit: all ? 100 : 5 }).then(function (res) {
-=======
     var idLog = S.target ? S.target.id : (S.aktif ? S.aktif.id : null);
     (idLog ? Api.get(EP.log, { tahun_ajaran_tujuan: idLog, per_page: all ? 100 : 5 }) : Promise.resolve({ data: [] })).then(function (res) {
->>>>>>> 9625e4f5c440ecbe2fb8dc94838f6de0297bb2b3
       if (seq !== logSeq) return;
       var rows = toList(res).map(normLog);
       if (!rows.length) {

@@ -5,17 +5,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= e($pageTitle) ?> | SI-KESA Admin</title>
-<<<<<<< HEAD
-  <meta name="theme-color" content="#455a1f">
-  <link rel="manifest" href="<?= e(url('manifest.json')) ?>">
-  <link rel="icon" href="<?= e(url('assets/icons/icon-192.png')) ?>">
-  <link rel="apple-touch-icon" href="<?= e(url('assets/icons/icon-192.png')) ?>">
-=======
   <meta name="theme-color" content="#455a2d">
   <link rel="manifest" href="<?= e(url('manifest.json')) ?>">
   <link rel="icon" type="image/png" href="<?= e(url('assets/img/logo_sekolah.png')) ?>">
 <link rel="apple-touch-icon" href="<?= e(url('assets/icons/icon-192.png')) ?>">
->>>>>>> 9625e4f5c440ecbe2fb8dc94838f6de0297bb2b3
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
