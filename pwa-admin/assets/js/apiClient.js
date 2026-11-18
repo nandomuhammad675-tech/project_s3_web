@@ -71,6 +71,13 @@
       });
     }
 
+    // Gambar berupa data URL pada body (banner, ikon, gambar mading) diunggah dulu; yang dikirim path-nya.
+    if ((method === 'POST' || method === 'PUT') && opts.body && typeof opts.body === 'object' && !opts._materialized) {
+      return materialize(path, opts.body).then(function (b) {
+        return request(method, path, Object.assign({}, opts, { body: b, _materialized: true }));
+      });
+    }
+
     var headers = { Accept: 'application/json' };
     var token = localStorage.getItem(TOKEN_KEY);
     if (token) headers.Authorization = 'Bearer ' + token;
