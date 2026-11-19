@@ -82,7 +82,7 @@ button,input{font:inherit}
 .tab{display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 10px;border:0;border-radius:10px;background:transparent;
     color:#fff;font-size:.9rem;font-weight:600;cursor:pointer;transition:background .2s,color .2s}
 .tab svg{width:18px;height:18px;flex:none}
-.tab[aria-selected="true"]{background:var(--gold);color:#2b2108;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.tab[aria-selected="true"]{background:var(--gold);color:#ffffff;box-shadow:0 2px 8px rgba(0,0,0,.2)}
 .tab:not([aria-selected="true"]):hover{background:rgba(255,255,255,.18)}
 
 h1{font-size:1.5rem;font-weight:700;line-height:1.2}
