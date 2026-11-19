@@ -60,3 +60,31 @@
 
 /* Carousel tetap bergerak walau sistem meminta animasi dikurangi (pergerakan lembut, bukan kedipan) */
 @media (prefers-reduced-motion:reduce){.carousel__slide{transition:opacity .6s ease,transform .6s ease,width .6s ease,height .6s ease!important}}
+
+/* ===== Hero: latar foto berganti otomatis + teks mengetik ===== */
+.hero--slides{background:#2f4a2b;overflow:hidden;align-items:center}
+/* bayangan gelap dari kiri agar teks terbaca, sisi kanan foto tetap jernih */
+.hero--slides::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(12,24,10,.82) 0%,rgba(12,24,10,.55) 40%,rgba(12,24,10,.15) 75%,rgba(12,24,10,.05) 100%),linear-gradient(180deg,rgba(35,58,32,.22),rgba(20,36,18,.5))}
+.hero__bg{position:absolute;inset:0;z-index:0}
+.hero__slide{position:absolute;inset:0;background:center/cover no-repeat;opacity:0;transform:scale(1.05);transition:opacity 1.4s ease,transform 8s ease-out}
+.hero__slide.is-active{opacity:1;transform:scale(1)}
+
+.hero--slides .hero__content{position:relative;z-index:2;width:100%;max-width:640px;padding:0 6vw;text-shadow:0 2px 14px rgba(0,0,0,.5)}
+.hero--slides .hero__small{display:flex;align-items:center;gap:10px;font-size:.8rem;letter-spacing:1.5px}
+.hero--slides .hero__small::before{content:"";flex:none;width:28px;height:3px;border-radius:2px;background:#f28c1a}
+.hero--slides h1{margin:10px 0 12px}
+.hero--slides .hero__tag{line-height:1.5;margin-bottom:22px}
+
+/* efek mengetik */
+.typing-caret{display:inline-block;width:0;height:1em;position:relative;vertical-align:-.12em}
+.typing-caret::after{content:"";position:absolute;left:3px;top:0;width:3px;height:100%;background:#f28c1a;animation:caretBlink 1s steps(1) infinite}
+@keyframes caretBlink{50%{opacity:0}}
+.hero__content.is-typing .btn-ppdb--hero{opacity:0;transform:translateY(10px);pointer-events:none;transition:opacity .6s ease,transform .6s ease}
+.hero__content.is-typing.is-done .btn-ppdb--hero{opacity:1;transform:none;pointer-events:auto}
+
+@media (max-width:700px){
+    .hero--slides{align-items:flex-end}
+    .hero--slides::before{background:linear-gradient(180deg,rgba(12,24,10,.1) 20%,rgba(12,24,10,.88))}
+    .hero--slides .hero__content{max-width:none;padding-bottom:12vh}
+}
+@media (prefers-reduced-motion:reduce){.hero__slide{transition:opacity .01s;transform:none}}

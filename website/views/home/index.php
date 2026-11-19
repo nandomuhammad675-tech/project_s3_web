@@ -66,22 +66,39 @@ $youtubeId = sikesa_youtube_id();
 // Kepala Sekolah: Guru berjabatan "Kepala Sekolah" di database
 $kepsek = sikesa_kepsek();
 
+// Gambar latar hero (berganti otomatis). Urutan sesuai daftar; ubah angkanya untuk ganti foto.
+$heroFiles = ['gambar/0.jpg', 'gambar/17.jpg'];
+$heroImgs  = array_values(array_filter($heroFiles, function ($f) {
+    return is_file(__DIR__ . '/../../public/assets/' . $f);
+}));
+if (!$heroImgs) { $heroImgs = ['img/home.jpg']; }
+
 layout_start([
     'title'       => 'SD Negeri Kedungsari 1',
     'current'     => 'home',
-    'description' => 'Website resmi SD Negeri Kedungsari 1 - Cerdas, Berkarakter, Berprestasi',
+    'description' => 'Website resmi SD Negeri Kedungsari 1 - Cerdas, Kreatif, Beriman, Berwawasan Lingkungan dan Inovatif.',
     'css'         => 'home',
     'js'          => 'home',
 ]);
 ?>
 <main>
 
-    <!-- ================= HERO ================= -->
-    <section class="hero" style="--bg:url('<?= asset('img/home.jpg') ?>')">
+    <!-- ================= HERO (latar foto berganti otomatis + teks mengetik berulang) ================= -->
+    <section class="hero hero--slides" id="heroSlides">
+        <div class="hero__bg" aria-hidden="true">
+            <?php foreach ($heroImgs as $i => $img): $u = esc(asset($img)); ?>
+                <?php if ($i === 0): ?>
+                <div class="hero__slide is-active" data-i="0" style="background-image:url('<?= $u ?>')"></div>
+                <?php else: ?>
+                <div class="hero__slide" data-i="<?= $i ?>" data-bg="<?= $u ?>"></div>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </div>
+
         <div class="hero__content">
-            <p class="hero__small">SELAMAT DATANG DI WEBSITE</p>
-            <h1>SD NEGERI<br>KEDUNGSARI 1</h1>
-            <p class="hero__tag">Cerdas &bull; Berkarakter &bull; Berprestasi</p>
+            <p class="hero__small" data-type data-speed="35">SELAMAT DATANG DI WEBSITE</p>
+            <h1><span data-type data-speed="70">SD NEGERI</span><br><span data-type data-speed="70">KEDUNGSARI 1</span></h1>
+            <p class="hero__tag" data-type data-speed="28">Cerdas &bull; Kreatif &bull; Beriman &bull; Berwawasan Lingkungan dan Inovatif</p>
             <a href="<?= page_url('ppdb') ?>" class="btn-ppdb btn-ppdb--hero">Pendaftaran Siswa Baru</a>
         </div>
     </section>
