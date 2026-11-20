@@ -23,6 +23,7 @@ layout_start([
 ]);
 ?>
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 <<<<<<< HEAD
 >>>>>>> 5b3ef9f59e4ee37668a6f19534664dce295acf35
@@ -198,6 +199,8 @@ $menuLain = [
 =======
 >>>>>>> 3751ae70d58b72e621282da65353f5c28af8561b
 >>>>>>> 5b3ef9f59e4ee37668a6f19534664dce295acf35
+=======
+>>>>>>> 5a2230407dda4e2620bd46122f0fe5764d3f4bfa
 <main>
     <?php ui_hero('Galeri', 'Merekam momen berharga dan dokumentasi kegiatan<br>SD NEGERI KEDUNGSARI 1'); ?>
 
@@ -223,6 +226,7 @@ $menuLain = [
         <?php endif; ?>
     </section>
 </main>
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 <<<<<<< HEAD
@@ -305,3 +309,6 @@ document.addEventListener('DOMContentLoaded', () => {
 <?php layout_end(); ?>
 >>>>>>> 3751ae70d58b72e621282da65353f5c28af8561b
 >>>>>>> 5b3ef9f59e4ee37668a6f19534664dce295acf35
+=======
+<?php layout_end(); ?>
+>>>>>>> 5a2230407dda4e2620bd46122f0fe5764d3f4bfa

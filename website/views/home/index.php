@@ -1,12 +1,19 @@
 <?php
 require_once __DIR__ . '/../../lib/bootstrap.php';
+require_once __DIR__ . '/../../lib/api.php';
+
 /**
  * Halaman Home - SD Negeri Kedungsari 1
+<<<<<<< HEAD
+=======
+ * Tes: taruh di website/public/home.php, buka http://localhost/project_s3_web/website/public/home.php
+ * Pakai sebagai halaman utama: salin seluruh isinya ke website/views/home/index.php
+>>>>>>> 5a2230407dda4e2620bd46122f0fe5764d3f4bfa
  */
 
 $current = 'home';
 
-// ===== DATA =====
+// ===== DATA FALLBACK & PROFIL =====
 $data = [
     'title' => 'SD Negeri Kedungsari 1',
 
@@ -43,8 +50,6 @@ $data = [
 
 $visi = $data['visi'];
 $misi = $data['misi'];
-
-require_once __DIR__ . '/../../lib/api.php';
 
 // 3 kegiatan & prestasi terbaru (event status_tampil = 1; terbaru di atas). null = API tidak terjangkau
 $berita = sikesa_event(null, 1, 3);
@@ -230,7 +235,7 @@ layout_start([
         <p class="subtitle">Mengenal lebih dekat SD Negeri Kedungsari 1 melalui video profil kami.</p>
 
         <div class="video" id="videoBox" data-yt="<?= esc($youtubeId) ?>"
-             style="--bg:url('<?= base_url('assets/img/video-thumb.jpg') ?>')">
+             style="--bg:url('https://img.youtube.com/vi/<?= esc($youtubeId) ?>/maxresdefault.jpg'),url('https://img.youtube.com/vi/<?= esc($youtubeId) ?>/hqdefault.jpg')">
             <button type="button" class="video__play" aria-label="Putar video">
                 <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
             </button>
