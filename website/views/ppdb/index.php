@@ -89,6 +89,7 @@ layout_start([
 ?>
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 =======
 >>>>>>> c0537a9e00559a0ef785f741664ec62ff3a44d17
@@ -343,6 +344,8 @@ $menuLain = [
 >>>>>>> 8d7d43c3183adc7a19a337326a880273da51868a
 =======
 >>>>>>> c0537a9e00559a0ef785f741664ec62ff3a44d17
+=======
+>>>>>>> 5b3ef9f59e4ee37668a6f19534664dce295acf35
 <main>
 
     <!-- ================= HERO ================= -->
@@ -508,6 +511,7 @@ $menuLain = [
 </main>
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 <?php layout_end(); ?>
 =======
 =======
@@ -575,3 +579,6 @@ document.addEventListener('DOMContentLoaded', () => {
 >>>>>>> 8d7d43c3183adc7a19a337326a880273da51868a
 =======
 >>>>>>> c0537a9e00559a0ef785f741664ec62ff3a44d17
+=======
+<?php layout_end(); ?>
+>>>>>>> 5b3ef9f59e4ee37668a6f19534664dce295acf35

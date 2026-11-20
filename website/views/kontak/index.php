@@ -23,6 +23,10 @@ layout_start([
 ]);
 ?>
 <<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 5b3ef9f59e4ee37668a6f19534664dce295acf35
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
 =======
@@ -191,7 +195,12 @@ $menuLain = [
 =======
 =======
 >>>>>>> 82200f0e38e90c8bbf80824aab51d892a727d18d
+<<<<<<< HEAD
 >>>>>>> c0537a9e00559a0ef785f741664ec62ff3a44d17
+=======
+=======
+>>>>>>> 3751ae70d58b72e621282da65353f5c28af8561b
+>>>>>>> 5b3ef9f59e4ee37668a6f19534664dce295acf35
 <main>
     <?php ui_hero('Hubungi Kami', 'Kami siap membantu informasi sekolah dan pendaftaran'); ?>
     <section class="section section--leaf" id="kontak">
@@ -229,6 +238,10 @@ $menuLain = [
         </div>
     </section>
 </main>
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 5b3ef9f59e4ee37668a6f19534664dce295acf35
 <<<<<<< HEAD
 <<<<<<< HEAD
 <?php layout_end(); ?>
@@ -299,4 +312,10 @@ document.addEventListener('DOMContentLoaded', () => {
 =======
 <?php layout_end(); ?>
 >>>>>>> 82200f0e38e90c8bbf80824aab51d892a727d18d
+<<<<<<< HEAD
 >>>>>>> c0537a9e00559a0ef785f741664ec62ff3a44d17
+=======
+=======
+<?php layout_end(); ?>
+>>>>>>> 3751ae70d58b72e621282da65353f5c28af8561b
+>>>>>>> 5b3ef9f59e4ee37668a6f19534664dce295acf35
