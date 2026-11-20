@@ -3,6 +3,7 @@
 $active_menu = 'jadwal';
 $page_title = 'Jadwal';
 $page_scripts = ['jadwal.js', 'page-jadwal.js'];
+$page_scripts = ['jadwal.js', 'page-jadwal.js?v=2'];
 
 // Panggil Layout Header & Sidebar
 require_once __DIR__ . '/../layouts/header.php';

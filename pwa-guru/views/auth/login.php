@@ -1,7 +1,7 @@
 <?php
 /**
- * SI-KESA PWA Guru | halaman login (desain yang sama dipakai PWA Admin).
- * Dibuka lewat index.php?hal=login. Alamat API/Admin diturunkan dari config.php.
+ * SI-KESA PWA Guru & Admin | Halaman Login Terpadu
+ * Dibuka lewat index.php?hal=login (atau index.php?hal=login&role=admin).
  */
 require_once __DIR__ . '/../../config.php';
 $sk      = sk_cfg();
@@ -20,15 +20,18 @@ $portal = [
 ];
 $config = [
     'apiBase'     => $apiBase,
-    'defaultRole' => 'guru',
-    'tujuan'      => ['guru' => sk_url('dashboard'), 'admin' => $sk['admin_url'] . 'dashboard'],
+    'defaultRole' => $role,
+    'tujuan'      => [
+        'guru'  => sk_url('dashboard'),
+        'admin' => $sk['admin_url'] . 'dashboard',
+    ],
     'portal'      => $portal,
     'keys'        => [
         'guru'  => ['token' => $sk['token_key'],       'user' => $sk['user_key']],
         'admin' => ['token' => $sk['admin_token_key'], 'user' => $sk['admin_user_key']],
     ],
 ];
-$ROLE_TITLE = 'Guru';
+$ROLE_TITLE = $role === 'admin' ? 'Admin' : 'Guru';
 $LOGO     = esc(aset($root, 'img/logo-sekolah.png'));
 $VIDEO    = esc(aset($root, 'vidio/VIDEO BG.mp4'));
 $MANIFEST = esc($root . 'manifest.json');
@@ -50,7 +53,7 @@ $SW       = esc($root . 'sw.js');
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* Halaman login SI-KESA: dipakai bersama oleh PWA Guru dan PWA Admin */
+/* Halaman login terpadu SI-KESA */
 :root{
     --green:#455a2d;--green-dark:#35471f;--gold:#eba048;--gold-dark:#d98c2e;
     --glass:rgba(41,56,26,.80);--line:rgba(255,255,255,.22);--field:#f4f3ee;--danger:#ffe3e0;
@@ -97,7 +100,7 @@ form{text-align:left}
     background:var(--field);color:#222;font-size:.95rem;transition:border-color .15s,background .15s}
 .input input::placeholder{color:#8a8f84}
 .input input:focus{outline:none;border-color:var(--gold);background:#fff}
-/* Ganti CSS .eye yang lama dengan ini */
+
 .eye {
     position: absolute;
     right: 6px;
@@ -133,20 +136,19 @@ form{text-align:left}
 }
 .eye .slash {
     stroke-dasharray: 24;
-    stroke-dashoffset: 0; /* Garis coret muncul saat password disembunyikan (aria-pressed="false") */
+    stroke-dashoffset: 0;
     transition: stroke-dashoffset .28s ease;
 }
-
-/* Saat password ditampilkan (aria-pressed="true") */
 .eye[aria-pressed="true"] {
     color: var(--green);
 }
 .eye[aria-pressed="true"] .slash {
-    stroke-dashoffset: 24; /* Garis coret menghilang secara mulus */
+    stroke-dashoffset: 24;
 }
 .eye[aria-pressed="true"] .pupil {
-    transform: scale(1.18); /* Pupil membesar sedikit saat "melihat" */
+    transform: scale(1.18);
 }
+input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:none}
 
 .alert{padding:10px 14px;margin-bottom:14px;border-radius:10px;background:var(--danger);color:#7a1717;font-size:.82rem;font-weight:600}
 
@@ -216,19 +218,19 @@ form{text-align:left}
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
                     <input type="password" id="password" name="password" required autocomplete="current-password" placeholder="Masukkan kata sandi">
                     <button type="button" class="eye" id="eye" aria-label="Tampilkan kata sandi" aria-pressed="false">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/>
-        <circle class="pupil" cx="12" cy="12" r="3"/>
-        <line class="slash" x1="3" y1="3" x2="21" y2="21"/>
-    </svg>
-</button>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/>
+                            <circle class="pupil" cx="12" cy="12" r="3"/>
+                            <line class="slash" x1="3" y1="3" x2="21" y2="21"/>
+                        </svg>
+                    </button>
                 </div>
             </div>
 
             <button type="submit" class="btn" id="btnMasuk"><span id="btnTeks">Masuk</span></button>
         </form>
 
-        <button type="button" class="install" data-pwa-install hidden>
+        <button type="button" class="install" id="btnInstallApp">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M5 21h14"/></svg>
             Pasang Aplikasi
         </button>
@@ -238,12 +240,6 @@ form{text-align:left}
 
 <script>window.SIKESA_LOGIN = <?= json_encode($config, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?>;</script>
 <script>
-/**
- * Login SI-KESA (dipakai PWA Guru dan PWA Admin). POST {apiBase}/auth/login {username, password}.
- * Token disimpan di localStorage dengan kunci sesuai peran. Logout hanya menghapus token di klien (berlaku 8 jam).
- * Kredensial TIDAK disimpan oleh aplikasi: penyimpanan dan pengisian otomatis diserahkan ke pengelola
- * kata sandi browser (atribut autocomplete + Credential Management API), seperti PWA pada umumnya.
- */
 (function () {
     'use strict';
     const CFG = window.SIKESA_LOGIN || {};
@@ -274,9 +270,9 @@ form{text-align:left}
         if (pesan) { tampilError(pesan); sessionStorage.removeItem('sikesa_login_msg'); adaPesan = true; }
     } catch (e) { /* abaikan */ }
 
-    /* Sudah login (peran aplikasi ini) dan token masih berlaku? langsung ke tujuan */
+    /* Sudah login sesuai peran tab aktif dan token masih berlaku? langsung ke tujuan */
     try {
-        const r = CFG.defaultRole;
+        const r = role;
         const t = localStorage.getItem(KEYS[r].token);
         const u = JSON.parse(localStorage.getItem(KEYS[r].user) || 'null');
         if (t && u && u.role === r && tokenMasihBerlaku(t) && !adaPesan && !CFG.demo) {
@@ -293,6 +289,7 @@ form{text-align:left}
         tabs.forEach((t) => t.setAttribute('aria-selected', t.dataset.role === r ? 'true' : 'false'));
         $('judul').textContent = p.judul;
         $('sub').textContent = p.sub;
+        document.title = 'Masuk | SI-KESA ' + (r === 'admin' ? 'Admin' : 'Guru');
         tampilError('');
     }
     tabs.forEach((t) => t.addEventListener('click', () => setRole(t.dataset.role)));
@@ -305,7 +302,7 @@ form{text-align:left}
         eye.setAttribute('aria-label', tampil ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi');
     });
 
-    /* Isi otomatis dari pengelola kata sandi browser (bila tersedia dan pengguna mengizinkan) */
+    /* Isi otomatis dari pengelola kata sandi browser */
     if (window.PasswordCredential && navigator.credentials && navigator.credentials.get) {
         navigator.credentials.get({ password: true, mediation: 'optional' }).then((c) => {
             if (c && c.type === 'password' && !$('username').value) { $('username').value = c.id; pw.value = c.password || ''; }
@@ -362,6 +359,25 @@ form{text-align:left}
         }
         sibuk(false);
     });
+
+    /* Tombol Pasang Aplikasi (PWA Install) */
+    let deferredPrompt = null;
+    const btnInstall = $('btnInstallApp');
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+    });
+    if (btnInstall) {
+        btnInstall.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                await deferredPrompt.userChoice;
+                deferredPrompt = null;
+            } else {
+                alert('Aplikasi sudah terpasang atau klik ikon Install di bilah alamat browser (kanan atas) untuk memasang SI-KESA.');
+            }
+        });
+    }
 
     const v = document.querySelector('.bg video');
     if (v) { v.muted = true; const p = v.play(); if (p && p.catch) p.catch(() => {}); }

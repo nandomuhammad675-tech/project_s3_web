@@ -20,16 +20,20 @@
     var per = J.perHari(st.items);
     grid.innerHTML = J.HARI.map(function (h) {
       var list = per[h];
-      var isi = list.length ? '<div class="divide-y divide-gray-50">' + list.map(function (j) {
-        return '<div class="flex items-center gap-4 px-5 py-3">' +
-          '<div class="flex flex-col text-xs font-bold text-[#455a2d] w-12 shrink-0"><span>' + U.esc(j.jam_mulai.slice(0, 5)) + '</span><span class="text-gray-400">' + U.esc(j.jam_selesai.slice(0, 5)) + '</span></div>' +
-          '<div class="flex-1 min-w-0"><h4 class="font-bold text-gray-800 text-sm truncate">' + U.esc(j.nama_mapel) + '</h4>' +
-          (j.keterangan ? '<p class="text-xs text-gray-500 truncate">' + U.esc(j.keterangan) + '</p>' : '') + '</div>' +
-          '<div class="flex gap-1 shrink-0">' +
-          '<button type="button" data-ubah="' + j.id_jadwal + '" class="w-8 h-8 rounded-lg hover:bg-gray-100 text-gray-500 flex items-center justify-center" title="Ubah"><i class="ph ph-pencil-simple text-lg"></i></button>' +
-          '<button type="button" data-hapus="' + j.id_jadwal + '" class="w-8 h-8 rounded-lg hover:bg-red-50 text-red-500 flex items-center justify-center" title="Hapus"><i class="ph ph-trash text-lg"></i></button>' +
-          '</div></div>';
-      }).join('') + '</div>'
+      var isi = list.length
+        ? '<div class="divide-y divide-gray-50">' + list.map(function (j) {
+            return '<div class="flex items-center gap-4 px-5 py-3">' +
+              '<div class="flex flex-col text-xs font-bold text-[#455a2d] w-12 shrink-0"><span>' + U.esc(j.jam_mulai.slice(0, 5)) + '</span><span class="text-gray-400">' + U.esc(j.jam_selesai.slice(0, 5)) + '</span></div>' +
+              '<div class="flex-1 min-w-0"><h4 class="font-bold text-gray-800 text-sm truncate">' + U.esc(j.nama_mapel) + '</h4>' +
+              (j.keterangan ? '<p class="text-xs text-gray-500 truncate">' + U.esc(j.keterangan) + '</p>' : '') + '</div>' +
+              '<div class="flex gap-1 shrink-0">' +
+              '<button type="button" data-ubah="' + j.id_jadwal + '" class="w-8 h-8 rounded-lg hover:bg-gray-100 text-gray-500 flex items-center justify-center" title="Ubah"><i class="ph ph-pencil-simple text-lg"></i></button>' +
+              '<button type="button" data-hapus="' + j.id_jadwal + '" class="w-8 h-8 rounded-lg hover:bg-red-50 text-red-500 flex items-center justify-center" title="Hapus"><i class="ph ph-trash text-lg"></i></button>' +
+              '</div></div>';
+          }).join('') +
+          '<div class="px-5 py-2.5 bg-gray-50/40 flex justify-end">' +
+            '<button type="button" data-tambah="' + h + '" class="text-xs text-[#eba048] font-bold hover:underline flex items-center gap-1"><i class="ph ph-plus"></i> Tambah mata pelajaran</button>' +
+          '</div></div>'
         : '<div class="px-5 py-4 flex items-center justify-between text-sm text-gray-400"><span class="flex items-center gap-2"><i class="ph ph-calendar-x text-lg"></i> Belum ada jadwal</span>' +
           '<button type="button" data-tambah="' + h + '" class="text-[#eba048] font-bold hover:underline flex items-center gap-1"><i class="ph ph-plus"></i> Tambah</button></div>';
       return '<div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">' +
@@ -63,10 +67,16 @@
     $('jdSemester').value = item ? item.semester : st.semester;
     $('jdHari').value = item ? item.hari : (hariAwal || 'senin');
     $('jdBaris').innerHTML = '';
-    if (item) { tambahBaris({ id_mapel: item.id_mapel, mulai: item.jam_mulai.slice(0, 5), selesai: item.jam_selesai.slice(0, 5), ket: item.keterangan || '' }); }
-    else { tambahBaris(); }
-    $('jdTambahBaris').hidden = !!item;
-    $('jdHint').hidden = !!item;
+    if (item) {
+      tambahBaris({ id_mapel: item.id_mapel, mulai: item.jam_mulai.slice(0, 5), selesai: item.jam_selesai.slice(0, 5), ket: item.keterangan || '' });
+    } else {
+      var per = J.perHari(st.items);
+      var listHari = per[$('jdHari').value] || [];
+      var jamTerakhir = listHari.length ? listHari[listHari.length - 1].jam_selesai.slice(0, 5) : '07:00';
+      tambahBaris({ id_mapel: null, mulai: jamTerakhir, selesai: ke(dariJam(jamTerakhir) + 35), ket: '' });
+    }
+    $('jdTambahBaris').hidden = false;
+    $('jdHint').hidden = false;
     $('jdSemester').disabled = !!item;
     galat(null); alertForm('');
     var m = $('modalJadwal'), o = $('modalOverlay'), c = $('modalContent');
@@ -90,8 +100,8 @@
   function tambahBaris(nilai) {
     var wadah = $('jdBaris');
     var terakhir = wadah.lastElementChild;
-    var mulai = nilai ? nilai.mulai : (terakhir ? terakhir.querySelector('[data-f=selesai]').value : '07:00');
-    var selesai = nilai ? nilai.selesai : ke(dariJam(mulai) + 35);
+    var mulai = (nilai && nilai.mulai) ? nilai.mulai : (terakhir ? terakhir.querySelector('[data-f=selesai]').value : '07:00');
+    var selesai = (nilai && nilai.selesai) ? nilai.selesai : ke(dariJam(mulai) + 35);
     var opsi = st.mapel.map(function (m) { return '<option value="' + m.id_mapel + '"' + (nilai && nilai.id_mapel === m.id_mapel ? ' selected' : '') + '>' + U.esc(m.nama_mapel) + '</option>'; }).join('');
     var d = document.createElement('div');
     d.className = 'border border-gray-200 rounded-xl p-3 bg-gray-50/60';
@@ -150,7 +160,8 @@
     baris.forEach(function (b, idx) {
       rantai = rantai.then(function () {
         var data = { semester: semester, hari: hari, id_mapel: b.id_mapel, jam_mulai: b.jam_mulai, jam_selesai: b.jam_selesai, keterangan: b.keterangan };
-        return (edit ? J.ubah(edit.id_jadwal, data) : J.buat(data)).then(function () { ok++; }, function (err) {
+        var aksi = (edit && idx === 0) ? J.ubah(edit.id_jadwal, data) : J.buat(data);
+        return aksi.then(function () { ok++; }, function (err) {
           if (err && err.status === 401) throw err;
           gagal.push('Baris ' + (idx + 1) + ': ' + U.pesanGalat(err));
         });
@@ -158,7 +169,7 @@
     });
     rantai.then(function () {
       if (gagal.length) { alertForm((ok ? ok + ' tersimpan. ' : '') + gagal.join(' ')); }
-      else { U.toast(edit ? 'Jadwal diperbarui.' : ok + ' jadwal ditambahkan.'); tutup(); }
+      else { U.toast(edit ? (ok > 1 ? 'Jadwal diperbarui & ' + (ok - 1) + ' jadwal ditambahkan.' : 'Jadwal diperbarui.') : ok + ' jadwal ditambahkan.'); tutup(); }
       st.semester = semester;
       return muat();
     }, function (err) { alertForm(U.pesanGalat(err)); }).then(function () { btn.disabled = false; });
