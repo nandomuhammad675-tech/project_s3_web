@@ -76,15 +76,13 @@ layout_start([
 
 <main>
 
-    <!-- ================= HERO ================= -->
-    <section class="hero" style="--bg:url('<?= asset('img/home.jpg') ?>')">
-        <div class="hero__content">
-            <p class="hero__small">SELAMAT DATANG DI WEBSITE</p>
-            <h1>SD NEGERI<br>KEDUNGSARI 1</h1>
-            <p class="hero__tag">Cerdas &bull; Berkarakter &bull; Berprestasi</p>
-            <a href="<?= page_url('ppdb') ?>" class="btn-ppdb btn-ppdb--hero">Pendaftaran Siswa Baru</a>
-        </div>
-    </section>
+    <!-- ================= HERO (foto berganti otomatis + teks mengetik berulang) ================= -->
+    <?php ui_hero_slides(
+        'SELAMAT DATANG DI WEBSITE',
+        ['SD NEGERI', 'KEDUNGSARI 1'],
+        'Cerdas • Kreatif • Beriman • Berwawasan Lingkungan dan Inovatif',
+        ['Pendaftaran Siswa Baru', page_url('ppdb')]
+    ); ?>
 
     <!-- ================= SAMBUTAN KEPALA SEKOLAH ================= -->
     <section class="section section--leaf" id="sambutan">

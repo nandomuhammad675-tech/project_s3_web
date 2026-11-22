@@ -2,7 +2,7 @@
 /**
  * lib/bootstrap.php - fungsi bantu BERSAMA untuk semua halaman website publik.
  * Dipanggil satu kali oleh public/index.php (router) sebelum halaman apa pun dimuat.
- * Memuat: base_url(), asset(), esc(), page_url(), tanggal_id(), layout_start()/layout_end(), site_info(), ui_hero()/ui_gagal()/ui_kosong()/ui_pager().
+ * Memuat: base_url(), asset(), esc(), page_url(), tanggal_id(), layout_start()/layout_end(), site_info(), ui_hero()/ui_hero_slides()/ui_gagal()/ui_kosong()/ui_pager().
  */
 if (defined('SIKESA_BOOTSTRAP_LOADED')) { return; }
 define('SIKESA_BOOTSTRAP_LOADED', true);
@@ -146,4 +146,36 @@ function ui_hero(string $judul, string $sub = '', ?string $bg = null): void
     $bg = $bg ?: asset('img/home.jpg');
     echo '<section class="hero page-hero" style="--bg:url(\'' . esc($bg) . '\')"><div class="page-hero__content"><h1>' . esc($judul) . '</h1>'
        . ($sub !== '' ? '<p>' . $sub . '</p>' : '') . '</div></section>';
+}
+
+/**
+ * Hero berlatar foto yang berganti otomatis + teks mengetik berulang (dipakai Beranda dan Profil).
+ * $kecil: teks kecil di atas judul. $judul: satu atau beberapa baris judul (h1). $tag: kalimat di bawah judul.
+ * $tombol: ['Teks tombol', 'alamat'] (boleh kosong). $foto: daftar file di public/assets/ (yang tidak ada dilewati; kosong -> img/home.jpg).
+ * Butuh css 'home' dan js 'home' pada layout_start() (gaya dan animasinya ada di home.css dan home.js).
+ */
+function ui_hero_slides(string $kecil, array $judul, string $tag = '', array $tombol = [], array $foto = ['gambar/23.jpg', 'gambar/17.jpg']): void
+{
+    $imgs = array_values(array_filter($foto, function ($f) {
+        return is_file(__DIR__ . '/../public/assets/' . $f);
+    }));
+    if (!$imgs) { $imgs = ['img/home.jpg']; }
+
+    echo '<section class="hero hero--slides" id="heroSlides"><div class="hero__bg" aria-hidden="true">';
+    foreach ($imgs as $i => $img) {
+        $u = esc(asset($img));
+        echo $i === 0
+            ? '<div class="hero__slide is-active" data-i="0" style="background-image:url(\'' . $u . '\')"></div>'
+            : '<div class="hero__slide" data-i="' . $i . '" data-bg="' . $u . '"></div>';
+    }
+    echo '</div><div class="hero__content">';
+    if ($kecil !== '') { echo '<p class="hero__small" data-type data-speed="35">' . esc($kecil) . '</p>'; }
+    echo '<h1>';
+    foreach ($judul as $n => $baris) {
+        echo ($n ? '<br>' : '') . '<span data-type data-speed="70">' . esc($baris) . '</span>';
+    }
+    echo '</h1>';
+    if ($tag !== '') { echo '<p class="hero__tag" data-type data-speed="28">' . esc($tag) . '</p>'; }
+    if (count($tombol) === 2) { echo '<a href="' . esc($tombol[1]) . '" class="btn-ppdb btn-ppdb--hero">' . esc($tombol[0]) . '</a>'; }
+    echo '</div></section>';
 }

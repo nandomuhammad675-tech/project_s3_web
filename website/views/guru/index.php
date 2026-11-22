@@ -1,8 +1,8 @@
 <?php
 require_once __DIR__ . '/../../lib/bootstrap.php';
 /**
-- Halaman Profil (Sejarah, Sambutan, Visi & Misi, Guru) - SD Negeri Kedungsari 1
-- SATU FILE. Letakkan di: website/views/guru/index.php
+ * Halaman Profil (Sejarah, Sambutan, Visi & Misi, Guru) - SD Negeri Kedungsari 1
+ * SATU FILE. Letakkan di: website/views/guru/index.php
  */
 
 $current = 'profil';
@@ -41,19 +41,14 @@ layout_start([
     'title'       => $title ?? 'SD Negeri Kedungsari 1',
     'current'     => 'profil',
     'description' => 'Website resmi SD Negeri Kedungsari 1 - Cerdas, Berkarakter, Berprestasi',
-    'css'         => 'guru',
+    'css'         => ['home', 'guru'],
     'js'          => 'home',
 ]);
 ?>
 <main>
 
-    <!-- ================= HERO ================= -->
-    <section class="hero page-hero" style="--bg:url('<?= asset('img/home.jpg') ?>')">
-        <div class="page-hero__content">
-            <h1>PROFIL</h1>
-            <p>Mengenal lebih dekat<br>SD NEGERI KEDUNGSARI 1</p>
-        </div>
-    </section>
+    <!-- ================= HERO (foto berganti otomatis + teks mengetik berulang) ================= -->
+    <?php ui_hero_slides('MENGENAL LEBIH DEKAT', ['PROFIL'], 'SD Negeri Kedungsari 1'); ?>
 
     <!-- ================= SEJARAH ================= -->
     <section class="section section--leaf" id="sejarah">
