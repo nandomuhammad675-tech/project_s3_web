@@ -145,3 +145,44 @@ a.kartu:hover,.kartu--hover:hover{transform:translateY(-4px);box-shadow:0 10px 0
 .sosmed svg{width:26px;height:26px;flex:none}
 .sosmed .sosmed__ig{color:#c13584}
 .sosmed .sosmed__fb{color:#1877f2}
+
+
+/* ===== Hero berlatar foto berganti otomatis + teks mengetik berulang (Beranda dan semua halaman) ===== */
+.hero--slides{background:#2f4a2b;overflow:hidden}
+/* bayangan gelap dari kiri agar teks terbaca, sisi kanan foto tetap jernih */
+.hero--slides::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(12,24,10,.82) 0%,rgba(12,24,10,.55) 40%,rgba(12,24,10,.15) 75%,rgba(12,24,10,.05) 100%),linear-gradient(180deg,rgba(35,58,32,.22),rgba(20,36,18,.5))}
+.hero__bg{position:absolute;inset:0;z-index:0}
+.hero__slide{position:absolute;inset:0;background:center/cover no-repeat;opacity:0;transform:scale(1.05);transition:opacity 1.4s ease,transform 8s ease-out}
+.hero__slide.is-active{opacity:1;transform:scale(1)}
+
+.hero--slides .hero__content{position:relative;z-index:2;width:100%;max-width:640px;padding:0 6vw;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.5)}
+.hero--slides .hero__small{display:flex;align-items:center;gap:10px;font-size:.8rem;font-weight:600;letter-spacing:1.5px}
+.hero--slides .hero__small::before{content:"";flex:none;width:28px;height:3px;border-radius:2px;background:#f28c1a}
+.hero--slides h1{font-size:clamp(2.2rem,5vw,3.4rem);line-height:1.1;font-weight:700;margin:10px 0 12px}
+.hero--slides .hero__tag{font-size:1.05rem;line-height:1.5;margin-bottom:22px}
+.hero--slides .btn-ppdb--hero{padding:9px 22px!important;font-size:.9rem}
+
+/* halaman dalam: teks rata tengah dan lebih besar */
+.hero--slides.hero--center{justify-content:center;text-align:center}
+.hero--slides.hero--center::before{background:radial-gradient(ellipse 75% 55% at 50% 50%,rgba(12,24,10,.82) 0%,rgba(12,24,10,.62) 55%,rgba(12,24,10,.28) 100%),linear-gradient(180deg,rgba(35,58,32,.2),rgba(20,36,18,.4))}
+.hero--slides.hero--center .hero__content{max-width:980px;padding:0 6vw;text-shadow:0 2px 18px rgba(0,0,0,.7)}
+.hero--slides.hero--center h1{font-size:clamp(2.2rem,5vw,3.4rem);text-transform:uppercase;margin:0 0 8px}
+.hero--slides.hero--center .hero__tag{font-size:1.05rem;margin:6px 0 0}
+
+/* efek mengetik */
+.typing-caret{display:inline-block;width:0;height:1em;position:relative;vertical-align:-.12em}
+.typing-caret::after{content:"";position:absolute;left:3px;top:0;width:3px;height:100%;background:#f28c1a;animation:caretBlink 1s steps(1) infinite}
+@keyframes caretBlink{50%{opacity:0}}
+.hero__content.is-typing .btn-ppdb--hero{opacity:0;transform:translateY(10px);pointer-events:none;transition:opacity .6s ease,transform .6s ease}
+.hero__content.is-typing.is-done .btn-ppdb--hero{opacity:1;transform:none;pointer-events:auto}
+
+@media (max-width:700px){
+    .hero--slides{align-items:flex-end}
+    .hero--slides::before{background:linear-gradient(180deg,rgba(12,24,10,.1) 20%,rgba(12,24,10,.88))}
+    .hero--slides .hero__content{max-width:none;padding-bottom:12vh}
+    .hero--slides.hero--center{align-items:center}
+    .hero--slides.hero--center::before{background:linear-gradient(180deg,rgba(12,24,10,.58),rgba(12,24,10,.8))}
+    .hero--slides.hero--center .hero__content{padding-bottom:0}
+    .hero--slides.hero--center h1{overflow-wrap:anywhere}
+}
+@media (prefers-reduced-motion:reduce){.hero__slide{transition:opacity .01s;transform:none}}

@@ -140,28 +140,44 @@ function ui_pager(int $hal, int $total, callable $url, string $label, string $an
        . '</div></nav>';
 }
 
-/** Hero halaman dalam (judul + subjudul), ukuran sama dengan Program/Profil. $bg = alamat gambar latar; bawaan: foto sekolah. */
-function ui_hero(string $judul, string $sub = '', ?string $bg = null): void
+/** Foto latar hero bawaan (jalur relatif terhadap public/assets/). Ubah daftar ini untuk mengganti foto hero di SEMUA halaman. */
+function hero_foto_bawaan(): array
 {
-    $bg = $bg ?: asset('img/home.jpg');
-    echo '<section class="hero page-hero" style="--bg:url(\'' . esc($bg) . '\')"><div class="page-hero__content"><h1>' . esc($judul) . '</h1>'
-       . ($sub !== '' ? '<p>' . $sub . '</p>' : '') . '</div></section>';
+    return ['gambar/0.jpg', 'gambar/17.jpg'];
 }
 
 /**
- * Hero berlatar foto yang berganti otomatis + teks mengetik berulang (dipakai Beranda dan Profil).
- * $kecil: teks kecil di atas judul. $judul: satu atau beberapa baris judul (h1). $tag: kalimat di bawah judul.
- * $tombol: ['Teks tombol', 'alamat'] (boleh kosong). $foto: daftar file di public/assets/ (yang tidak ada dilewati; kosong -> img/home.jpg).
- * Butuh css 'home' dan js 'home' pada layout_start() (gaya dan animasinya ada di home.css dan home.js).
+ * Hero halaman dalam (Profil, Berita, Program, Ekstra, Galeri, Mading, Hubungi Kami):
+ * judul besar di tengah + subjudul, foto latar berganti otomatis, teks mengetik berulang.
+ * $sub boleh berisi <br> untuk memisah baris. $bg (opsional) = alamat satu gambar latar tetap (tanpa slideshow).
  */
-function ui_hero_slides(string $kecil, array $judul, string $tag = '', array $tombol = [], array $foto = ['gambar/23.jpg', 'gambar/17.jpg']): void
+function ui_hero(string $judul, string $sub = '', ?string $bg = null): void
 {
-    $imgs = array_values(array_filter($foto, function ($f) {
+    if ($bg) {
+        echo '<section class="hero page-hero" style="--bg:url(\'' . esc($bg) . '\')"><div class="page-hero__content"><h1>' . esc($judul) . '</h1>'
+           . ($sub !== '' ? '<p>' . $sub . '</p>' : '') . '</div></section>';
+        return;
+    }
+    $baris = $sub !== '' ? preg_split('/<br\s*\/?>/i', $sub) : [];
+    ui_hero_slides('', [$judul], $baris, [], null, true);
+}
+
+/**
+ * Hero berlatar foto yang berganti otomatis + teks mengetik berulang.
+ * $kecil: teks kecil di atas judul. $judul: satu atau beberapa baris judul (h1).
+ * $tag: kalimat di bawah judul (teks, atau daftar baris). $tombol: ['Teks tombol', 'alamat'] (boleh kosong).
+ * $foto: daftar file di public/assets/ (null = hero_foto_bawaan(); yang tidak ada dilewati; kosong -> img/home.jpg).
+ * $tengah: true = teks rata tengah dan lebih besar (halaman dalam); false = rata kiri (Beranda).
+ * Gaya ada di style.css, animasinya di main.js.
+ */
+function ui_hero_slides(string $kecil, array $judul, $tag = '', array $tombol = [], ?array $foto = null, bool $tengah = false): void
+{
+    $imgs = array_values(array_filter($foto ?? hero_foto_bawaan(), function ($f) {
         return is_file(__DIR__ . '/../public/assets/' . $f);
     }));
     if (!$imgs) { $imgs = ['img/home.jpg']; }
 
-    echo '<section class="hero hero--slides" id="heroSlides"><div class="hero__bg" aria-hidden="true">';
+    echo '<section class="hero hero--slides' . ($tengah ? ' hero--center' : '') . '" id="heroSlides"><div class="hero__bg" aria-hidden="true">';
     foreach ($imgs as $i => $img) {
         $u = esc(asset($img));
         echo $i === 0
@@ -175,7 +191,14 @@ function ui_hero_slides(string $kecil, array $judul, string $tag = '', array $to
         echo ($n ? '<br>' : '') . '<span data-type data-speed="70">' . esc($baris) . '</span>';
     }
     echo '</h1>';
-    if ($tag !== '') { echo '<p class="hero__tag" data-type data-speed="28">' . esc($tag) . '</p>'; }
+    $tagBaris = is_array($tag) ? $tag : ($tag !== '' ? [$tag] : []);
+    if ($tagBaris) {
+        echo '<p class="hero__tag">';
+        foreach ($tagBaris as $n => $baris) {
+            echo ($n ? '<br>' : '') . '<span data-type data-speed="28">' . esc($baris) . '</span>';
+        }
+        echo '</p>';
+    }
     if (count($tombol) === 2) { echo '<a href="' . esc($tombol[1]) . '" class="btn-ppdb btn-ppdb--hero">' . esc($tombol[0]) . '</a>'; }
     echo '</div></section>';
 }

@@ -1,7 +1,7 @@
 <?php
 /** Navbar bersama (dipanggil dari layouts/main.php). Butuh: $current (kunci menu aktif), page_url(), asset(). */
 $menu = [
-    'home'    => 'Home',
+    'home'    => 'Beranda',
     'profil'  => 'Profil',
     'berita'  => 'Berita',
     'program' => 'Program',
