@@ -136,12 +136,12 @@
 }
 .nav-sub__link {
   display: block;
-  padding: 7px 10px;
-  margin: 1px 0;
+  padding: 8px 10px;
+  margin: 2px 0;
   font-size: 12.5px;
   color: #dbe5bd;
   text-decoration: none;
-  border-radius: 7px;
+  border-radius: 9px;
 }
 .nav-sub__link:hover {
   background: rgba(255, 255, 255, 0.09);
@@ -150,7 +150,7 @@
 .nav-sub__link.is-active {
   color: #fff;
   font-weight: 600;
-  background: rgba(235, 164, 60, 0.28);
+  background: #eba048 !important;
 }
 
 .sidebar-backdrop {

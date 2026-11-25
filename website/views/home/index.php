@@ -202,7 +202,7 @@ layout_start([
     </section>
 
     <!-- ================= VISI & MISI ================= -->
-    <section class="section" id="visi-misi">
+    <section class="section section--tint" id="visi-misi">
         <h2 class="title">Visi &amp; Misi</h2>
 
         <div class="visimisi">

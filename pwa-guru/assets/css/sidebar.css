@@ -1,0 +1,97 @@
+/* SI-KESA PWA Guru | sidebar + topbar (disalin dari PWA Admin supaya tampilannya sama) */
+:root {
+  --olive-900: #35471f;
+  --olive-800: #455a2d;
+  --amber-500: #eba048;
+  --amber-600: #d98c2e;
+  --red-600:   #dc2626;
+  --bg:        #f8f7f3;
+  --surface:   #ffffff;
+  --ink:       #1c2b2d;
+  --ink-2:     #4b5a5c;
+  --ink-3:     #7a8688;
+  --line:      #e7e4dc;
+}
+
+.ico { width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.ico--xs { width: 14px; height: 14px; }
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  flex: none;
+  width: 252px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--olive-800);
+  color: #eef2e0;
+  z-index: 40;
+}
+.sidebar__brand { display: flex; align-items: center; gap: 12px; padding: 18px 16px 14px; }
+.sidebar__logo { border-radius: 10px; background: transparent; }
+.sidebar__app { font-size: 15px; font-weight: 700; letter-spacing: 0.01em; color: #fff; }
+.sidebar__school { font-size: 11.5px; color: #cdd8a8; }
+
+.sidebar__nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 12px 20px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+}
+.sidebar__nav::-webkit-scrollbar { width: 6px; }
+.sidebar__nav::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.25); border-radius: 6px; }
+
+.nav-group { margin-top: 14px; }
+.nav-group__label {
+  padding: 6px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #aebd7c;
+}
+.nav-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 40px;
+  padding: 8px 10px;
+  margin: 2px 0;
+  background: transparent;
+  border: 0;
+  border-radius: 9px;
+  color: #eef2e0;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+.nav-item:hover { background: rgba(255, 255, 255, 0.09); }
+.nav-item.is-active { background: var(--amber-500); color: #fff; font-weight: 600; }
+.nav-item__text { flex: 1; line-height: 1.3; }
+
+/* ---------- Topbar ---------- */
+.topbar {
+  position: sticky; top: 0; z-index: 20; height: 52px; display: flex; align-items: center; gap: 12px;
+  padding: 0 24px; background: var(--surface); border-bottom: 1px solid var(--line);
+}
+.topbar__right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.icon-btn {
+  position: relative; width: 36px; height: 36px; display: inline-grid; place-items: center;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px; color: var(--ink-2); cursor: pointer;
+}
+.icon-btn:hover { background: var(--bg); }
+.bell__dot { position: absolute; top: 7px; right: 8px; width: 7px; height: 7px; border-radius: 50%; background: var(--red-600); box-shadow: 0 0 0 2px #fff; }
+.avatar {
+  width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
+  background: #dfe6c4; color: var(--olive-800); font-weight: 600; font-size: 12px; user-select: none; text-decoration: none;
+}
+.crumb { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 13px; color: var(--ink-2); white-space: nowrap; }
+.crumb__sep { color: var(--ink-3); }
+.crumb__current { font-weight: 600; color: var(--ink); overflow: hidden; text-overflow: ellipsis; }

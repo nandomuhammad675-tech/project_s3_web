@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="<?= e(url('assets/css/style.css')) ?>">
-  <link rel="stylesheet" href="<?= e(url('assets/css/sidebar.css')) ?>">
+  <link rel="stylesheet" href="<?= e(url('assets/css/sidebar.css')) ?>?v=2">
   <link rel="stylesheet" href="<?= e(url('assets/css/table.css')) ?>">
   <link rel="stylesheet" href="<?= e(url('assets/css/form.css')) ?>">
   <?php foreach (($pageStyles ?? []) as $css): ?>
