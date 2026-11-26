@@ -1,7 +1,7 @@
 <?php
 /**
- * SI-KESA PWA Guru & Admin | Halaman Login Terpadu
- * Dibuka lewat index.php?hal=login (atau index.php?hal=login&role=admin).
+- SI-KESA PWA Guru & Admin | Halaman Login Terpadu
+- Dibuka lewat index.php?hal=login (atau index.php?hal=login&role=admin).
  */
 require_once __DIR__ . '/../../config.php';
 $sk      = sk_cfg();
@@ -15,8 +15,18 @@ function aset(string $root, string $path): string {
 
 $role   = ($_GET['role'] ?? 'guru') === 'admin' ? 'admin' : 'guru';
 $portal = [
-    'guru'  => ['judul' => 'Masuk Sebagai Guru',  'sub' => 'Kelola kegiatan belajar dan data kelas Anda'],
-    'admin' => ['judul' => 'Masuk Sebagai Admin', 'sub' => 'Kelola data sekolah, guru, dan pengguna'],
+    'guru'  => [
+        'judul'       => 'Masuk Sebagai Guru',
+        'sub'         => 'Kelola kegiatan belajar dan data kelas Anda',
+        'label'       => 'NIP/Username',
+        'placeholder' => 'Masukkan NIP/Username',
+    ],
+    'admin' => [
+        'judul'       => 'Masuk Sebagai Admin',
+        'sub'         => 'Kelola data sekolah, guru, dan pengguna',
+        'label'       => 'Username',
+        'placeholder' => 'Masukkan Username',
+    ],
 ];
 $config = [
     'apiBase'     => $apiBase,
@@ -205,10 +215,10 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
             <div class="alert" id="alert" role="alert" hidden></div>
 
             <div class="field">
-                <label for="username">NIP/Username</label>
+                <label for="username" id="labelUsername"><?= esc($portal[$role]['label']) ?></label>
                 <div class="input">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a7 7 0 0 1 7-7h2a7 7 0 0 1 7 7v1"/></svg>
-                    <input type="text" id="username" name="username" required maxlength="50" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="Masukkan NIP/Username">
+                    <input type="text" id="username" name="username" required maxlength="50" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="<?= esc($portal[$role]['placeholder']) ?>">
                 </div>
             </div>
 
@@ -289,6 +299,8 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
         tabs.forEach((t) => t.setAttribute('aria-selected', t.dataset.role === r ? 'true' : 'false'));
         $('judul').textContent = p.judul;
         $('sub').textContent = p.sub;
+        $('labelUsername').textContent = p.label;
+        $('username').placeholder = p.placeholder;
         document.title = 'Masuk | SI-KESA ' + (r === 'admin' ? 'Admin' : 'Guru');
         tampilError('');
     }

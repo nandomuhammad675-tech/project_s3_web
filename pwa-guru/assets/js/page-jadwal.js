@@ -5,7 +5,7 @@
   var $ = function (id) { return document.getElementById(id); };
   var NAMA_HARI = { senin: 'Senin', selasa: 'Selasa', rabu: 'Rabu', kamis: 'Kamis', jumat: 'Jumat', sabtu: 'Sabtu' };
 
-  var st = { semester: 'ganjil', items: [], mapel: [], edit: null, memuat: false };
+  var st = { semester: 'ganjil', items: [], mapel: [], edit: null, memuat: false, targetHapus: null, delBusy: false };
 
   function tab() {
     ['ganjil', 'genap'].forEach(function (s) {
@@ -52,7 +52,7 @@
       });
   }
 
-  /* ---------- modal ---------- */
+  /* ---------- modal tambah/ubah ---------- */
   function galat(map) {
     document.querySelectorAll('#formJadwal [data-err]').forEach(function (p) {
       var m = map && map[p.getAttribute('data-err')];
@@ -90,8 +90,63 @@
     setTimeout(function () { m.classList.add('hidden'); }, 300);
   }
 
+  /* ---------- modal konfirmasi hapus (Tailwind murni - identik PWA Admin) ---------- */
+  var dDlg = $('dlg-hapus'), dTarget = $('dlg-hapus-target'), dMsg = $('dlg-hapus-msg'),
+      dOk = $('dlg-hapus-ok'), dCancel = $('dlg-hapus-cancel');
+
+  function setDelBusy(on) {
+    st.delBusy = on;
+    dOk.disabled = on;
+    dOk.textContent = on ? 'Menghapus...' : 'Hapus';
+  }
+
+  function closeDelete() {
+    if (st.delBusy) return;
+    dDlg.classList.add('hidden');
+    dDlg.classList.remove('flex');
+    st.targetHapus = null;
+  }
+
+  function openDelete(item) {
+    if (!item) return;
+    st.targetHapus = item;
+    $('dlg-hapus-title').textContent = 'Hapus Jadwal';
+    var hari = NAMA_HARI[item.hari] || item.hari;
+    var jam = item.jam_mulai.slice(0, 5) + '–' + item.jam_selesai.slice(0, 5);
+    dTarget.innerHTML = U.esc(hari) + ' (' + U.esc(jam) + ') &middot; <strong>' + U.esc(item.nama_mapel) + '</strong>';
+    dMsg.hidden = true;
+    dMsg.textContent = '';
+    setDelBusy(false);
+    dDlg.classList.remove('hidden');
+    dDlg.classList.add('flex');
+    dCancel.focus();
+  }
+
+  dCancel.addEventListener('click', closeDelete);
+  dDlg.addEventListener('click', function (e) { if (e.target === dDlg) closeDelete(); });
+
+  dOk.addEventListener('click', function () {
+    if (st.delBusy || !st.targetHapus) return;
+    var target = st.targetHapus;
+    setDelBusy(true);
+    J.hapus(Number(target.id_jadwal)).then(function () {
+      closeDelete();
+      U.toast('Jadwal dihapus.');
+      return muat();
+    }, function (err) {
+      dMsg.textContent = U.pesanGalat(err);
+      dMsg.hidden = false;
+    }).then(function () {
+      setDelBusy(false);
+    });
+  });
+
   $('modalJadwal').addEventListener('click', function (e) { if (e.target.closest('[data-tutup]')) tutup(); });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('modalJadwal').classList.contains('hidden')) tutup(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    if (!dDlg.classList.contains('hidden')) return closeDelete();
+    if (!$('modalJadwal').classList.contains('hidden')) tutup();
+  });
 
   /* ---------- baris mapel + jam ---------- */
   function ke(menit) { var m = Math.max(0, Math.min(23 * 60 + 59, menit)); return U.dua(Math.floor(m / 60)) + ':' + U.dua(m % 60); }
@@ -182,12 +237,16 @@
   $('gridJadwal').addEventListener('click', function (e) {
     var t = e.target.closest('[data-tambah]'), u = e.target.closest('[data-ubah]'), h = e.target.closest('[data-hapus]');
     if (t) return buka(null, t.getAttribute('data-tambah'));
-    if (u) { var id = Number(u.getAttribute('data-ubah')); var it = st.items.filter(function (x) { return x.id_jadwal === id; })[0]; if (it) buka(it); return; }
+    if (u) {
+      var idUbah = Number(u.getAttribute('data-ubah'));
+      var itUbah = st.items.filter(function (x) { return x.id_jadwal === idUbah; })[0];
+      if (itUbah) buka(itUbah);
+      return;
+    }
     if (h) {
-      if (!window.confirm('Hapus jadwal ini?')) return;
-      h.disabled = true;
-      J.hapus(Number(h.getAttribute('data-hapus'))).then(function () { U.toast('Jadwal dihapus.'); return muat(); },
-        function (err) { h.disabled = false; U.toast(U.pesanGalat(err), 'error'); });
+      var idHapus = Number(h.getAttribute('data-hapus'));
+      var itHapus = st.items.filter(function (x) { return x.id_jadwal === idHapus; })[0];
+      if (itHapus) openDelete(itHapus);
     }
   });
 

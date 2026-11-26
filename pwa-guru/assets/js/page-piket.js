@@ -5,7 +5,7 @@
   var $ = function (id) { return document.getElementById(id); };
   var NAMA = { senin: 'Senin', selasa: 'Selasa', rabu: 'Rabu', kamis: 'Kamis', jumat: 'Jumat', sabtu: 'Sabtu' };
 
-  var st = { items: [], siswa: [], hari: null, edit: null, pilih: {} };
+  var st = { items: [], siswa: [], hari: null, edit: null, pilih: {}, targetHapus: null, delBusy: false };
 
   function render() {
     var per = P.perHari(st.items);
@@ -36,7 +36,7 @@
     });
   }
 
-  /* ---------- modal ---------- */
+  /* ---------- modal tambah/ubah ---------- */
   function galat(peta) {
     document.querySelectorAll('#formPiket [data-err]').forEach(function (p) {
       var m = peta && peta[p.getAttribute('data-err')]; p.hidden = !m; p.textContent = m || '';
@@ -72,8 +72,55 @@
     setTimeout(function () { m.classList.add('hidden'); }, 300);
   }
 
+  /* ---------- modal konfirmasi hapus (<dialog> gaya PWA Admin) ---------- */
+  var dDlg = $('dlg-hapus'), dTarget = $('dlg-hapus-target'), dMsg = $('dlg-hapus-msg'),
+      dOk = $('dlg-hapus-ok'), dCancel = $('dlg-hapus-cancel');
+
+  function setDelBusy(on) {
+    st.delBusy = on;
+    dOk.disabled = on;
+    dOk.textContent = on ? 'Menghapus...' : 'Hapus';
+  }
+
+  function openDelete(hari, item, dariModalEdit) {
+    if (!item) return;
+    st.targetHapus = { hari: hari, id_piket: item.id_piket, dariModalEdit: !!dariModalEdit };
+    $('dlg-hapus-title').textContent = 'Hapus Piket';
+    var daftarNama = (item.siswa && item.siswa.length)
+      ? item.siswa.map(function (x) { return U.esc(x.nama_siswa); }).join(', ')
+      : 'Belum ada petugas';
+    dTarget.innerHTML = U.esc(NAMA[hari].toUpperCase()) + ' &middot; <strong>' + daftarNama + '</strong>';
+    dMsg.hidden = true;
+    dMsg.textContent = '';
+    setDelBusy(false);
+    dDlg.showModal();
+    dCancel.focus();
+  }
+
+  dCancel.addEventListener('click', function () { if (!st.delBusy) dDlg.close(); });
+  dDlg.addEventListener('cancel', function (ev) { if (st.delBusy) ev.preventDefault(); });
+
+  dOk.addEventListener('click', function () {
+    if (st.delBusy || !st.targetHapus) return;
+    var target = st.targetHapus;
+    setDelBusy(true);
+    P.hapus(target.id_piket).then(function () {
+      dDlg.close();
+      U.toast('Piket hari ' + NAMA[target.hari] + ' dihapus');
+      if (target.dariModalEdit) tutup();
+      return muat();
+    }, function (err) {
+      dMsg.textContent = U.pesanGalat(err);
+      dMsg.hidden = false;
+    }).then(function () {
+      setDelBusy(false);
+    });
+  });
+
   $('modalPiket').addEventListener('click', function (e) { if (e.target.closest('[data-tutup]')) tutup(); });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('modalPiket').classList.contains('hidden')) tutup(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && !dDlg.open && !$('modalPiket').classList.contains('hidden')) tutup();
+  });
   $('pkCari').addEventListener('input', daftarSiswa);
   $('pkDaftar').addEventListener('change', function (e) {
     var id = e.target.getAttribute('data-id'); if (!id) return;
@@ -97,19 +144,15 @@
   });
 
   $('pkHapus').addEventListener('click', function () {
-    if (!st.edit || !window.confirm('Hapus piket hari ' + NAMA[st.hari] + '?')) return;
-    var b = this; b.disabled = true;
-    P.hapus(st.edit.id_piket).then(function () { U.toast('Piket dihapus.'); tutup(); return muat(); },
-      function (err) { U.toast(U.pesanGalat(err), 'error'); }).then(function () { b.disabled = false; });
+    if (!st.edit) return;
+    openDelete(st.hari, st.edit, true);
   });
 
   $('gridPiket').addEventListener('click', function (e) {
     var t = e.target.closest('[data-tambah]'), u = e.target.closest('[data-ubah]'), d = e.target.closest('[data-hapus-hari]');
     if (d) {
       var hh = d.getAttribute('data-hapus-hari'), pp = P.perHari(st.items)[hh];
-      if (!pp || !window.confirm('Hapus piket hari ' + NAMA[hh] + '?')) return;
-      d.disabled = true;
-      P.hapus(pp.id_piket).then(function () { U.toast('Piket dihapus.'); return muat(); }, function (err) { d.disabled = false; U.toast(U.pesanGalat(err), 'error'); });
+      openDelete(hh, pp, false);
       return;
     }
     if (t) return buka(t.getAttribute('data-tambah'), null);

@@ -13,9 +13,7 @@ $page_scripts = $page_scripts ?? [];
 (function () {
     let sudahKonfirmasi = false;
 
-    // 1. Ganti path foto sesuai keinginanmu
     const fotoUrl = <?= json_encode($sk['base'] . '/assets/img/logo-sekolah.png', JSON_UNESCAPED_SLASHES) ?>;
-    // 2. Atur lebar & tinggi foto langsung di sini
     const lebarFoto  = '84px';
     const tinggiFoto = 'auto';
 
@@ -41,7 +39,7 @@ $page_scripts = $page_scripts ?? [];
                         <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
                     </svg>
                 </button>
-                <img src="${fotoUrl}" alt="Foto" style="width:${lebarFoto};height:${tinggiFoto};max-width:100%;object-fit:contain;display:block;margin:0 auto 16px">
+                <img src="${fotoUrl}" alt="Logo SD Negeri Kedungsari 1" style="width:${lebarFoto};height:${tinggiFoto};max-width:100%;object-fit:contain;display:block;margin:0 auto 16px">
                 <h3 style="margin:0 0 8px;font-size:1.2rem;font-weight:700;color:#1f2916">Keluar dari SI-KESA?</h3>
                 <p style="margin:0 0 24px;font-size:.85rem;color:#5f6955;line-height:1.55">Sesi Anda akan diakhiri. Anda perlu masuk kembali untuk mengakses halaman dashboard.</p>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">

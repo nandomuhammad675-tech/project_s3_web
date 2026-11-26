@@ -38,8 +38,71 @@ require_once __DIR__ . '/../layouts/sidebar.php';
 
     </main>
 
-    <!-- INJECT FILE FORM MODAL DISINI -->
+   <!-- INJECT FILE FORM MODAL DISINI -->
     <?php include __DIR__ . '/form.php'; ?>
+
+    <!-- MODAL KONFIRMASI HAPUS PIKET (IDENTIK DENGAN PWA ADMIN) -->
+    <dialog class="modal modal--sm" id="dlg-hapus" aria-labelledby="dlg-hapus-title">
+        <div class="modal__head">
+            <h2 id="dlg-hapus-title">Hapus Piket</h2>
+        </div>
+        <div class="modal__body">
+            <p class="modal__lead">Yakin ingin menghapus? Tindakan ini tidak dapat dibatalkan.</p>
+            <div class="del-target" id="dlg-hapus-target" style="background:#f7f6f0;border:1px solid #e5e4dc;border-radius:12px;padding:12px 16px;margin-top:14px;font-size:14px;color:#374151"></div>
+            <div class="notice notice--warn" id="dlg-hapus-msg" hidden style="margin-top:12px"></div>
+        </div>
+        <div class="modal__foot" style="display:flex;justify-content:flex-end;gap:10px;padding-top:18px">
+            <button type="button" class="btn btn--outline" id="dlg-hapus-cancel">Batal</button>
+            <button type="button" class="btn btn--danger" id="dlg-hapus-ok">Hapus</button>
+        </div>
+    </dialog>
+    <style>
+#dlg-hapus {
+    border: 0;
+    border-radius: 24px;
+    padding: 28px 30px 26px;
+    width: min(100% - 32px, 460px);
+    background: #ffffff;
+    color: #1f2937;
+    box-shadow: 0 24px 60px rgba(15, 23, 10, 0.25);
+}
+#dlg-hapus::backdrop {
+    background: rgba(24, 34, 15, 0.52);
+    backdrop-filter: blur(2px);
+}
+#dlg-hapus .modal__head h2 {
+    margin: 0 0 8px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1f2937;
+}
+#dlg-hapus .modal__lead {
+    margin: 0;
+    font-size: 14px;
+    color: #4b5563;
+}
+#dlg-hapus .btn {
+    padding: 9px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+}
+#dlg-hapus .btn--outline {
+    background: #ffffff;
+    border: 1.5px solid #556b3c;
+    color: #3f522b;
+}
+#dlg-hapus .btn--danger {
+    background: #dc2626;
+    border: 0;
+    color: #ffffff;
+}
+#dlg-hapus .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+</style>
 
 </div>
 

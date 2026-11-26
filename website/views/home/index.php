@@ -238,32 +238,61 @@ layout_start([
     </section>
     <?php endif; ?>
 
-    <!-- ================= PROMOSI / DOWNLOAD APLIKASI ADMIN ================= -->
+   <!-- ================= PORTAL PWA & DOWNLOAD APLIKASI ================= -->
     <section class="section section--tint" id="aplikasi">
-        <div class="app-promo">
-            <div class="app-promo__text">
-                <p class="kicker">PORTAL INTERNAL ADMIN</p>
-                <h2 class="title title--plain" style="text-align:left; margin: 4px 0 12px;">Aplikasi Mobile Admin SI-KESA</h2>
-                <p class="app-promo__desc">
-                    Kelola data akademik, presensi, jadwal, dan informasi sekolah lebih praktis langsung dari perangkat Android Anda. Khusus untuk Admin dan staf pengelola SDN Kedungsari 1.
+        <div class="portal-showcase">
+
+            <!-- CARD 1: ADMIN & GURU (PWA LOGIN) -->
+            <div class="portal-card">
+                <p class="kicker">PORTAL INTERNAL SEKOLAH</p>
+                <h3>Akses Sistem SI-KESA</h3>
+                <p class="portal-card__desc">
+                    Masuk ke dashboard pengelolaan akademik, presensi, dan administrasi sekolah untuk Admin maupun Guru.
                 </p>
 
-                <div class="app-promo__actions">
-                    <a href="<?= asset('apk/si-kesa-admin.apk') ?>" class="btn-app btn-app--primary" download>
-                        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-                            <path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993.0001.5511-.4482.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.9973-3.4592a.416.416 0 00-.1521-.5676.416.416 0 00-.5676.1521l-2.0223 3.503C15.5902 8.2439 13.8533 7.8508 12 7.8508s-3.5902.3931-5.1367 1.0989L4.841 5.4467a.4161.4161 0 00-.5677-.1521.4157.4157 0 00-.1521.5676l1.9973 3.4592C2.6889 11.1867.3432 14.6589 0 18.761h24c-.3435-4.1021-2.6892-7.5743-6.1185-9.4396"/>
+                <div class="portal-card__actions">
+                    <a href="http://localhost/project_s3_web/pwa-guru/index.php?hal=login" class="btn-portal btn-portal--green">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                         </svg>
-                        <div>
-                            <small>Unduh APK Admin</small>
-                            <strong>Android (v1.0)</strong>
-                        </div>
+                        <span>Login Admin</span>
+                    </a>
+
+                    <a href="http://localhost/project_s3_web/pwa-guru/index.php?hal=login" class="btn-portal btn-portal--outline">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                        <span>Login Guru</span>
                     </a>
                 </div>
             </div>
 
-            <div class="app-promo__visual">
-                <img src="<?= asset('img/mockup-app.png') ?>" alt="Aplikasi Mobile Admin SI-KESA" class="app-promo__img">
+            <!-- TENGAH: SPACE FOTO APLIKASI -->
+            <div class="portal-showcase__media">
+                <img src="<?= asset('img/gambarhp.png') ?>" alt="Aplikasi Mobile SI-KESA">
             </div>
+
+            <!-- CARD 2: WALI MURID (DOWNLOAD APK) -->
+            <div class="portal-card">
+                <p class="kicker">UNTUK ORANG TUA</p>
+                <h3>Aplikasi Wali Murid</h3>
+                <p class="portal-card__desc">
+                    Pantau kehadiran, nilai, jadwal pelajaran, dan informasi terbaru putra-putri Anda dari ponsel.
+                </p>
+
+                <div class="portal-card__actions">
+                    <a href="<?= asset('apk/si-kesa-walimurid.apk') ?>" class="btn-portal btn-portal--orange btn-portal--sm" download>
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                        <span>Unduh Aplikasi (APK)</span>
+                    </a>
+                </div>
+            </div>
+
         </div>
     </section>
 
