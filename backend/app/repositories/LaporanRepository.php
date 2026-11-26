@@ -77,7 +77,7 @@ final class LaporanRepository
     public function nilai(int $idTahun, string $semester, ?int $idKelas): array
     {
         $sql = "SELECT n.id_kelas, s.id_siswa, s.nisn_resmi AS nisn, s.nama_siswa, r.nomor_absen,
-                    m.id_mapel, m.nama_mapel, n.jenis_penilaian AS jenis, n.nomor_uh, n.nilai_angka AS nilai
+                    m.id_mapel, m.kode_mapel, m.nama_mapel, n.jenis_penilaian AS jenis, n.nomor_uh, n.nilai_angka AS nilai
                 FROM data_nilai n
                 JOIN data_siswa s ON s.id_siswa = n.id_siswa
                 JOIN mata_pelajaran m ON m.id_mapel = n.id_mapel

@@ -29,7 +29,7 @@ final class GuruValidator
             $d['jabatan'] = $v->string('jabatan', 'Jabatan', false, 50);
         }
         if ($baru || $v->ada('foto_profil')) {
-            $d['foto_profil'] = $v->string('foto_profil', 'Foto profil', false, 255);
+            $d['foto_profil'] = KontenValidator::gambar($v, 'foto_profil', 'Foto profil', false);
         }
         if ($baru || $v->ada('email')) {
             $d['email'] = $v->email('email', 'Email', false, 100);

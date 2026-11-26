@@ -1,0 +1,10 @@
+/* Daftar Kegiatan & Prestasi */
+.filter{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:-10px auto 30px}
+.berita-card{display:flex;flex-direction:column;background:var(--card-grey)}
+.berita-card__link{display:flex;flex-direction:column;height:100%}
+.berita-card__img{aspect-ratio:3/2;width:100%;object-fit:cover;border-bottom:3px solid var(--green)}
+.berita-card__body{display:flex;flex-direction:column;flex:1;padding:16px 18px 14px}
+.berita-card h3{font-size:.98rem;font-weight:700;line-height:1.35;color:#111a2e;margin:6px 0 8px}
+.berita-card p{font-size:.84rem;color:#2b3550;line-height:1.5;margin-bottom:14px}
+.berita-card time{margin-top:auto;font-size:.78rem;color:var(--muted)}
+.badge{align-self:flex-start;display:inline-block;font-size:.7rem;font-weight:600;color:#fff;background:var(--green);border-radius:999px;padding:2px 12px}

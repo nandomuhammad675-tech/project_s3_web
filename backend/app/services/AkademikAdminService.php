@@ -28,4 +28,21 @@ final class AkademikAdminService
         return Pagination::hasil($repo->daftar($jenis, $f, $p['limit'], $p['offset']), $repo->total($jenis, $f), $p)
             + ['tahun_ajaran' => $tahun->namaTahun];
     }
+
+    /**
+     * Data untuk ekspor Excel: tahun ajaran (default aktif) + semua baris sesuai filter.
+     * @return array{tahun:\App\Models\TahunAjaran|object, rows:array<int, array<string, mixed>>}
+     */
+    public function untukExcel(string $jenis, array $f): array
+    {
+        $tahun = $f['id_tahun_ajaran'] === null
+            ? (new TahunAjaranRepository())->aktif()
+            : ((new TahunAjaranRepository())->cari($f['id_tahun_ajaran'])
+                ?? throw HttpException::notFound('Tahun ajaran tidak ditemukan.'));
+        if ($tahun === null) {
+            throw HttpException::notFound('Belum ada tahun ajaran aktif.');
+        }
+        $f['id_tahun_ajaran'] = $tahun->idTahunAjaran;
+        return ['tahun' => $tahun, 'rows' => (new AkademikAdminRepository())->semua($jenis, $f)];
+    }
 }

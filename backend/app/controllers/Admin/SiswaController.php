@@ -11,6 +11,17 @@ use App\Services\SiswaService;
 
 final class SiswaController
 {
+    /** POST /api/admin/siswa/impor  { "rows": [ {nama_siswa, nisn_resmi, nama_wali?, no_hp_wali?}, ... ] } */
+    public function impor(Request $req): void
+    {
+        $rows = $req->json()['rows'] ?? null;
+        if (!is_array($rows)) {
+            throw HttpException::badRequest('Kirim daftar baris pada field "rows".');
+        }
+        $h = (new SiswaService())->impor($rows);
+        ResponseHelper::success($h['berhasil'] . ' dari ' . $h['total'] . ' siswa berhasil diimpor.', $h);
+    }
+
     /** GET /api/admin/siswa?q=nama-atau-nisn&status=baru|aktif|lulus|pindah */
     public function index(Request $req): void
     {

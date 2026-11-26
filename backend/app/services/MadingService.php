@@ -24,9 +24,12 @@ final class MadingService
         return Pagination::hasil($this->repo->daftar($p['limit'], $p['offset']), $this->repo->total(), $p);
     }
 
-    public function publik(array $p): array
+    /** Respons publik + `kategori_tersedia` (daftar kategori untuk saringan). $kategori null = semua. */
+    public function publik(array $p, ?string $kategori = null): array
     {
-        return Pagination::hasil($this->repo->daftarPublik($p['limit'], $p['offset']), $this->repo->totalPublik(), $p);
+        $h = Pagination::hasil($this->repo->daftarPublik($p['limit'], $p['offset'], $kategori), $this->repo->totalPublik($kategori), $p);
+        $h['kategori_tersedia'] = $this->repo->kategoriPublik();
+        return $h;
     }
 
     public function detail(int $id): array

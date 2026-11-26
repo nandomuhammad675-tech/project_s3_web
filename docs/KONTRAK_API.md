@@ -1,4 +1,4 @@
-# Kontrak API SI-KESA (backend v1, langkah 1–6)
+# Kontrak API SI-KESA (backend v1, langkah 1–6; revisi v10: media di database, impor siswa, ekspor per kelas/mapel)
 
 Dokumen ini menjelaskan **apa yang sebenarnya dilakukan backend** (bukan rencana). Untuk tim Website, Mobile, dan tester.
 Rujukan resmi bila ada beda: URS/BRD/SRS v2.7, TDD v1.7, `si_kesa_v9.sql`. Penjelasan layar demi layar ada di Studi Kasus 01 (Website) dan 02 (Mobile).
@@ -259,3 +259,17 @@ Siswa yang kemudian pindah **tetap dimuat** selama punya data pada semester itu.
 |---|---|---|
 | Dok. 01 tes **G6**: simpan absensi dua kali pada tanggal yang sama, "kedua kali berhasil sebagai koreksi" | `POST` kedua kali → 409 | Klien memakai alur POST (baru) + PUT (koreksi) seperti di bagian 4. Atau backend dijadikan upsert (keputusan terbuka). |
 | Dok. 01 form Jadwal/Nilai: mapel "dari daftar mapel" | Sebelumnya hanya `/api/admin/mapel` | Ditambah `GET /api/guru/mapel`. |
+
+---
+
+## 9. Perubahan revisi (skema v10)
+
+| Endpoint | Keterangan |
+|---|---|
+| `GET /api/media/{id}` (publik) | Gambar dari database. Kolom gambar lain berisi path `media/<id>`; buka di `{base URL}/api/media/<id>`. |
+| `POST /api/admin/upload` | multipart `file` (JPG/PNG/WEBP ≤ 2 MB) → `{path: "media/<id>"}`. Tautan/URL gambar tidak diterima lagi (422). |
+| `POST /api/admin/siswa/impor` | `{"rows":[{nisn_resmi, nama_siswa, nama_wali?, no_hp_wali?}]}` (≤ 500) → `{total, berhasil, gagal, hasil:[{baris,status,pesan}]}`. Siswa berstatus baru. |
+| `GET /api/admin/akademik/{absensi\|nilai\|disiplin}/excel` | Filter sama dengan daftar. XLSX: absensi dan disiplin satu sheet per kelas; nilai satu sheet per mapel per kelas (mis. `MTK-4A`) dengan kolom UH 1..n, ASTS, ASAS. |
+| `GET /api/{admin\|guru}/laporan[/excel]` | Parameter opsional `siswa` (id_siswa) dan `mapel` (id_mapel). Struktur sheet sama seperti di atas; kelas tidak pernah digabung. |
+
+Mading tidak memiliki tanggal (hanya `status_tampil`). `foto_profil`, `banner`, `file_gambar`, dan `ikon` harus berformat `media/<id>`.

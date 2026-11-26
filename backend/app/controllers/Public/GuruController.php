@@ -9,7 +9,7 @@ use App\Services\GuruService;
 
 final class GuruController
 {
-    /** GET /api/public/guru: nama, NIP, jabatan, foto (tanpa email/telepon; NFR-SEC-08). */
+    /** GET /api/public/guru: nama, NIP, jabatan, foto, ekskul (nama ekstrakurikuler yang diajar) (tanpa email/telepon; NFR-SEC-08). */
     public function index(Request $req): void
     {
         ResponseHelper::success('OK', (new GuruService())->publik());

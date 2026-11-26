@@ -1,0 +1,16 @@
+/* Gaya khusus halaman: kegiatan (gaya umum ada di ../style.css) */
+:root{--card-grey:#dcdcdc}
+.btn-ppdb--hero{padding:9px 22px!important;font-size:.9rem}
+.page-hero{min-height:calc(100vh - 64px);min-height:calc(100svh - 64px);align-items:center;justify-content:center;text-align:center}
+.berita-grid{position:relative;z-index:1;display:grid;grid-template-columns:repeat(2,1fr);gap:44px 40px; max-width:1100px;margin:0 auto;text-align:left}
+.berita-card{display:flex;flex-direction:column;background:var(--card-grey);border:3px solid var(--green); border-radius:18px;overflow:hidden;box-shadow:0 6px 0 rgba(91,117,83,.35); transition:transform .2s,box-shadow .2s}
+.berita-card:hover{transform:translateY(-4px);box-shadow:0 10px 0 rgba(91,117,83,.35)}
+.berita-card__link{display:flex;flex-direction:column;height:100%}
+.berita-card__img{aspect-ratio:3/2;width:100%;object-fit:cover;background:#c9d1bf;border-bottom:3px solid var(--green)}
+.berita-card__body{display:flex;flex-direction:column;flex:1;padding:16px 18px 14px}
+.berita-card h3{font-size:.95rem;font-weight:700;line-height:1.35;color:#111a2e;margin-bottom:8px}
+.berita-card p{font-size:.82rem;color:#2b3550;line-height:1.5;margin-bottom:14px}
+.berita-card time{margin-top:auto;font-size:.75rem;color:var(--muted)}
+.berita-kosong{position:relative;z-index:1;color:var(--muted)}
+.pager__nav{position:relative;z-index:1;display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+@media (max-width:860px){  .berita-grid{grid-template-columns:1fr}  }

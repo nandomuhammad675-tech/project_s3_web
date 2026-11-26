@@ -1,0 +1,9 @@
+/* Detail Ekstrakurikuler */
+.detail-card{max-width:1000px;margin:0 auto;background:var(--card-blue);border:3px solid var(--green);border-radius:22px;padding:34px clamp(18px,5vw,50px) 40px;text-align:left;box-shadow:0 8px 0 rgba(91,117,83,.35)}
+.detail-card h2{font-size:clamp(1.2rem,2.6vw,1.7rem);font-weight:700;color:var(--green-dark);margin:28px 0 10px}
+.detail-card h2:first-child{margin-top:0}
+.detail-card p{font-size:.95rem;color:#1e2a4a;line-height:1.65}
+.detail-card ul{list-style:disc;padding-left:26px;font-size:.95rem;color:#1e2a4a;display:grid;gap:3px}
+.detail-card .materi + .materi{margin-top:14px}
+.detail-card .materi strong{display:block;font-size:.95rem;color:#101a3a}
+.detail__actions{margin-top:32px}

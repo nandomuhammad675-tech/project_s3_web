@@ -22,8 +22,10 @@ final class Database
                 PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES   => false,
-                // timestamp di skema memakai UTC (si_kesa_v9.sql: time_zone +00:00)
-                PDO::MYSQL_ATTR_INIT_COMMAND => "SET time_zone = '+00:00'",
+                // timestamp di skema memakai UTC (si_kesa_v9.sql: time_zone +00:00).
+                // sql_mode ketat: nilai tidak valid (enum di luar daftar, angka/teks melebihi kolom) DITOLAK database,
+                // bukan dipotong diam-diam. Bawaan my.ini XAMPP tidak ketat (hasil tests/Database/uji_skema.php).
+                PDO::MYSQL_ATTR_INIT_COMMAND => "SET time_zone = '+00:00', sql_mode = 'STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,NO_ENGINE_SUBSTITUTION'",
             ]);
         }
         return self::$pdo;

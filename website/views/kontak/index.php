@@ -1,81 +1,32 @@
 <?php
+require_once __DIR__ . '/../../lib/bootstrap.php';
 /**
- * Halaman Hubungi Kami - SD Negeri Kedungsari 1
- * SATU FILE. Letakkan di: website/views/kontak/index.php
- * Dibuka lewat '?page=kontak'
+ * Hubungi Kami - dibuka lewat '?page=kontak'
+ * Kontak ditulis tetap di views/partials/site-info.php (BUKAN dari database/API) dan tidak ada formulir kirim pesan.
+ * Baris yang nilainya kosong disembunyikan, KECUALI media sosial: Instagram dan Facebook selalu tampil.
  */
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
-// ===== Fungsi bantu (dilewati jika sudah ada) =====
-if (!function_exists('base_url')) {
-    function base_url(string $path = ''): string {
-        static $base = null;
-        if ($base === null) {
-            $base = '';
-            $root = rtrim(str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT'] ?? '') ?: ''), '/');
-            foreach ([__DIR__ . '/../../public', __DIR__ . '/public', __DIR__, __DIR__ . '/..'] as $dir) {
-                $assets = realpath($dir . '/assets');
-                if ($assets) {
-                    $pub = str_replace('\\', '/', dirname($assets));
-                    if ($root !== '' && stripos($pub, $root) === 0) {
-                        $base = substr($pub, strlen($root)) . '/';
-                        break;
-                    }
-                }
-            }
-            if ($base === '') {
-                $base = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'])), '/') . '/';
-            }
-        }
-        return $base . ltrim($path, '/');
-    }
-}
-if (!function_exists('esc')) {
-    function esc($text): string {
-        return htmlspecialchars((string) $text, ENT_QUOTES, 'UTF-8');
-    }
-}
-if (!function_exists('page_url')) {
-    function page_url(string $key): string {
-        static $map = [
-            'home'    => '',
-            'profil'  => '?page=guru',
-            'berita'  => '?page=kegiatan',
-            'ekstra'  => '?page=ekstrakurikuler',
-            'galeri'  => '?page=galeri',
-            'kontak'  => '?page=kontak',
-            'ppdb'    => '?page=ppdb',
-        ];
-        return base_url($map[$key] ?? $key);
-    }
-}
-
-$current = 'kontak';
-
-// ===== DATA KONTAK (ubah di sini) =====
-$kontak = [
-    'alamat'    => 'Jl. Raya Kedungsari No. 154, Kedungsari, Kec. Tarokan, Kab. Kediri, Jawa Timur.',
-    'telepon'   => '(0000) 0000',
-    'email'     => 'dnkedungsarisatu@yahoo.co.id',
-    'whatsapp'  => '0000-0000-0000',
-    'instagram' => '#',   // ganti dengan link Instagram sekolah
-    'facebook'  => '#',   // ganti dengan link Facebook sekolah
+$k = site_info();
+$telHref = $k['telepon'] !== '' ? 'tel:' . preg_replace('/[^0-9+]/', '', $k['telepon']) : '';
+$wa = preg_replace('/\D/', '', $k['whatsapp']);
+if ($wa !== '' && $wa[0] === '0') { $wa = '62' . substr($wa, 1); }
+$waHref = $wa !== '' ? 'https://wa.me/' . $wa : '';
+$sosmed = [
+    ['Instagram', $k['instagram'] ?: '#', 'sosmed__ig', '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4.2"/><circle cx="17.3" cy="6.7" r="1" fill="currentColor" stroke="none"/></svg>'],
+    ['Facebook',  $k['facebook'] ?: '#',  'sosmed__fb', '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0 0 22 12z"/></svg>'],
 ];
 
-// Peta: ganti dengan link "Sematkan peta" (embed) Google Maps sekolah jika ingin titik yang tepat
-$petaUrl = 'https://www.google.com/maps?q=' . rawurlencode('SDN Kedungsari 1, Tarokan, Kediri') . '&output=embed';
-
-// Link bantu: nomor telepon & WhatsApp
-$telHref = 'tel:' . preg_replace('/[^0-9+]/', '', $kontak['telepon']);
-$waDigit = preg_replace('/\D/', '', $kontak['whatsapp']);
-if (strpos($waDigit, '0') === 0) {
-    $waDigit = '62' . substr($waDigit, 1);
-}
-$waHref = 'https://wa.me/' . $waDigit;
-
-$title = 'Hubungi Kami - SD Negeri Kedungsari 1';
+layout_start([
+    'title'       => 'Hubungi Kami - SD Negeri Kedungsari 1',
+    'current'     => 'kontak',
+    'description' => 'Hubungi SD Negeri Kedungsari 1 - alamat, telepon, email, media sosial, jam layanan, dan lokasi sekolah',
+    'css'         => 'kontak',
+]);
 ?>
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
+>>>>>>> c0537a9e00559a0ef785f741664ec62ff3a44d17
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -235,93 +186,55 @@ $menuLain = [
         </ul>
     </nav>
 
+<<<<<<< HEAD
+>>>>>>> 8d7d43c3183adc7a19a337326a880273da51868a
+=======
+=======
+>>>>>>> 82200f0e38e90c8bbf80824aab51d892a727d18d
+>>>>>>> c0537a9e00559a0ef785f741664ec62ff3a44d17
 <main>
-    <section class="section section--leaf kontak-section" id="kontak">
-        <h1 class="title">Hubungi Kami</h1>
-
-        <!-- ================= INFORMASI KONTAK ================= -->
-        <div class="panel panel--info">
-            <div class="panel__head">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M12 6.5C10.2 5.2 7.6 4.5 3 4.5v13c4.6 0 7.2.7 9 2 1.8-1.3 4.4-2 9-2v-13c-4.6 0-7.2.7-9 2z"/>
-                    <path d="M12 6.5v13"/>
-                </svg>
-                <h2>Informasi Kontak</h2>
-            </div>
-
+    <?php ui_hero('Hubungi Kami', 'Kami siap membantu informasi sekolah dan pendaftaran'); ?>
+    <section class="section section--leaf" id="kontak">
+        <h2 class="title">Informasi Kontak</h2>
+        <div class="kontak">
             <ul class="info-list">
+                <?php if ($k['alamat'] !== ''): ?>
+                <li class="info-item"><span class="info-item__label">Alamat</span><span><?= esc($k['alamat']) ?></span></li>
+                <?php endif; if ($k['telepon'] !== ''): ?>
+                <li class="info-item"><span class="info-item__label">Telepon</span><a href="<?= esc($telHref) ?>"><?= esc($k['telepon']) ?></a></li>
+                <?php endif; if ($k['whatsapp'] !== ''): ?>
+                <li class="info-item"><span class="info-item__label">WhatsApp</span><a href="<?= esc($waHref) ?>" target="_blank" rel="noopener noreferrer"><?= esc($k['whatsapp']) ?></a></li>
+                <?php endif; if ($k['email'] !== ''): ?>
+                <li class="info-item"><span class="info-item__label">Email</span><a href="mailto:<?= esc($k['email']) ?>"><?= esc($k['email']) ?></a></li>
+                <?php endif; if (!empty($k['jam'])): ?>
+                <li class="info-item"><span class="info-item__label">Jam Layanan</span><span><?= esc($k['jam']) ?></span></li>
+                <?php endif; ?>
                 <li class="info-item">
-                    <span class="info-item__icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/>
-                            <circle cx="12" cy="9.5" r="2.6"/>
-                        </svg>
+                    <span class="info-item__label">Media Sosial</span>
+                    <span class="sosmed">
+                        <?php foreach ($sosmed as [$nama, $url, $kelas, $ikon]): ?>
+                            <a class="<?= $kelas ?>" href="<?= esc($url) ?>" target="_blank" rel="noopener noreferrer"><?= $ikon ?><span><?= esc($nama) ?></span></a>
+                        <?php endforeach; ?>
                     </span>
-                    <span class="info-item__text"><?= esc($kontak['alamat']) ?></span>
-                </li>
-
-                <li class="info-item">
-                    <span class="info-item__icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M5 3.5h3.2l1.6 4.2-2 1.3a11 11 0 0 0 6.2 6.2l1.3-2 4.2 1.6V18a2.5 2.5 0 0 1-2.7 2.5C9.9 20 4 14.1 3.5 6.2A2.5 2.5 0 0 1 5 3.5z"/>
-                        </svg>
-                    </span>
-                    <a class="info-item__text" href="<?= esc($telHref) ?>"><?= esc($kontak['telepon']) ?></a>
-                </li>
-
-                <li class="info-item">
-                    <span class="info-item__icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="5" width="18" height="14" rx="2"/>
-                            <path d="m3.5 7 8.5 6 8.5-6"/>
-                        </svg>
-                    </span>
-                    <a class="info-item__text" href="mailto:<?= esc($kontak['email']) ?>"><?= esc($kontak['email']) ?></a>
-                </li>
-
-                <li class="info-item">
-                    <span class="info-item__icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M3.5 20.5 5 15.8A8.5 8.5 0 1 1 8.4 19z"/>
-                            <path d="M9 8.5c0 3.5 3 6.5 6.5 6.5l1.2-1.4-2.2-1.1-1 .8a4.6 4.6 0 0 1-2-2l.8-1-1.1-2.2z"/>
-                        </svg>
-                    </span>
-                    <a class="info-item__text" href="<?= esc($waHref) ?>" target="_blank" rel="noopener"><?= esc($kontak['whatsapp']) ?></a>
                 </li>
             </ul>
-        </div>
 
-        <!-- ================= PETA & MEDIA SOSIAL ================= -->
-        <div class="kontak-row">
-            <div class="panel panel--map">
-                <iframe loading="lazy" title="Lokasi SD Negeri Kedungsari 1"
-                        src="<?= esc($petaUrl) ?>" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
+            <div class="aksi">
+                <a class="pill" href="<?= esc($k['peta_link']) ?>" target="_blank" rel="noopener noreferrer">Buka di Google Maps</a>
             </div>
 
-            <aside class="panel panel--sosmed">
-                <div class="panel__head"><h2>Hubungi Kami</h2></div>
-
-                <div class="sosmed-list">
-                    <a class="sosmed-item" href="<?= esc($kontak['instagram']) ?>" target="_blank" rel="noopener">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <rect x="3" y="3" width="18" height="18" rx="5"/>
-                            <circle cx="12" cy="12" r="4.2"/>
-                            <circle cx="17.3" cy="6.7" r="1" fill="currentColor" stroke="none"/>
-                        </svg>
-                        <span>Instagram</span>
-                    </a>
-
-                    <a class="sosmed-item" href="<?= esc($kontak['facebook']) ?>" target="_blank" rel="noopener">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M14.5 21v-8h2.7l.5-3.2h-3.2V7.9c0-.9.4-1.7 1.8-1.7h1.5V3.4c-.3 0-1.3-.2-2.4-.2-2.5 0-4 1.5-4 4.1v2.5H8.3V13H11v8"/>
-                        </svg>
-                        <span>Facebook</span>
-                    </a>
-                </div>
-            </aside>
+            <div class="peta">
+                <iframe loading="lazy" title="Lokasi SD Negeri Kedungsari 1" src="<?= esc($k['peta']) ?>" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
         </div>
     </section>
 </main>
+<<<<<<< HEAD
+<<<<<<< HEAD
+<?php layout_end(); ?>
+=======
+=======
+>>>>>>> c0537a9e00559a0ef785f741664ec62ff3a44d17
 
 <footer class="footer">
     <div class="footer__inner">
@@ -380,3 +293,10 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+<<<<<<< HEAD
+>>>>>>> 8d7d43c3183adc7a19a337326a880273da51868a
+=======
+=======
+<?php layout_end(); ?>
+>>>>>>> 82200f0e38e90c8bbf80824aab51d892a727d18d
+>>>>>>> c0537a9e00559a0ef785f741664ec62ff3a44d17

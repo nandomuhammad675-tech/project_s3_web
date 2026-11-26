@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Helpers\FileHelper;
 use App\Core\HttpException;
 use App\Helpers\Pagination;
 use App\Helpers\Validasi;
@@ -55,7 +56,8 @@ final class GaleriService
 
     public function hapus(int $id): void
     {
-        $this->detail($id);
+        $g = $this->detail($id);
         $this->repo->hapus($id);
+        FileHelper::hapus(isset($g['file_gambar']) ? (string) $g['file_gambar'] : null);   // berkas gambarnya ikut dihapus
     }
 }

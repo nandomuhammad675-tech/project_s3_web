@@ -57,6 +57,8 @@ final class AkademikValidator
             'semester'        => $semester,
             'id_tahun_ajaran' => $tahun,
             'id_kelas'        => Pagination::angka($req, 'kelas'),
+            'id_siswa'        => Pagination::angka($req, 'siswa'),
+            'id_mapel'        => Pagination::angka($req, 'mapel'),
             'jenis'           => self::pilihan($req, 'jenis', ['absensi', 'nilai', 'semua']) ?? 'semua',
         ];
     }

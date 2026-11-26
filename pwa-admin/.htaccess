@@ -1,0 +1,19 @@
+# SI-KESA PWA Admin
+Options -Indexes
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # Semua alamat yang bukan file/folder nyata diarahkan ke index.php
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^ index.php [L]
+</IfModule>
+
+# Service worker harus selalu segar
+<Files "sw.js">
+  Header set Cache-Control "no-cache"
+</Files>
+<Files "manifest.json">
+  Header set Content-Type "application/manifest+json"
+</Files>

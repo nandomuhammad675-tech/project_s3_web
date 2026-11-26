@@ -33,14 +33,16 @@ final class GaleriMadingRepository
         return (int) $this->db->query('SELECT COUNT(*) FROM galeri_mading')->fetchColumn();
     }
 
-    public function daftarPublik(int $limit, int $offset): array
+    public function daftarPublik(int $limit, int $offset, ?string $kategori = null): array
     {
         $st = $this->db->prepare(
             'SELECT id_mading, judul_karya, kategori, deskripsi, nama_penulis, file_gambar FROM galeri_mading
-             WHERE status_tampil = 1 ORDER BY id_mading DESC LIMIT ? OFFSET ?'
+             WHERE status_tampil = 1' . ($kategori === null ? '' : ' AND kategori = ?') . ' ORDER BY id_mading DESC LIMIT ? OFFSET ?'
         );
-        $st->bindValue(1, $limit, PDO::PARAM_INT);
-        $st->bindValue(2, $offset, PDO::PARAM_INT);
+        $i = 1;
+        if ($kategori !== null) { $st->bindValue($i++, $kategori); }
+        $st->bindValue($i++, $limit, PDO::PARAM_INT);
+        $st->bindValue($i, $offset, PDO::PARAM_INT);
         $st->execute();
         return array_map(static function (array $r): array {
             $r['id_mading'] = (int) $r['id_mading'];
@@ -48,9 +50,19 @@ final class GaleriMadingRepository
         }, $st->fetchAll());
     }
 
-    public function totalPublik(): int
+    public function totalPublik(?string $kategori = null): int
     {
-        return (int) $this->db->query('SELECT COUNT(*) FROM galeri_mading WHERE status_tampil = 1')->fetchColumn();
+        $st = $this->db->prepare('SELECT COUNT(*) FROM galeri_mading WHERE status_tampil = 1' . ($kategori === null ? '' : ' AND kategori = ?'));
+        $st->execute($kategori === null ? [] : [$kategori]);
+        return (int) $st->fetchColumn();
+    }
+
+    /** Kategori yang dipakai karya tampil (untuk saringan di website), urut abjad. */
+    public function kategoriPublik(): array
+    {
+        return $this->db->query(
+            "SELECT DISTINCT kategori FROM galeri_mading WHERE status_tampil = 1 AND kategori IS NOT NULL AND kategori <> '' ORDER BY kategori"
+        )->fetchAll(PDO::FETCH_COLUMN);
     }
 
     public function cari(int $id): ?array
