@@ -56,7 +56,7 @@ final class LaporanExporter
         $wb->disconnectWorksheets();
     }
 
-        private static function informasi(Spreadsheet $wb, array $meta, string $jenis): void
+    private static function informasi(Spreadsheet $wb, array $meta, string $jenis): void
     {
         $s = $wb->getActiveSheet();
         $s->setTitle('Informasi');
@@ -69,8 +69,6 @@ final class LaporanExporter
             ['Semester', ucfirst($meta['semester'])],
             ['Kelas', $meta['kelas']],
             ['Siswa', $meta['siswa'] ?? 'Semua siswa'],
-            ['Periode data absensi', SheetHelper::periode($meta)],
-            ['Tanggal ekspor', $meta['tanggal_ekspor']],
         ];
         // Periode mengikuti jenis laporan: nilai = nama semester, absensi = rentang tanggal data absensi.
         if ($jenis === 'nilai' || $jenis === 'semua') {
@@ -79,13 +77,13 @@ final class LaporanExporter
         if ($jenis === 'absensi' || $jenis === 'semua') {
             $baris[] = ['Periode data absensi', SheetHelper::periode($meta)];
         }
-        $baris[] = ['Tanggal ekspor', $meta['tanggal_ekspor']];
+        $baris[] = ['Tanggal unduh', $meta['tanggal_ekspor']];
 
         foreach ($baris as $i => [$k, $v]) {
             SheetHelper::teks($s, 1, 3 + $i, $k);
             SheetHelper::teks($s, 2, 3 + $i, $v);
             $s->getStyle('A' . (3 + $i))->getFont()->setBold(true);
         }
-        SheetHelper::lebarOtomatis($s, 2);
+        SheetHelper::lebarOtomatis($s, 2, 3);
     }
 }

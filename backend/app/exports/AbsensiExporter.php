@@ -30,9 +30,11 @@ final class AbsensiExporter
             );
             SheetHelper::header($s, 4, self::JUDUL);
             $baris = 4;
+            $urut = 0;
             foreach ($k['absensi'] as $r) {
                 $baris++;
-                SheetHelper::angka($s, 1, $baris, $r['nomor_absen'] === null ? null : (int) $r['nomor_absen']);
+                // No = urutan baris (1, 2, 3, ...), tidak bergantung pada nomor absen yang bisa kosong.
+                SheetHelper::angka($s, 1, $baris, ++$urut);
                 SheetHelper::teks($s, 2, $baris, (string) $r['nisn']);
                 SheetHelper::teks($s, 3, $baris, (string) $r['nama_siswa']);
                 SheetHelper::angka($s, 4, $baris, (int) $r['hadir']);
