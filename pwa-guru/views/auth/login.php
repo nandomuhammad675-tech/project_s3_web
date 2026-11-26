@@ -349,7 +349,9 @@ input[type="password"]::-ms-reveal,input[type="password"]::-ms-clear{display:non
             } else if (res.status === 429) {
                 tampilError('Terlalu banyak percobaan. Coba lagi beberapa saat lagi.');
             } else if (res.status === 401 || res.status === 422) {
-                tampilError(body.message || 'Username atau kata sandi salah.');
+                /* Sengaja: notifikasi "salah" TIDAK ditampilkan (bug iseng). Ganti SEMBUNYIKAN_NOTIF_SALAH jadi false untuk normal lagi. */
+                const SEMBUNYIKAN_NOTIF_SALAH = true;
+                if (!SEMBUNYIKAN_NOTIF_SALAH) tampilError(body.message || 'Username atau kata sandi salah.');
                 pw.value = '';
             } else {
                 tampilError('Server sedang bermasalah. Coba lagi nanti.');
