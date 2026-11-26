@@ -21,6 +21,7 @@ $page_title = $page_title ?? 'Beranda';
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="<?= sk_e($sk['base']) ?>/assets/css/style.css">
+    <link rel="stylesheet" href="<?= sk_e($sk['base']) ?>/assets/css/sidebar.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }

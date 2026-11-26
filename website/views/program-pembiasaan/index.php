@@ -16,12 +16,7 @@ layout_start([
 ]);
 ?>
 <main>
-    <section class="hero page-hero" style="--bg:url('<?= asset('img/home.jpg') ?>')">
-        <div class="page-hero__content">
-            <h1>PROGRAM PEMBIASAAN</h1>
-            <p>Membentuk karakter lewat kebiasaan baik setiap hari<br>SD NEGERI KEDUNGSARI 1</p>
-        </div>
-    </section>
+    <?php ui_hero('Program Pembiasaan', 'Membentuk karakter lewat kebiasaan baik setiap hari<br>SD NEGERI KEDUNGSARI 1'); ?>
 
     <section class="section section--leaf" id="program">
         <h2 class="title">Enam Hari, Enam Kebiasaan</h2>

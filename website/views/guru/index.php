@@ -41,14 +41,13 @@ layout_start([
     'title'       => $title ?? 'SD Negeri Kedungsari 1',
     'current'     => 'profil',
     'description' => 'Website resmi SD Negeri Kedungsari 1 - Cerdas, Berkarakter, Berprestasi',
-    'css'         => ['home', 'guru'],
-    'js'          => 'home',
+    'css'         => 'guru',
 ]);
 ?>
 <main>
 
     <!-- ================= HERO (foto berganti otomatis + teks mengetik berulang) ================= -->
-    <?php ui_hero_slides('MENGENAL LEBIH DEKAT', ['PROFIL'], 'SD Negeri Kedungsari 1'); ?>
+        <?php ui_hero('Profil', 'Mengenal lebih dekat<br>SD NEGERI KEDUNGSARI 1'); ?>
 
     <!-- ================= SEJARAH ================= -->
     <section class="section section--leaf" id="sejarah">

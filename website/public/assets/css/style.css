@@ -53,6 +53,10 @@ ul{list-style:none}
 .section--leaf::before,.section--leaf::after{content:"";position:absolute;width:190px;height:260px;opacity:.28;pointer-events:none; background:no-repeat center/contain url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 140'><path d='M50 4C95 40 98 100 50 136 2 100 5 40 50 4Z' fill='%236f8a62'/><path d='M50 14V132' stroke='%23fbfaf4' stroke-width='2'/></svg>")}
 .section--leaf::before{left:-60px;top:40px;transform:rotate(-25deg)}
 .section--leaf::after{right:-60px;top:20px;transform:rotate(30deg) scaleX(-1)}
+/* Hiasan tambahan section berdaun: ranting kecil + cahaya lembut agar tidak polos */
+.section--leaf{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 160'><g><path d='M60 158C57 110 70 70 62 8' fill='none' stroke='%236f8a62' stroke-width='2.2' stroke-linecap='round'/><g fill='%236f8a62'><path transform='translate(60 120) rotate(-150) scale(0.9)' d='M0 0C12-12 30-12 40 0 30 12 12 12 0 0Z'/><path transform='translate(61 120) rotate(-30) scale(0.9)' d='M0 0C12-12 30-12 40 0 30 12 12 12 0 0Z'/><path transform='translate(62 92) rotate(-155) scale(0.8)' d='M0 0C12-12 30-12 40 0 30 12 12 12 0 0Z'/><path transform='translate(63 92) rotate(-25) scale(0.8)' d='M0 0C12-12 30-12 40 0 30 12 12 12 0 0Z'/><path transform='translate(64 64) rotate(-160) scale(0.7)' d='M0 0C12-12 30-12 40 0 30 12 12 12 0 0Z'/><path transform='translate(64 64) rotate(-20) scale(0.7)' d='M0 0C12-12 30-12 40 0 30 12 12 12 0 0Z'/><path transform='translate(63 38) rotate(-150) scale(0.55)' d='M0 0C12-12 30-12 40 0 30 12 12 12 0 0Z'/><path transform='translate(63 38) rotate(-35) scale(0.55)' d='M0 0C12-12 30-12 40 0 30 12 12 12 0 0Z'/><path transform='translate(62 10) rotate(-90) scale(0.6)' d='M0 0C12-12 30-12 40 0 30 12 12 12 0 0Z'/></g></g></svg>"),url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 160'><g transform='translate(120 0) scale(-1 1)'><path d='M60 158C57 110 70 70 62 8' fill='none' stroke='%236f8a62' stroke-width='2.2' stroke-linecap='round'/><g fill='%236f8a62'><path transform='translate(60 120) rotate(-150) scale(0.9)' d='M0 0C12-12 30-12 40 0 30 12 12 12 0 0Z'/><path transform='translate(61 120) rotate(-30) scale(0.9)' d='M0 0C12-12 30-12 40 0 30 12 12 12 0 0Z'/><path transform='translate(62 92) rotate(-155) scale(0.8)' d='M0 0C12-12 30-12 40 0 30 12 12 12 0 0Z'/><path transform='translate(63 92) rotate(-25) scale(0.8)' d='M0 0C12-12 30-12 40 0 30 12 12 12 0 0Z'/><path transform='translate(64 64) rotate(-160) scale(0.7)' d='M0 0C12-12 30-12 40 0 30 12 12 12 0 0Z'/><path transform='translate(64 64) rotate(-20) scale(0.7)' d='M0 0C12-12 30-12 40 0 30 12 12 12 0 0Z'/><path transform='translate(63 38) rotate(-150) scale(0.55)' d='M0 0C12-12 30-12 40 0 30 12 12 12 0 0Z'/><path transform='translate(63 38) rotate(-35) scale(0.55)' d='M0 0C12-12 30-12 40 0 30 12 12 12 0 0Z'/><path transform='translate(62 10) rotate(-90) scale(0.6)' d='M0 0C12-12 30-12 40 0 30 12 12 12 0 0Z'/></g></g></svg>"),radial-gradient(circle at 0 100%,rgba(111,138,98,.13),transparent 38%),radial-gradient(circle at 100% 100%,rgba(111,138,98,.13),transparent 38%);background-repeat:no-repeat;background-position:left 5vw bottom 14px,right 5vw bottom 14px,0 0,0 0;background-size:96px auto,96px auto,100% 100%,100% 100%}
+.section--tint{background-image:radial-gradient(circle,rgba(111,138,98,.16) 1.6px,transparent 1.8px);background-size:26px 26px}
+@media (max-width:520px){.section--leaf{background-size:52px auto,52px auto,100% 100%,100% 100%;background-position:left 3vw bottom 10px,right 3vw bottom 10px,0 0,0 0}}
 .title{position:relative;display:inline-block;font-size:clamp(1.7rem,3.5vw,2.4rem);font-weight:700;color:var(--green);margin-bottom:34px;padding-bottom:12px}
 .title::after{content:"";position:absolute;left:50%;bottom:0;width:60%;height:3px;background:var(--green);transform:translateX(-50%);border-radius:3px}
 .pill{display:inline-block;font:inherit;font-size:.85rem;font-weight:600;padding:6px 20px;border-radius:999px;cursor:pointer; background:#fff;color:var(--green-dark);border:1.5px solid var(--green);transition:background .2s,color .2s}
@@ -145,3 +149,44 @@ a.kartu:hover,.kartu--hover:hover{transform:translateY(-4px);box-shadow:0 10px 0
 .sosmed svg{width:26px;height:26px;flex:none}
 .sosmed .sosmed__ig{color:#c13584}
 .sosmed .sosmed__fb{color:#1877f2}
+
+
+/* ===== Hero berlatar foto berganti otomatis + teks mengetik berulang (Beranda dan semua halaman) ===== */
+.hero--slides{background:#2f4a2b;overflow:hidden}
+/* bayangan gelap dari kiri agar teks terbaca, sisi kanan foto tetap jernih */
+.hero--slides::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(90deg,rgba(12,24,10,.82) 0%,rgba(12,24,10,.55) 40%,rgba(12,24,10,.15) 75%,rgba(12,24,10,.05) 100%),linear-gradient(180deg,rgba(35,58,32,.22),rgba(20,36,18,.5))}
+.hero__bg{position:absolute;inset:0;z-index:0}
+.hero__slide{position:absolute;inset:0;background:center/cover no-repeat;opacity:0;transform:scale(1.05);transition:opacity 1.4s ease,transform 8s ease-out}
+.hero__slide.is-active{opacity:1;transform:scale(1)}
+
+.hero--slides .hero__content{position:relative;z-index:2;width:100%;max-width:640px;padding:0 6vw;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.5)}
+.hero--slides .hero__small{display:flex;align-items:center;gap:10px;font-size:.8rem;font-weight:600;letter-spacing:1.5px}
+.hero--slides .hero__small::before{content:"";flex:none;width:28px;height:3px;border-radius:2px;background:#f28c1a}
+.hero--slides h1{font-size:clamp(2.2rem,5vw,3.4rem);line-height:1.1;font-weight:700;margin:10px 0 12px}
+.hero--slides .hero__tag{font-size:1.05rem;line-height:1.5;margin-bottom:22px}
+.hero--slides .btn-ppdb--hero{padding:9px 22px!important;font-size:.9rem}
+
+/* halaman dalam: teks rata tengah dan lebih besar */
+.hero--slides.hero--center{justify-content:center;text-align:center}
+.hero--slides.hero--center::before{background:radial-gradient(ellipse 75% 55% at 50% 50%,rgba(12,24,10,.82) 0%,rgba(12,24,10,.62) 55%,rgba(12,24,10,.28) 100%),linear-gradient(180deg,rgba(35,58,32,.2),rgba(20,36,18,.4))}
+.hero--slides.hero--center .hero__content{max-width:980px;padding:0 6vw;text-shadow:0 2px 18px rgba(0,0,0,.7)}
+.hero--slides.hero--center h1{font-size:clamp(2.2rem,5vw,3.4rem);text-transform:uppercase;margin:0 0 8px}
+.hero--slides.hero--center .hero__tag{font-size:1.05rem;margin:6px 0 0}
+
+/* efek mengetik */
+.typing-caret{display:inline-block;width:0;height:1em;position:relative;vertical-align:-.12em}
+.typing-caret::after{content:"";position:absolute;left:3px;top:0;width:3px;height:100%;background:#f28c1a;animation:caretBlink 1s steps(1) infinite}
+@keyframes caretBlink{50%{opacity:0}}
+.hero__content.is-typing .btn-ppdb--hero{opacity:0;transform:translateY(10px);pointer-events:none;transition:opacity .6s ease,transform .6s ease}
+.hero__content.is-typing.is-done .btn-ppdb--hero{opacity:1;transform:none;pointer-events:auto}
+
+@media (max-width:700px){
+    .hero--slides{align-items:flex-end}
+    .hero--slides::before{background:linear-gradient(180deg,rgba(12,24,10,.1) 20%,rgba(12,24,10,.88))}
+    .hero--slides .hero__content{max-width:none;padding-bottom:12vh}
+    .hero--slides.hero--center{align-items:center}
+    .hero--slides.hero--center::before{background:linear-gradient(180deg,rgba(12,24,10,.58),rgba(12,24,10,.8))}
+    .hero--slides.hero--center .hero__content{padding-bottom:0}
+    .hero--slides.hero--center h1{overflow-wrap:anywhere}
+}
+@media (prefers-reduced-motion:reduce){.hero__slide{transition:opacity .01s;transform:none}}
