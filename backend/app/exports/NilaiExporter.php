@@ -95,9 +95,11 @@ final class NilaiExporter
             <=> [$b['nomor_absen'] === null ? PHP_INT_MAX : (int) $b['nomor_absen'], (string) $b['nama_siswa']]);
 
         $baris = 4;
+        $urut = 0;
         foreach ($list as $r) {
             $baris++;
-            SheetHelper::angka($s, 1, $baris, $r['nomor_absen'] === null ? null : (int) $r['nomor_absen']);
+            // No = urutan baris (1, 2, 3, ...). Dulu memakai nomor_absen sehingga kosong bila nomor absen belum diisi.
+            SheetHelper::angka($s, 1, $baris, ++$urut);
             SheetHelper::teks($s, 2, $baris, (string) $r['nisn']);
             SheetHelper::teks($s, 3, $baris, (string) $r['nama_siswa']);
             for ($i = 1; $i <= $maksUh; $i++) {
@@ -108,5 +110,7 @@ final class NilaiExporter
         }
         SheetHelper::bingkai($s, count($judul), 5, $baris);
         SheetHelper::lebarOtomatis($s, count($judul));
+        // Kolom A berisi judul panjang (A1/A2) sehingga auto-size membuatnya sangat lebar; kunci lebarnya.
+        $s->getColumnDimension('A')->setAutoSize(false)->setWidth(6);
     }
 }

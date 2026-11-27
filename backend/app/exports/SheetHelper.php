@@ -44,10 +44,24 @@ final class SheetHelper
         $s->freezePane('A' . ($baris + 1));
     }
 
-    public static function lebarOtomatis(Worksheet $s, int $jumlahKolom): void
+    /**
+     * Lebar kolom dihitung dari isi tabel (mulai [$barisAwal], bawaan baris 4 = kepala kolom), BUKAN dari
+     * judul panjang di baris 1-2. Jadi kolom No tetap sempit dan lebarnya sama di semua aplikasi Excel/HP.
+     */
+    public static function lebarOtomatis(Worksheet $s, int $jumlahKolom, int $barisAwal = 4): void
     {
+        $barisAkhir = $s->getHighestRow();
         for ($i = 1; $i <= $jumlahKolom; $i++) {
-            $s->getColumnDimension(Coordinate::stringFromColumnIndex($i))->setAutoSize(true);
+            $huruf = Coordinate::stringFromColumnIndex($i);
+            $maks = 0;
+            for ($r = $barisAwal; $r <= $barisAkhir; $r++) {
+                if (!$s->cellExists($huruf . $r)) {
+                    continue;
+                }
+                $maks = max($maks, mb_strlen((string) $s->getCell($huruf . $r)->getValue()));
+            }
+            $lebar = max(6.0, min(60.0, $maks * 1.15 + 3));
+            $s->getColumnDimension($huruf)->setAutoSize(false)->setWidth($lebar);
         }
     }
 

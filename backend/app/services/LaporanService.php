@@ -22,7 +22,7 @@ final class LaporanService
     public function untukGuru(array $g, array $p): array
     {
         if ($g['id_tahun_ajaran'] === null || (int) $p['id_tahun_ajaran'] !== (int) $g['id_tahun_ajaran']) {
-            throw HttpException::forbidden('Guru hanya dapat melihat atau mengekspor laporan tahun ajaran aktif.');
+            throw HttpException::forbidden('Guru hanya dapat melihat atau mengunduh laporan tahun ajaran aktif.');
         }
         return $this->saring($this->susun((int) $g['id_tahun_ajaran'], $p['semester'], (int) $g['id_kelas']), $p);
     }

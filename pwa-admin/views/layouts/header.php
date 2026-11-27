@@ -1,4 +1,4 @@
-<?php /** @var string $pageTitle @var array $config @var bool $requireAuth */ ?>
+<?php /** @var string $pageTitle @var array $config @var bool $requireAuth @var string $activeRoute */ ?>
 <!doctype html>
 <html lang="id">
 <head>

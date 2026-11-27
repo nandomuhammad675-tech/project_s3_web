@@ -31,7 +31,7 @@ final class AkademikExporter
             $s->getStyle('A' . $baris)->getFont()->setBold(true);
             $baris++;
         }
-        SheetHelper::lebarOtomatis($s, 2);
+        SheetHelper::lebarOtomatis($s, 2, 3);
 
         $meta = ['keterangan' => $info['keterangan']];
         match ($jenis) {
