@@ -35,7 +35,7 @@ $ico = fn(string $n, string $cls = '') => '<svg class="ico ' . $cls . '" aria-hi
         </select>
         <?= $ico('chevron', 'ico--sm select-wrap__arrow') ?>
       </div>
-      <button type="button" class="btn btn--soft" id="sw-reset"><?= $ico('refresh', 'ico--sm') ?> Reset</button>
+      <button type="button" class="btn btn--soft" id="sw-reset"><?= $ico('refresh', 'ico--sm') ?> Refresh</button>
     </div>
   </div>
 

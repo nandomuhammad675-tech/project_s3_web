@@ -39,7 +39,7 @@ $sel = function (string $id, string $label, string $wrapId = '') use ($ico) {
         <?= $ico('search', 'ico--sm') ?>
         <input type="search" class="input" id="ak-siswa" placeholder="Cari nama atau NISN siswa..." autocomplete="off" aria-label="Cari siswa">
       </div>
-      <button type="button" class="btn btn--soft" id="ak-reset"><?= $ico('refresh', 'ico--sm') ?> Reset</button>
+      <button type="button" class="btn btn--soft" id="ak-reset"><?= $ico('refresh', 'ico--sm') ?> Refresh</button>
     </div>
     <button type="button" class="btn btn--outline" id="ak-export" disabled><?= $ico('download', 'ico--sm') ?> Ekspor Excel</button>
   </div>

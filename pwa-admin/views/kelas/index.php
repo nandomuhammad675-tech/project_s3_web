@@ -21,7 +21,7 @@ $ico = fn(string $n, string $cls = '') => '<svg class="ico ' . $cls . '" aria-hi
           <select class="input select" id="kl-tahun" aria-label="Filter tahun ajaran"></select>
           <?= $ico('chevron', 'ico--sm select-wrap__arrow') ?>
         </div>
-        <button type="button" class="btn btn--soft" id="kl-reset"><?= $ico('refresh', 'ico--sm') ?> Reset</button>
+        <button type="button" class="btn btn--soft" id="kl-reset"><?= $ico('refresh', 'ico--sm') ?> Refresh</button>
       </div>
     </div>
 

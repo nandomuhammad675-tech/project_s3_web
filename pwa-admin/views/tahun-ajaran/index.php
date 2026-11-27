@@ -15,7 +15,7 @@ $ico = fn(string $n, string $cls = '') => '<svg class="ico ' . $cls . '" aria-hi
       <?= $ico('search', 'ico--sm') ?>
       <input type="search" class="input" id="ta-search" placeholder="Cari tahun ajaran..." autocomplete="off" aria-label="Cari tahun ajaran">
     </div>
-    <button type="button" class="btn btn--soft" id="ta-reset"><?= $ico('refresh', 'ico--sm') ?> Reset</button>
+    <button type="button" class="btn btn--soft" id="ta-reset"><?= $ico('refresh', 'ico--sm') ?> Refresh</button>
   </div>
 
   <div class="table-wrap">
